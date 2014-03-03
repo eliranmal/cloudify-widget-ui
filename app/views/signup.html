@@ -1,0 +1,17 @@
+<div clas="error">
+    {{pageError}}
+</div>
+
+
+Email : <input ng-model="userSignup.email" type="text"/><br/>
+First Name : <input ng-model="userSignup.firstName" type="text"/><br/>
+Last Name : <input ng-model="userSignup.lastName" type="text"/><br/>
+Password : <input ng-model="userSignup.password" type="password"/><br/>
+Password Confirm : <input ng-model="userSignup.passwordConfirm" type="password"/><br/>
+
+        <button ng-click="signup()">Submit</button>
+
+
+        <br/>
+        Already have a login?<br/>
+        <a ng-href="#/login">Login</a>

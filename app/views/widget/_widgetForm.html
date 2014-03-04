@@ -1,0 +1,62 @@
+
+<p>
+    Product Name(*) : <input type="text" ng-model="widget.productName"/><br/>
+    Product Version(*) : <input type="text" ng-model="widget.productVersion"/><br/>
+    Title (*) : <input type="text" ng-model="widget.title"/><br/>
+    Recipe Name (*) : <input type="text" ng-model="widget.recipeName"/><br/>
+    Recipe URL : <input type="text" ng-model="widget.recipeUrl"/><br/>
+    Provider URL (*) : <input type="text" ng-model="widget.providerUrl"/><br/>
+</p>
+
+<p>
+    Embed Video Snippet : <input type="text" ng-model="widget.embedVideoSnippet"/><br/>
+    Console Link Title : <input type="text" ng-model="widget.consoleLink.title"/><br/>
+    Console Link URL : <input type="text" ng-model="widget.consoleLink.url"/><br/>
+    Console URL Service : <input type="text" ng-model="widget.consoleLink.url"/><br/>
+    <span>
+        required for the link on remote bootstrap
+    </span>
+    Uninstall name: <input type="text" ng-model="widget.uninstallName"/><br/>
+    <span>
+        To enable the widget to stop on remote bootstrap
+    </span>
+
+    Recipe Root Path : <inpyt type="text" ng-model="widget.recipeRootPath"/><br/>
+
+
+</p>
+
+<p>
+    Show advanced  : <input type="text" ng-model="widget.providerUrl"/><br/>
+    Cloud : <select ng-model="cloud" ng-options="c.label for c in clouds"></select><br/>
+</p>
+
+
+<p>
+    Require Login : <input type="checkbox"/><br/>
+    <span>
+        If "proprietary" login is selected, the widget will do nothing on "play" but send a PostMessage event. <br/>
+        It will wait for the embedding page to invoke the play.<br/>
+        It will look for userId and userKey to verify with Verification URL and Web Service Private Key that the<br/>
+        credentials are legitimate<br/>
+    </span>
+    Login Type: <select ng-model="loginType" ng-options="c.label for c in loginTypes"></select><br/>
+</p>
+        <strong> proprietary login details</strong>
+<p>
+    Verification URL : <input type="text"/><br/>
+    Web Service Private Key : <input type="text"/><br/>
+</p>
+
+<p>
+    An HTML snippet for description
+    <textarea ng-model="widget.description"></textarea>
+</p>
+
+
+
+
+
+
+
+

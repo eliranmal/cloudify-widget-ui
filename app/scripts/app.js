@@ -34,6 +34,14 @@ angular.module('cloudifyWidgetUiApp', [])
                 templateUrl: 'views/dashboard.html',
                 controller:'DashboardCtrl'
             })
+            .when('/widget/:widgetId/update', {
+                templateUrl: 'views/widget/update.html',
+                controller: 'WidgetCrudCtrl'
+            })
+            .when('/widget/create', {
+                templateUrl : 'views/widget/create.html',
+                controller: 'WidgetCrudCtrl'
+            })
             .when('/login', {
                 templateUrl: 'views/login.html',
                 controller: 'LoginCtrl'

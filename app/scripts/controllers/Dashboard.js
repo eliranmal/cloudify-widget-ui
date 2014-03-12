@@ -1,8 +1,10 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-  .controller('DashboardCtrl', function ($scope, $http, $log ) {
-        $http.get('/backend/user/widgets',
+  .controller('DashboardCtrl', function ($scope, $log, WidgetsService ) {
+        $log.info('getting widgets');
+        function listWidgets(){
+        WidgetsService.listWidgets().then(
             function success( result ){
                 $log.info('got widgets successfully');
                 $scope.widgets = result.data;
@@ -12,5 +14,16 @@ angular.module('cloudifyWidgetUiApp')
                 $scope.pageError = result.data.message;
 
             }
-        )
+        );}
+
+        listWidgets();
+
+
+        $scope.delete = function( widget ){
+            WidgetsService.deleteWidget( widget).then( function(){
+                listWidgets();
+            });
+        }
+
+
   });

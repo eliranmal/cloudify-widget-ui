@@ -1,12 +1,14 @@
-<div class="error">
-    {{pageError}}
-</div>
+<div ng-show="needsLogin">
+    <div class="error">
+        {{pageError}}
+    </div>
 
-<form ng-submit="login()">
-Username : <input ng-model="page.email"/><br/>
-Password: <input ng-model="page.password" type="password"/><br/>
-<input type="submit" value="Submit"/>
+    <form ng-submit="login()">
+        Username : <input ng-model="page.email"/><br/>
+        Password: <input ng-model="page.password" type="password"/><br/>
+        <input type="submit" value="Submit"/>
         <br/>
         Don't have an account? <br/>
         <a ng-href="#/signup">Signup</a>
-</form>
+    </form>
+</div>

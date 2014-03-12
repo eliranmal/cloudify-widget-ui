@@ -16,7 +16,7 @@ exports.login = function(req, res){
             if ( !!obj ){
                 logger.info('user ' + credentials.email + ' logged in');
                 req.session.userId = obj._id.toString();
-                res.send({'message': 'successfully logged in'});
+                res.send( managers.users.getPublicUserDetails( obj ) );
                 done();
                 return;
             }else{
@@ -29,57 +29,23 @@ exports.login = function(req, res){
     });
 };
 
-function validateEmail(email) {
-    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-}
+
 
 exports.signup = function(req , res){
      var user = req.body;
 
-    if ( !validateEmail(user.email )){
-        logger.info('invalid email on signup [%s]', user.email );
-        res.send(500, {'message' : 'invalid email'});
-        return;
-    }
-
-    if ( _.isEmpty(user.password ) || _.isEmpty(user.password.trim()) || user.password !== user.passwordConfirm ){
-        logger.info('invalid password/confirm combination [%s]/[%s]', user.password, user.passwordConfirm);
-        res.send(500, { 'message' : 'invalid password'});
-        return;
-    }
-
-    logger.info('signing up user with email : ' + user.email );
-    managers.db.connect('users', function(db, collection, done){
-        collection.count( { 'email' : user.email }, function( err, count ){
-            if ( count > 0 ){
-                logger.error('user with email ' + user.email + ' already exists');
-                res.send(500, {'message':'already exists'});
-                done();
-                return;
-            }else{
-                delete user['confirmPassword'];
-                user.password = sha1(user.password);
-                collection.insert(user, function( err, obj ){
-                    if ( !!err ){
-                        logger.error('error creating account :' + err.message);
-                        done();
-                        return;
-                    }else{
-                        logger.info('user created successfully')
-                        res.send(obj);
-                        done();
-                        return;
-                    }
-                })
-            }
-        });
-
-    });
+     managers.users.createUser(user, function( err, user ){
+         if ( !!err ){
+             logger.error('error while creating user ' + err);
+             res.send(500, { 'message' : err });
+         }
+         logger.info('user signed up successfully');
+         res.send( managers.users.getPublicUserDetails( user ) );
+     })
 };
 
 exports.logout = function( req, res ){
 //    req.session.destroy();
     req.session = null;
     res.send({'message': 'logged out successfully'});
-}
+};

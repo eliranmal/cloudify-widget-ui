@@ -1,6 +1,8 @@
 <div>
+    hello {{user.email}},
     <button ng-click="logout()">logout</button>
-    <a ng-href="#/pool">Pool</a>
+    <a pool-manager ng-href="#/pool">Pool</a>
+    <a admin ng-href="#/admin/users">Manage Users</a>
 </div>
 
 <div ng-transclude></div>

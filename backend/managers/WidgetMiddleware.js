@@ -2,6 +2,17 @@ var dbManager = require('./DbManager');
 var ObjectID = require('mongodb').ObjectID;
 var logger = require('log4js').getLogger('widgetMiddleware');
 
+
+/**
+ * relies on 'loggedUser' middleware.
+ * verifies the user on session is admin
+ */
+exports.adminUser = function( req, res, next){
+    if ( !req.session.user.isAdmin ){
+        res.send(401, {'message' : 'need to be admin'});
+    }
+};
+
 exports.loggedUser = function ( req, res, next ){
 
     if ( !req.session ){
@@ -19,17 +30,25 @@ exports.loggedUser = function ( req, res, next ){
     dbManager.connect('users', function(db, collection, done){
         collection.findOne({_id: new ObjectID(userId)}, function(err, result){
             if ( !!err ){
-                logger.info('unable to verify if user is logged in');
+                logger.info('unable to verify if user is logged in : ' + err.message );
                 res.send(401, {'message' : 'unable to verify session : '  + err.message });
                 done();
                 return;
             }
             if ( !!result ){
-                logger.info('user is logged in : '  + result.email );
+                logger.trace('user is logged in : '  + result.email );
                 req.user = result;
                 done();
                 next();
+                return;
             }
+
+            // default behavior if user was not found and we didn't get an error from DB.
+            // lets delete the cookie and redirect to login
+
+            req.session = null;
+            res.send(401, {'message': 'need to relogin'});
+
 
         })
     })

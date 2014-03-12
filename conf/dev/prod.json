@@ -1,5 +1,5 @@
 {
     "name" : "new-widget",
-    "mongodbUrl": null
-
+    "mongodbUrl": null,
+    "adminUser" : null /* for example : { "email" : "admin@gigaspaces.com" , "password" : "1q2w3e4r" , "poolKey" : "7859674589673489567"}*/
 }

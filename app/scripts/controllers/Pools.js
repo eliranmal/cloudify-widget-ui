@@ -1,17 +1,11 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('PoolsCtrl', function ($scope, $log, PoolsService) {
+    .controller('PoolsCtrl', function ($scope, $log, AdminService) {
 
         $scope.getPools = function () {
-            PoolsService.getPools().then(function (result) {
+            AdminService.getPools().then(function (result) {
                 $scope.pools = result.data;
-            });
-        }
-
-        $scope.getPool = function (userId) {
-            PoolsService.getPool(userId).then(function (result) {
-                $scope.userPool = result.data;
             });
         }
 

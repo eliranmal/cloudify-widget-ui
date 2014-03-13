@@ -17,7 +17,7 @@ function _callback( res, callback ){
 }
 
 exports.createUsers = function( req, res ){
-    managers.poolClient.createAccounts( req.user.poolKey, _callback ( res ) )
+    managers.poolClient.createAccount( req.user.poolKey, _callback ( res ) )
 };
 
 exports.readUsers = function (req, res) {

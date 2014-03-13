@@ -1,6 +1,7 @@
 <div layout>
-    <h3>Pools</h3>
-    <table ng-init="getPools()">
+    <h3>Pool for user {{ accountId }}</h3>
+
+    <table ng-init="getPool()">
         <thead>
             <tr>
                 <td>ID</td>
@@ -18,4 +19,6 @@
             </tr>
         </tbody>
     </table>
+
+    <a href="#/admin/users">back to all users</a>
 </div>

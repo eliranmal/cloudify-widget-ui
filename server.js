@@ -70,7 +70,7 @@ app.get('/backend/user/loggedIn', function(req, res){ res.send(managers.users.ge
 app.get('/backend/admin/users', controllers.pool.readUsers);
 app.post('/backend/admin/users', controllers.pool.createUsers);
 app.get('/backend/admin/pools', controllers.pool.adminReadPools);
-app.get('/backend/admin/account/:accountId/pools', controllers.pool.adminReadAccountPools);
+app.get('/backend/admin/accounts/:accountId/pools', controllers.pool.adminReadAccountPools);
 
 var server = app.listen(9001, function(){
     console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);

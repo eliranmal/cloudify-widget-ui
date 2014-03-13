@@ -1,9 +1,13 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .factory('UsersService', function ($http) {
+    .factory('AdminService', function ($http) {
 
-        function UsersService() {
+        function AdminService() {
+
+            this.getPools = function () {
+                return $http.get('/backend/admin/pools');
+            };
 
             this.getUsers = function () {
                 return $http.get('/backend/admin/users');
@@ -15,5 +19,5 @@ angular.module('cloudifyWidgetUiApp')
 
         }
 
-        return new UsersService();
+        return new AdminService();
     });

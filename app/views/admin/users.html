@@ -1,20 +1,22 @@
-<h1>Users</h1>
+<div layout>
 
-<div>
     <button ng-click="createUser()">Create New User</button>
+
+    <h3>Users</h3>
+    <table ng-init="getUsers()">
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>UUID</td>
+                <td>User Pools</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="user in users">
+                <td>{{ user.id }}</td>
+                <td>{{ user.uuid }}</td>
+                <td><a ng-href="#/admin/accounts/{{ user.id }}/pools">pools</a></td>
+            </tr>
+        </tbody>
+    </table>
 </div>
-
-<hr />
-
-<table ng-init="getUsers()">
-    <thead>
-        <tr>
-            <td>UUID</td>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="user in users">
-            <td>{{ user.uuid }}</td>
-        </tr>
-    </tbody>
-</table>

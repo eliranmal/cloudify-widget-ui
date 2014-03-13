@@ -1,11 +1,32 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('AdminUsersCtrl', function ($scope, AdminService) {
+    .controller('AdminUsersCtrl', function ($scope, $log, AdminService) {
 
         $scope.foo = 'bar';
 
-        AdminService.users().then(function () {
-            console.log('yyayyyyyay')
-        });
+        $scope.getUsers = function () {
+            $scope.users = [
+                {
+                    uuid: 'a'
+                },
+                {
+                    uuid: 'b'
+                },
+                {
+                    uuid: 'c'
+                }
+            ];
+/*
+            AdminService.users().then(function (data) {
+                $scope.users = data;
+            });
+*/
+        };
+
+        $scope.createUser = function () {
+            $log.info('creating new user');
+//            AdminService.createUser();
+        };
+
     });

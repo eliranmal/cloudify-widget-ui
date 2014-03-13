@@ -1,4 +1,20 @@
+<h1>Users</h1>
 
-<p>This is the admin/users view.</p>
+<div>
+    <button ng-click="createUser()">Create New User</button>
+</div>
 
-{{ model.users }}
+<hr />
+
+<table ng-init="getUsers()">
+    <thead>
+        <tr>
+            <td>UUID</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="user in users">
+            <td>{{ user.uuid }}</td>
+        </tr>
+    </tbody>
+</table>

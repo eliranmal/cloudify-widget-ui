@@ -17,6 +17,7 @@ if ( !!conf.adminUser ){
     conf.adminUser.passwordConfirm = conf.adminUser.password;
     conf.adminUser.firstName = 'admin';
     conf.adminUser.lastName = 'admin';
+    conf.adminUser.poolKey = '7859674589673489567';
     conf.adminUser.isAdmin = true;
     managers.users.createUser(conf.adminUser, function(err, user){
         if ( !!err && err.indexOf('exists') < 0 ){
@@ -35,6 +36,7 @@ app.configure(function(){
     app.use(express.cookieParser());
     app.use(express.cookieSession({ secret: 'your secret here' }));
     app.use('/backend/user', managers.middleware.loggedUser);
+    app.use('/backend/admin', managers.middleware.loggedUser);
     app.use('/backend/admin', managers.middleware.adminUser);
     app.use(app.router);
 
@@ -64,7 +66,9 @@ app.post('/backend/widgets/:widgetId/status', function(req, res){ res.send(500, 
 // a route to check if user logged in. relies on middleware to do the actual verification.
 app.get('/backend/user/loggedIn', function(req, res){ res.send(managers.users.getPublicUserDetails( req.user ) );} );
 
-app.get('/backend/admin/users', controllers.pool.users);
+//app.get('/backend/admin/users', function(req, res){ res.send('hello world!')});
+app.get('/backend/admin/users', controllers.pool.readUsers);
+app.post('/backend/admin/users', controllers.pool.createUsers);
 
 var server = app.listen(9001, function(){
     console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);

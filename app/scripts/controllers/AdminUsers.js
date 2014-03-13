@@ -17,6 +17,9 @@ angular.module('cloudifyWidgetUiApp')
                     uuid: 'c'
                 }
             ];
+            AdminService.users().then(function ( result ) {
+                $scope.model = { users : result.data };
+            });
 /*
             AdminService.users().then(function (data) {
                 $scope.users = data;

@@ -2,5 +2,10 @@
     "name" : "new-widget",
     "mongodbUrl": null,
     "adminUserExample" :  { "email" : "admin@gigaspaces.com" , "password" : "1q2w3e4r" , "poolKey" : "7859674589673489567"},
-    "adminUser" : null
+    "adminUser" : null,
+    "poolRestUrl" :{
+        "protocol" : "http",
+        "domain" : "localhost",
+        "port" : "8011"
+    }
 }

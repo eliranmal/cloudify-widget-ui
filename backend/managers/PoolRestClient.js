@@ -122,7 +122,7 @@ var _args = function () {
 /**************** ADMIN LEVEL CALLS ***************************/
 
 
-exports.createAccounts = function (poolKey, callback) {
+exports.createAccount = function (poolKey, callback) {
     logger.info('creating account');
     call.post('/admin/accounts', _args().poolKey(poolKey), callback);
 };

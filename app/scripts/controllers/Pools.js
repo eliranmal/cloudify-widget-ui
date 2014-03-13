@@ -4,7 +4,9 @@ angular.module('cloudifyWidgetUiApp')
     .controller('PoolsCtrl', function ($scope, $log, PoolsService) {
 
         $scope.getPools = function () {
-            $scope.pools = PoolsService.getPools();
+            PoolsService.getPools().then(function (result) {
+                $scope.pools = result.data;
+            });
         }
 
     });

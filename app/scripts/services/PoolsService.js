@@ -10,7 +10,7 @@ angular.module('cloudifyWidgetUiApp')
             };
 
             this.getPool = function (userId) {
-                return $http.get('/backend/admin/users/' + userId + '/pools');
+                return $http.get('/backend/admin/account/' + userId + '/pools');
             };
 
         }

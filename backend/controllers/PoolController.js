@@ -28,8 +28,8 @@ exports.adminReadPools = function ( req, res ){
     managers.poolClient.adminReadPools (req.user.poolKey, _callback(res ) );
 };
 
-exports.accountReadPools = function( req, res ){
-    managers.poolClient.accountReadPools( req.user.poolKey, req.params.accountId, _callback(res))
+exports.adminReadAccountPools = function( req, res ){
+    managers.poolClient.adminReadAccountPools( req.user.poolKey, req.params.accountId, _callback(res))
 };
 
 
@@ -45,7 +45,7 @@ exports.deleteAccountPools = function( req, res ){
     managers.poolClient.deleteAccountPools( req.user.poolKey, req.params.accountId, req.params.poolId, _callback(res))
 };
 
-exports.readAccountPool = function( req, res ){
+exports.adminReadAccountPool = function( req, res ){
     managers.poolClient.readAccountPool( req.user.poolKey, req.params.accountId, req.params.poolId,  _callback(res))
 };
 
@@ -62,17 +62,17 @@ exports.readPoolStatus = function( req, res ){
 exports.addMachine = function( req, res ){
     managers.poolClient.addMachine( req.user.poolKey, req.params.poolId, _callback(res))
 };
-exports.addMachine = function( req, res ){
-    managers.poolClient.addMachine( req.user.poolKey, req.params.poolId, req.params.nodeId, _callback(res))
+exports.bootstrapMachine = function( req, res ){
+    managers.poolClient.bootstrapMachine( req.user.poolKey, req.params.poolId, req.params.nodeId, _callback(res))
 };
-exports.addMachine = function( req, res ){
-    managers.poolClient.addMachine( req.user.poolKey, req.params.poolId, req.params.nodeId, _callback(res))
+exports.deleteMachine = function( req, res ){
+    managers.poolClient.deleteMachine( req.user.poolKey, req.params.poolId, req.params.nodeId, _callback(res))
 };
 
 
 /**************** ACCOUNT LEVEL CALLS ***************************/
 
-exports.readPools = function( req, res ){
+exports.accountReadPools = function( req, res ){
     managers.poolClient.readPools( req.user.poolKey, _callback(res))
 };
 

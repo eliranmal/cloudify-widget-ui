@@ -149,7 +149,7 @@ exports.adminReadPools = function( poolKey, callback ){
     call.get('/admin/pools', _args().poolKey(poolKey), callback);
 };
 
-exports.readAccountPools = function( poolKey, accountId, callback ){
+exports.adminReadAccountPools = function( poolKey, accountId, callback ){
     logger.info('getting all pools for account : ' + accountId);
     call.get('/admin/accounts/${accountId}/pools', _args().poolKey(poolKey).accountId(accountId), callback);
 };
@@ -190,11 +190,11 @@ exports.addMachine = function( poolKey , poolId, callback ){
     logger.info('adding machine to pool');
     call.post('/admin/pools/${poolId}/addMachine', _args().poolId(poolId), callback );
 };
-exports.addMachine = function( poolKey , poolId, nodeId,  callback ){
+exports.bootstrapMachine = function( poolKey , poolId, nodeId,  callback ){
     logger.info('adding machine to pool');
     call.post('/admin/pools/${poolId}/nodes/${nodeId}/bootstrap', _args().poolId(poolId).nodeId(nodeId), callback );
 };
-exports.addMachine = function( poolKey , poolId, nodeId, callback ){
+exports.deleteMachine = function( poolKey , poolId, nodeId, callback ){
     logger.info('adding machine to pool');
     call.post('/admin/pools/${poolId}/nodes/${nodeId}/delete', _args().poolId(poolId).nodeId(nodeId), callback );
 };

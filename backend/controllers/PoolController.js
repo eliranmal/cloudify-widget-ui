@@ -28,8 +28,8 @@ exports.adminReadPools = function ( req, res ){
     managers.poolClient.adminReadPools (req.user.poolKey, _callback(res ) );
 };
 
-exports.readAccountPools = function( req, res ){
-    managers.poolClient.readAccountPools( req.user.poolKey, req.params.accountId, _callback(res))
+exports.accountReadPools = function( req, res ){
+    managers.poolClient.accountReadPools( req.user.poolKey, req.params.accountId, _callback(res))
 };
 
 

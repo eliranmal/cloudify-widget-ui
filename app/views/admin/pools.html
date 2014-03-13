@@ -1,5 +1,10 @@
 <h1>Pools</h1>
 
+<input type="text" ng-model="userId">
+<button ng-click="getPool(userId)">Get pool for user</button>
+        <div>{{ userPool }}</div>
+
 <ul ng-init="getPools()">
     <li ng-repeat="pool in pools">{{ pool }}</li>
 </ul>
+

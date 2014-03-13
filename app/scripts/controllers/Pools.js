@@ -9,4 +9,10 @@ angular.module('cloudifyWidgetUiApp')
             });
         }
 
+        $scope.getPool = function (userId) {
+            PoolsService.getPool(userId).then(function (result) {
+                $scope.userPool = result.data;
+            });
+        }
+
     });

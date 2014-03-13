@@ -16,6 +16,17 @@ function _url(relativePath) {
     return result;
 }
 
+function responseError ( response, data ){
+    var err = new Error();
+    err.response = response;
+    if ( typeof(data) === 'string' ){
+        try{
+            data = JSON.parse(data);
+        }catch(e){}
+    }
+    err.data = data;
+    return err;
+}
 
 function Call() {
 
@@ -25,12 +36,13 @@ function Call() {
                 callback(null, data);
             } else {
                 logger.info('got an error from rest client', data, response);
-                callback(new Error([data, response]))
+                callback(responseError(response,data));
             }
         }
     }
 
     this.invoke = function(method, url, args, callback ){
+        debugger;
         var myArgs = args;
         if ( args instanceof ArgsBuilder){
             myArgs = args.done();
@@ -67,22 +79,22 @@ function ArgsBuilder(){
     var _args = {  };
 
     this.header = function( _header ){
-        _.merge( _args, _header);
+        _.merge( _args, {"headers" : _header } );
         return this;
     };
 
     this.path = function( _path ){
-        _.merge( _args, _path );
+        _.merge( _args, {"path":_path} );
         return this;
     };
 
     this.data = function(_data){
-        _.merge( _args, _data );
+        _.merge( _args, {"data":_data} );
         return this;
     };
 
     this.param = function(_param){
-        _.merge( _args, _param);
+        _.merge( _args, {"parameters":_param});
     };
 
     this.done = function(){
@@ -132,7 +144,7 @@ exports.readAccounts = function (poolKey, callback) {
     call.get('/admin/accounts', _args().poolKey(poolKey), callback);
 };
 
-exports.readPools = function( poolKey, callback ){
+exports.adminReadPools = function( poolKey, callback ){
     logger.info('reading all pools');
     call.get('/admin/pools', _args().poolKey(poolKey), callback);
 };
@@ -190,7 +202,7 @@ exports.addMachine = function( poolKey , poolId, nodeId, callback ){
 
 /**************** ACCOUNT LEVEL CALLS ***************************/
 
-exports.readPools = function( poolKey, callback ){
+exports.accountReadPools = function( poolKey, callback ){
     logger.info('reading account pools');
     call.get('/account/pools', _args().poolKey(poolKey), callback);
 };

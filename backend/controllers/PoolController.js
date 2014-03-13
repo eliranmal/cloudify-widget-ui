@@ -5,7 +5,7 @@ var managers = require('../managers');
 function _callback( res, callback ){
     return function( err, data ){
         if ( !!err ){
-            res.send(err.response.statusCode, data);
+            res.send(err.response.statusCode, err.data);
         }
         if ( !!callback ){
             callback(data);
@@ -24,8 +24,8 @@ exports.readUsers = function (req, res) {
     managers.poolClient.readAccounts( req.user.poolKey, _callback( res ) )
 };
 
-exports.readPools = function ( req, res ){
-    managers.poolClient.readPools (req.user.poolKey, _callback(res ) );
+exports.adminReadPools = function ( req, res ){
+    managers.poolClient.adminReadPools (req.user.poolKey, _callback(res ) );
 };
 
 exports.readAccountPools = function( req, res ){

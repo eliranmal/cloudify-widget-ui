@@ -2,23 +2,34 @@ var logger = require('log4js').getLogger('PoolController');
 
 var managers = require('../managers');
 
+function _callback( res, callback ){
+    return function( err, data ){
+        if ( !!err ){
+            res.send(err.response.statusCode, data);
+        }
+        if ( !!callback ){
+            callback(data);
+        }
+        else{
+            res.send(data);
+        }
+    }
+}
+
+exports.createUsers = function( req, res ){
+    managers.poolClient.createAccounts( req.user.poolKey, _callback ( res ) )
+};
+
 exports.readUsers = function (req, res) {
-    logger.info('getting all users');
-    managers.poolClient.readAccounts(req.user.poolKey, function (err, accounts) {
-        res.send(accounts);
-    });
+    managers.poolClient.readAccounts( req.user.poolKey, _callback( res ) )
 };
 
-exports.createUsers = function (req, res) {
-    logger.info('creating new user');
-    managers.poolClient.createAccount(req.user.poolKey, function (err, account) {
-        res.send(account);
-    });
+exports.readPools = function ( req, res ){
+    managers.poolClient.readPools (req.user.poolKey, _callback(res ) );
 };
 
-exports.readPools = function (req, res) {
-    logger.info('getting all pools');
-    managers.poolClient.readPools(req.user.poolKey, function (err, pools) {
-        res.send(pools);
-    });
+exports.readAccountPools = function( req, res ){
+    managers.poolClient.readAccountPools( req.user.poolKey, req.params.accountId, _callback(res))
 };
+
+

@@ -64,6 +64,8 @@ app.post('/backend/widgets/:widgetId/status', function(req, res){ res.send(500, 
 // a route to check if user logged in. relies on middleware to do the actual verification.
 app.get('/backend/user/loggedIn', function(req, res){ res.send(managers.users.getPublicUserDetails( req.user ) );} );
 
+app.get('/backend/admin/users', controllers.pool.users);
+
 var server = app.listen(9001, function(){
     console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
 });

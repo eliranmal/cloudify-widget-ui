@@ -57,8 +57,6 @@ exports.createAccounts = function (poolKey, callback) {
 
 exports.readAccounts = function (poolKey, callback) {
     logger.info('get accounts called on pool rest client');
-
-    // TODO base url to conf or something
     call.get(_url('/admin/accounts'), _defaultHeaders(poolKey), callback);
 
 };

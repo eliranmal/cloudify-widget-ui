@@ -8,9 +8,12 @@ var logger = require('log4js').getLogger('widgetMiddleware');
  * verifies the user on session is admin
  */
 exports.adminUser = function( req, res, next){
-    if ( !req.session.user.isAdmin ){
+    if ( !req.user.isAdmin ){
         res.send(401, {'message' : 'need to be admin'});
+        return;
     }
+    logger.info('user ' + req.user.email  + ' is admin');
+    next();
 };
 
 exports.loggedUser = function ( req, res, next ){

@@ -5,7 +5,7 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.foo = 'bar';
 
-        AdminService.users().then(function () {
-            console.log('yyayyyyyay')
+        AdminService.users().then(function ( result ) {
+            $scope.model = { users : result.data };
         });
     });

@@ -10,7 +10,9 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.createUsers = function () {
-            AdminService.createUsers();
+            AdminService.createUsers().then(function (result) {
+                $scope.getUsers();
+            });
         };
 
     });

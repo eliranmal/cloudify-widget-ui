@@ -1,20 +1,19 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .factory('AdminService', function ($http, $log) {
+    .factory('UsersService', function ($http) {
 
-        $log.info('initializing AdminService');
-        function AdminService() {
+        function UsersService() {
 
             this.getUsers = function () {
                 return $http.get('/backend/admin/users');
             };
 
-            this.createUsers = function () {
+            this.createUser = function () {
                 return $http.post('/backend/admin/users');
             };
 
         }
 
-        return new AdminService();
+        return new UsersService();
     });

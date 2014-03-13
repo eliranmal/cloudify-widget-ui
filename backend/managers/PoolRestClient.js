@@ -201,3 +201,23 @@ exports.createPool = function( poolKey, poolSettings, callback ){
     logger.info('creating pool for account');
     call.post('/account/pools', _args().poolKey(poolKey), callback);
 };
+
+exports.updatePool = function( poolKey, poolId, poolSettings, callback ){
+    logger.info('updating pool [%s] for account ', poolId );
+    call.post('/account/pools/${poolId}', _args().poolKey(poolKey).poolId(poolId).data(poolSettings), callback);
+};
+
+exports.deletePool = function(poolKey, poolId, callback){
+    logger.info('deleting pool [%s] for account', poolId);
+    call.post('/account/pools/${poolId}/delete', _args().poolKey(poolKey).poolId(poolId), callback);
+};
+
+exports.readPoolStatus = function( poolKey, poolId, callback ){
+    logger.info('get pool [%s] status for account ', poolId );
+    call.get('/account/pools/${poolId}/status', _args().poolKey(poolKey).poolId(poolId), callback);
+};
+
+exports.readPoolsStatus = function( poolKey, callback ){
+    logger.info('reading all pools  general status');
+    call.get('/account/pools/status', _args().poolKey(poolKey),callback);
+};

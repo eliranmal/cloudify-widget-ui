@@ -1,1 +1,8 @@
-<p>This is the createUserPool view.</p>
+<div layout>
+    <a href="#/admin/accounts/{{ model.accountId }}/pools">back to user pools</a>
+    <h3>Create new pool for user {{ model.accountId }}</h3>
+    <!--<label for="poolSettingsTextarea">pool settings</label>-->
+    <textarea placeholder="pool settings" id="poolSettingsTextarea" ng-model="model.newPoolSettings"></textarea>
+    <br/>
+    <button ng-click="addAccountPool()">Add Pool</button>
+</div>

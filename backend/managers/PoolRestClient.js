@@ -166,12 +166,12 @@ exports.updateAccountPools = function( poolKey, accountId, poolId, poolSettings,
 
 exports.deleteAccountPools = function( poolKey, accountId, poolId, callback ){
     logger.info('deleting account [%s] pool [%s]', accountId, poolId);
-    call.post('/admin/account/${accountId}/pools/${poolId}/delete', _args().poolKey(poolKey).accountId(accountId).poolId(poolId), callback);
+    call.post('/admin/accounts/${accountId}/pools/${poolId}/delete', _args().poolKey(poolKey).accountId(accountId).poolId(poolId), callback);
 };
 
 exports.readAccountPool = function( poolKey, accountId, poolId, callback ){
     logger.info('reading account [%s] pool [%s]', accountId, poolId);
-    call.get('/admin/account/${accountId}/pools/${poolId}', _args().poolKey(poolKey).accountId(accountId).poolId(poolId), callback);
+    call.get('/admin/accounts/${accountId}/pools/${poolId}', _args().poolKey(poolKey).accountId(accountId).poolId(poolId), callback);
 };
 
 // detailed status
@@ -181,7 +181,7 @@ exports.readPoolStatus = function( poolKey, poolId, callback ){
 };
 
 // detailed status
-exports.readPoolStatus = function( poolKey, callback ){
+exports.readPoolsStatus = function( poolKey, callback ){
     logger.info('reading general pool status' );
     call.get('/admin/pools/status', _args().poolKey(poolKey) , callback);
 };
@@ -222,7 +222,7 @@ exports.deletePool = function(poolKey, poolId, callback){
     call.post('/account/pools/${poolId}/delete', _args().poolKey(poolKey).poolId(poolId), callback);
 };
 
-exports.readPoolStatus = function( poolKey, poolId, callback ){
+exports.accountReadPoolStatus = function( poolKey, poolId, callback ){
     logger.info('get pool [%s] status for account ', poolId );
     call.get('/account/pools/${poolId}/status', _args().poolKey(poolKey).poolId(poolId), callback);
 };

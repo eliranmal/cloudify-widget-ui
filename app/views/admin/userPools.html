@@ -1,24 +1,45 @@
 <div layout>
-    <h3>Pool for user {{ accountId }}</h3>
+    <a href="#/admin/users">back to all users</a>
+    <a href="#/admin/accounts/{{ model.accountId }}/pools/create">create new pool</a>
 
-    <table ng-init="getPool()">
+    <h3>Pools for user {{ model.accountId }}</h3>
+    <table ng-init="getAccountPools()">
         <thead>
             <tr>
-                <td>ID</td>
-                <td>Account ID</td>
+                <td>Pool ID</td>
                 <td>Pool Settings</td>
+                <td>Edit Mode</td>
+                <td>Delete Pool</td>
+                <td>Pool Status</td>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="pool in pools">
+            <tr ng-repeat="pool in model.pools">
                 <td>{{ pool.id }}</td>
-                <td>{{ pool.accountId }}</td>
                 <td>
-                    <pre>{{ pool.poolSettings | json }}</pre>
+                    <textarea json-binder ng-readonly="!editMode" ng-model="pool.poolSettings"></textarea>
+                </td>
+                <td>
+                    <input type="checkbox"
+                           ng-model="editMode"
+                           ng-change="updateAccountPool(editMode, pool)">
+                </td>
+                <td>
+                    <button ng-click="deleteAccountPool(pool.id)">delete pool</button>
+                </td>
+                <td>
+                    <button ng-click="getPoolStatus(pool.id)">status</button>
+                    <pre>{{ model.status }}</pre>
+                    <!--<pre>{{ getPoolStatus(pool.id) }}</pre>-->
                 </td>
             </tr>
         </tbody>
     </table>
 
-    <a href="#/admin/users">back to all users</a>
+<!--
+    <label>show pool
+        <input type="text" placeholder="pool id" ng-model="singlePoolId" ng-change="getAccountPool(singlePoolId)">
+    </label>
+    <pre>{{ singlePool | json }}</pre>
+-->
 </div>

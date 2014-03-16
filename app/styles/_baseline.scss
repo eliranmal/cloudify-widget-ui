@@ -1,6 +1,15 @@
+a,
+button {
+  margin-right: .7em;
+}
 table {
   td {
     padding: 2px 6px;
     border: 1px solid #ccc;
+    text-align: center;
   }
+}
+textarea {
+  width: 400px;
+  min-height: 200px;
 }

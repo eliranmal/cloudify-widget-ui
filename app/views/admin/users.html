@@ -1,8 +1,6 @@
 <div layout>
-
-    <button ng-click="createUser()">Create New User</button>
-
     <h3>Users</h3>
+    <button ng-click="addUser()">Create New User</button>
     <table ng-init="getUsers()">
         <thead>
             <tr>
@@ -12,10 +10,10 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="user in users">
+            <tr ng-repeat="user in model.users">
                 <td>{{ user.id }}</td>
                 <td>{{ user.uuid }}</td>
-                <td><a ng-href="#/admin/accounts/{{ user.id }}/pools">pools</a></td>
+                <td><a ng-href="#/admin/accounts/{{ user.id }}/pools">user pools</a></td>
             </tr>
         </tbody>
     </table>

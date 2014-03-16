@@ -49,7 +49,7 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
             }
         };
     })
-    .config(function ($routeProvider, $httpProvider) {
+    .config(function ($routeProvider, $httpProvider, $logProvider) {
         $routeProvider
             .when('/demo', {
                 templateUrl: 'views/demo.html',
@@ -65,26 +65,18 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
             })
             .when('/admin/pools', {
                 templateUrl: 'views/admin/pools.html',
-                controller: 'PoolsCtrl'
+                controller: 'AdminPoolCrudCtrl'
             })
             .when('/admin/users', {
                 templateUrl: 'views/admin/users.html',
-                controller: 'UsersCtrl'
+                controller: 'AdminPoolCrudCtrl'
             })
             .when('/admin/accounts/:accountId/pools', {
                 templateUrl: 'views/admin/userPools.html',
-                controller: 'AccountPoolsCtrl'
-            })
-            .when('/accounts/:accountId/pools', {
-                templateUrl: 'views/admin/readUserPools.html',
                 controller: 'AdminPoolCrudCtrl'
             })
-            .when('/accounts/:accountId/pools', {
-                templateUrl: 'views/admin/createUserPools.html',
-                controller: 'AdminPoolCrudCtrl'
-            })
-            .when('/accounts/:accountId/pools', {
-                templateUrl: 'views/admin/editUserPools.html',
+            .when('/admin/accounts/:accountId/pools/create', {
+                templateUrl: 'views/admin/createUserPool.html',
                 controller: 'AdminPoolCrudCtrl'
             })
             .when('/widgets', {
@@ -120,4 +112,6 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
             });
 
         $httpProvider.interceptors.push('myHttpInterceptor');
+
+        $logProvider.debugEnabled(true);
     });

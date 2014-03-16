@@ -1,10 +1,83 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-  .controller('AdminPoolCrudCtrl', function ($scope) {
-    $scope.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
-  });
+    .controller('AdminPoolCrudCtrl', function ($scope, $log, $routeParams, AdminPoolCrudService) {
+
+        $scope.model = {
+            accountId: $routeParams['accountId'],
+            newPoolSettings: '',
+            pools: [],
+            users: []
+        };
+
+        $scope.getUsers = function () {
+            AdminPoolCrudService.getUsers().then(function (result) {
+                $scope.model.users = result.data;
+            });
+        };
+
+        $scope.addUser = function () {
+            AdminPoolCrudService.addUser().then(function (result) {
+                $scope.getUsers();
+            });
+        };
+
+        $scope.getAccountPools = function () {
+            AdminPoolCrudService.getAccountPools($scope.model.accountId).then(function (result) {
+                $scope.model.pools = result.data;
+            });
+        };
+
+        $scope.getAccountPool = function (poolId) {
+            AdminPoolCrudService.getAccountPool($scope.model.accountId, poolId).then(function (result) {
+                $scope.model.singlePool = result.data;
+            });
+        };
+
+        $scope.addAccountPool = function () {
+            $log.info('addAccountPool, accountId: ', $scope.model.accountId, ', newPoolSettings: ', $scope.model.newPoolSettings)
+            if (!$scope.model.newPoolSettings) {
+                return;
+            }
+            AdminPoolCrudService.addAccountPool($scope.model.accountId, $scope.model.newPoolSettings).then(function (result) {
+                $scope.getAccountPools();
+                $scope.model.newPoolSettings = '';
+            });
+        };
+
+        $scope.updateAccountPool = function (editMode, pool) {
+            $log.info('updateAccountPool: ', $scope.model.accountId, pool.id);
+            if (editMode) {
+                // save current state before user starts to edit
+                $scope.model.originalPoolSettings = pool.poolSettings;
+            } else if ($scope.model.originalPoolSettings !== pool.poolSettings) {
+                // update with new data
+                AdminPoolCrudService.updateAccountPool($scope.model.accountId, pool.id, pool.poolSettings).then(function (result) {
+                    $scope.getAccountPools();
+                });
+            }
+        };
+
+        $scope.deleteAccountPool = function (poolId) {
+            $log.info('deleteAccountPool, accountId: ', $scope.model.accountId, ', poolId: ', poolId)
+            AdminPoolCrudService.deleteAccountPool($scope.model.accountId, poolId).then(function (result) {
+                $scope.getAccountPools();
+            });
+        };
+
+        $scope.getPoolStatus = function (poolId) {
+            throw new Error('not supported !');
+            AdminPoolCrudService.getPoolStatus(poolId).then(function (result) {
+                $log.debug('got pool status ', result.data);
+
+            });
+        };
+
+        $scope.getPoolsStatus = function () {
+            AdminPoolCrudService.getPoolsStatus().then(function (result) {
+                $log.debug('got pools status ', result.data);
+
+            });
+        };
+
+    });

@@ -85,7 +85,7 @@ app.get('/backend/user/account/pools', controllers.pool.accountReadPools );
 app.post('/backend/user/account/pools', controllers.pool.createPool);
 app.post('/backend/user/account/pools/:poolId', controllers.pool.updatePool);
 app.post('/backend/user/account/pools/:poolId/delete', controllers.pool.deletePool);
-app.get('/backend/user/account/pools/:poolId/status', controllers.pool.readPoolStatus);
+app.get('/backend/user/account/pools/:poolId/status', controllers.pool.accountReadPoolStatus);
 app.get('/backend/user/account/pools/status', controllers.pool.readPoolsStatus);
 
 

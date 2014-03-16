@@ -7,6 +7,9 @@ table {
     padding: 2px 6px;
     border: 1px solid #ccc;
     text-align: center;
+    pre {
+      text-align: left;
+    }
   }
 }
 textarea {

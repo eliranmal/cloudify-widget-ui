@@ -14,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="pool in model.pools">
+            <tr ng-repeat="pool in model.accountPools">
                 <td>{{ pool.id }}</td>
                 <td>
                     <textarea json-binder ng-readonly="!editMode" ng-model="pool.poolSettings"></textarea>

@@ -6,6 +6,7 @@ angular.module('cloudifyWidgetUiApp')
         $scope.model = {
             accountId: $routeParams['accountId'],
             newPoolSettings: '',
+            accountPools: [],
             pools: [],
             users: []
         };
@@ -22,9 +23,15 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.getPools = function () {
+            AdminPoolCrudService.getPools().then(function (result) {
+                $scope.model.pools = result.data;
+            });
+        };
+
         $scope.getAccountPools = function () {
             AdminPoolCrudService.getAccountPools($scope.model.accountId).then(function (result) {
-                $scope.model.pools = result.data;
+                $scope.model.accountPools = result.data;
             });
         };
 
@@ -66,10 +73,8 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.getPoolStatus = function (poolId) {
-            throw new Error('not supported !');
             AdminPoolCrudService.getPoolStatus(poolId).then(function (result) {
                 $log.debug('got pool status ', result.data);
-
             });
         };
 

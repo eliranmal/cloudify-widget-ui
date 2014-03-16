@@ -73,7 +73,7 @@ exports.deleteMachine = function( req, res ){
 /**************** ACCOUNT LEVEL CALLS ***************************/
 
 exports.accountReadPools = function( req, res ){
-    managers.poolClient.readPools( req.user.poolKey, _callback(res))
+    managers.poolClient.accountReadPools( req.user.poolKey, _callback(res))
 };
 
 exports.createPool = function( req, res ){

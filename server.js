@@ -71,6 +71,23 @@ app.get('/backend/admin/users', controllers.pool.readUsers);
 app.post('/backend/admin/users', controllers.pool.createUsers);
 app.get('/backend/admin/pools', controllers.pool.adminReadPools);
 app.get('/backend/admin/accounts/:accountId/pools', controllers.pool.adminReadAccountPools);
+app.post('/backend/admin/accounts/:accountId/pools', controllers.pool.createAccountPools);
+app.post('/backend/admin/accounts/:accountId/pools/:poolId', controllers.pool.updateAccountPools);
+app.post('/backend/admin/accounts/:accountId/pools/:poolId/delete', controllers.pool.deleteAccountPools);
+app.get('/backend/admin/accounts/:accountId/pools/:poolId', controllers.pool.adminReadAccountPool);
+app.get('/backend/admin/pools/:poolId/status', controllers.pool.readPoolStatus);
+app.get('/backend/admin/pools/status', controllers.pool.readPoolsStatus);
+app.post('/backend/admin/pools/:poolId/addMachine', controllers.pool.addMachine);
+app.post('/backend/admin/pools/:poolId/bootstrapMachine', controllers.pool.bootstrapMachine);
+app.post('/backend/admin/pools/:poolId/deleteMachine', controllers.pool.deleteMachine);
+
+app.get('/backend/user/account/pools', controllers.pool.accountReadPools );
+app.post('/backend/user/account/pools', controllers.pool.createPool);
+app.post('/backend/user/account/pools/:poolId', controllers.pool.updatePool);
+app.post('/backend/user/account/pools/:poolId/delete', controllers.pool.deletePool);
+app.get('/backend/user/account/pools/:poolId/status', controllers.pool.readPoolStatus);
+app.get('/backend/user/account/pools/status', controllers.pool.readPoolsStatus);
+
 
 var server = app.listen(9001, function(){
     console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);

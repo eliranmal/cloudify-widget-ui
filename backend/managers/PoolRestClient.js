@@ -180,7 +180,7 @@ exports.readPoolStatus = function( poolKey, poolId, callback ){
     call.get('/admin/pools/${poolId}/status', _args().poolKey(poolKey).poolId(poolId), callback);
 };
 
-// detailed status
+// general status
 exports.readPoolsStatus = function( poolKey, callback ){
     logger.info('reading general pool status' );
     call.get('/admin/pools/status', _args().poolKey(poolKey) , callback);
@@ -227,7 +227,7 @@ exports.accountReadPoolStatus = function( poolKey, poolId, callback ){
     call.get('/account/pools/${poolId}/status', _args().poolKey(poolKey).poolId(poolId), callback);
 };
 
-exports.readPoolsStatus = function( poolKey, callback ){
+exports.accountReadPoolsStatus = function( poolKey, callback ){
     logger.info('reading all pools  general status');
     call.get('/account/pools/status', _args().poolKey(poolKey),callback);
 };

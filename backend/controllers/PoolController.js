@@ -54,9 +54,9 @@ exports.readPoolStatus = function( req, res ){
     managers.poolClient.readPoolStatus( req.user.poolKey, req.params.poolId, _callback(res))
 };
 
-// detailed status
-exports.readPoolStatus = function( req, res ){
-    managers.poolClient.readPoolStatus( req.user.poolKey, req.params.poolId, _callback(res))
+// general status
+exports.readPoolsStatus = function( req, res ){
+    managers.poolClient.readPoolStatus( req.user.poolKey, _callback(res))
 };
 
 exports.addMachine = function( req, res ){
@@ -88,12 +88,12 @@ exports.deletePool = function( req, res ){
     managers.poolClient.deletePool( req.user.poolKey, req.params.poolId, _callback(res))
 };
 
-exports.readPoolStatus = function( req, res ){
-    managers.poolClient.readPoolStatus( req.user.poolKey, req.params.poolId, _callback(res))
+exports.accountReadPoolStatus = function( req, res ){
+    managers.poolClient.accountReadPoolStatus( req.user.poolKey, req.params.poolId, _callback(res))
 };
 
-exports.readPoolsStatus = function( req, res ){
-    managers.poolClient.readPoolsStatus( req.user.poolKey, _callback(res))
+exports.accountReadPoolsStatus = function( req, res ){
+    managers.poolClient.accountReadPoolsStatus( req.user.poolKey, _callback(res))
 };
 
 

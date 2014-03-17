@@ -89,9 +89,28 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.getMachines = function (poolId) {
+            AdminPoolCrudService.getMachines(poolId).then(function (result) {
+                $log.debug('got machines, result data is ', result.data);
+                $scope.model.machines = result.data;
+            });
+        };
+
         $scope.addMachine = function (poolId) {
             AdminPoolCrudService.addMachine(poolId).then(function (result) {
-                $log.debug('machine created, result data is ', result.data)
+                $log.debug('machine created, result data is ', result.data);
+            });
+        };
+
+        $scope.deleteMachine = function (poolId, machineId) {
+            AdminPoolCrudService.deleteMachine(poolId, machineId).then(function (result) {
+                $log.debug('machine deleted, result data is ', result.data);
+            });
+        };
+
+        $scope.bootstrapMachine = function (poolId, machineId) {
+            AdminPoolCrudService.bootstrapMachine(poolId, machineId).then(function (result) {
+                $log.debug('machine bootstrapped, result data is ', result.data);
             });
         };
 

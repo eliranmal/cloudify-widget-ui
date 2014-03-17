@@ -70,16 +70,20 @@ app.get('/backend/user/loggedIn', function(req, res){ res.send(managers.users.ge
 app.get('/backend/admin/users', controllers.pool.readUsers);
 app.post('/backend/admin/users', controllers.pool.createUsers);
 app.get('/backend/admin/pools', controllers.pool.adminReadPools);
+
 app.get('/backend/admin/accounts/:accountId/pools', controllers.pool.adminReadAccountPools);
 app.post('/backend/admin/accounts/:accountId/pools', controllers.pool.createAccountPools);
 app.post('/backend/admin/accounts/:accountId/pools/:poolId', controllers.pool.updateAccountPools);
 app.post('/backend/admin/accounts/:accountId/pools/:poolId/delete', controllers.pool.deleteAccountPools);
 app.get('/backend/admin/accounts/:accountId/pools/:poolId', controllers.pool.adminReadAccountPool);
+
 app.get('/backend/admin/pools/status', controllers.pool.readPoolsStatus);
 app.get('/backend/admin/pools/:poolId/status', controllers.pool.readPoolStatus);
-app.post('/backend/admin/pools/:poolId/addMachine', controllers.pool.addMachine);
-app.post('/backend/admin/pools/:poolId/bootstrapMachine', controllers.pool.bootstrapMachine);
-app.post('/backend/admin/pools/:poolId/deleteMachine', controllers.pool.deleteMachine);
+
+app.get('/backend/admin/pools/:poolId/nodes', controllers.pool.readPoolMachines);
+app.post('/backend/admin/pools/:poolId/nodes', controllers.pool.addMachine);
+app.post('/backend/admin/pools/:poolId/nodes/:nodeId/bootstrap', controllers.pool.bootstrapMachine);
+app.post('/backend/admin/pools/:poolId/nodes/:nodeId/delete', controllers.pool.deleteMachine);
 
 app.get('/backend/user/account/pools', controllers.pool.accountReadPools );
 app.post('/backend/user/account/pools', controllers.pool.createPool);

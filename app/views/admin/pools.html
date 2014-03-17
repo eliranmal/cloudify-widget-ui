@@ -16,7 +16,7 @@
                 <td>
                     <pre>{{ pool.poolSettings | json }}</pre>
                 </td>
-                <td><button ng-click="addMachine(pool.id)">create machine</button></td>
+                <td><a href="#/admin/pools/{{ pool.id }}/machines">see machines</a></td>
             </tr>
         </tbody>
     </table>

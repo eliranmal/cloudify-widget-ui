@@ -1,0 +1,38 @@
+<div layout>
+    <a href="#/admin/pools">back to all pools</a>
+
+    <!--<pre ng-init="getMachines(model.poolId)">{{ model.machines | json}}</pre>-->
+
+    <h3>Machines for pool {{ model.poolId }}</h3>
+    <button ng-click="addMachine(model.poolId)">create machine</button>
+    <table ng-init="getMachines(model.poolId)">
+        <thead>
+            <tr>
+                <th>Machine ID</th>
+                <th>Pool Settings ID</th>
+                <th>Machine Status</th>
+                <th colspan="2">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="machine in model.machines">
+                <td>{{ machine.machineId }}</td>
+                <td>{{ machine.poolId }}</td>
+                <td>{{ machine.nodeStatus }}</td>
+                <td>
+                    <button ng-click="bootstrapMachine(machine.poolId, machine.machineId)">bootstrap machine</button>
+                </td>
+                <td>
+                    <button ng-click="deleteMachine(machine.poolId, machine.machineId)">delete machine</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!--
+        <label>show pool
+            <input type="text" placeholder="pool id" ng-model="singlePoolId" ng-change="getAccountPool(singlePoolId)">
+        </label>
+        <pre>{{ singlePool | json }}</pre>
+    -->
+</div>

@@ -179,23 +179,26 @@ exports.readPoolStatus = function( poolKey, poolId, callback ){
     logger.info('reading detailed pool status [%s]', poolId );
     call.get('/admin/pools/${poolId}/status', _args().poolKey(poolKey).poolId(poolId), callback);
 };
-
 // general status
 exports.readPoolsStatus = function( poolKey, callback ){
     logger.info('reading general pool status' );
     call.get('/admin/pools/status', _args().poolKey(poolKey) , callback);
 };
 
+exports.readPoolMachines = function( poolKey, poolId, callback ){
+    logger.info('reading pool machines [%s]', poolId );
+    call.get('/admin/pools/${poolId}/nodes', _args().poolKey(poolKey).poolId(poolId), callback);
+};
 exports.addMachine = function( poolKey , poolId, callback ){
     logger.info('adding machine to pool');
-    call.post('/admin/pools/${poolId}/addMachine', _args().poolKey(poolKey).poolId(poolId), callback );
+    call.post('/admin/pools/${poolId}/nodes', _args().poolKey(poolKey).poolId(poolId), callback );
 };
 exports.bootstrapMachine = function( poolKey , poolId, nodeId,  callback ){
-    logger.info('adding machine to pool');
+    logger.info('bootstrapping machine');
     call.post('/admin/pools/${poolId}/nodes/${nodeId}/bootstrap', _args().poolKey(poolKey).poolId(poolId).nodeId(nodeId), callback );
 };
 exports.deleteMachine = function( poolKey , poolId, nodeId, callback ){
-    logger.info('adding machine to pool');
+    logger.info('deleting machine from pool');
     call.post('/admin/pools/${poolId}/nodes/${nodeId}/delete', _args().poolKey(poolKey).poolId(poolId).nodeId(nodeId), callback );
 };
 

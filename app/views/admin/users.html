@@ -6,14 +6,14 @@
             <tr>
                 <th>ID</th>
                 <th>UUID</th>
-                <th>User Pools</th>
+                <th colspan="1">Actions</th>
             </tr>
         </thead>
         <tbody>
             <tr ng-repeat="user in model.users">
                 <td>{{ user.id }}</td>
                 <td>{{ user.uuid }}</td>
-                <td><a ng-href="#/admin/accounts/{{ user.id }}/pools">user pools</a></td>
+                <td><a ng-href="#/admin/accounts/{{ user.id }}/pools">see pools</a></td>
             </tr>
         </tbody>
     </table>

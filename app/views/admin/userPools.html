@@ -8,8 +8,7 @@
             <tr>
                 <th>Pool ID</th>
                 <th>Pool Settings</th>
-                <th>Edit Mode</th>
-                <th>Delete Pool</th>
+                <th colspan="2">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -19,9 +18,12 @@
                     <textarea json-binder ng-readonly="!editMode" ng-model="pool.poolSettings"></textarea>
                 </td>
                 <td>
-                    <input type="checkbox"
-                           ng-model="editMode"
-                           ng-change="updateAccountPool(editMode, pool)">
+                    <label>
+                        <input type="checkbox"
+                               ng-model="editMode"
+                               ng-change="updateAccountPool(editMode, pool)">
+                        edit pool
+                    </label>
                 </td>
                 <td>
                     <button ng-click="deleteAccountPool(pool.id)">delete pool</button>

@@ -89,4 +89,10 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.addMachine = function (poolId) {
+            AdminPoolCrudService.addMachine(poolId).then(function (result) {
+                $log.debug('machine created, result data is ', result.data)
+            });
+        };
+
     });

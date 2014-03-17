@@ -44,6 +44,10 @@ angular.module('cloudifyWidgetUiApp')
             this.getPoolsStatus = function () {
                 return $http.get('/backend/admin/pools/status');
             }
+
+            this.addMachine = function (poolId) {
+                return $http.post('/backend/admin/pools/' + poolId + '/addMachine');
+            }
         }
 
         return new AdminPoolCrudService();

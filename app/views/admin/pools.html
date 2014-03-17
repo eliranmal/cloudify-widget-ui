@@ -3,9 +3,10 @@
     <table ng-init="getPools()">
         <thead>
             <tr>
-                <th>ID</th>
+                <th>Pool ID</th>
                 <th>Account ID</th>
                 <th>Pool Settings</th>
+                <th colspan="1">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -15,6 +16,7 @@
                 <td>
                     <pre>{{ pool.poolSettings | json }}</pre>
                 </td>
+                <td><button ng-click="addMachine(pool.id)">create machine</button></td>
             </tr>
         </tbody>
     </table>

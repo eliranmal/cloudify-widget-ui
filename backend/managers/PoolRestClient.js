@@ -188,15 +188,15 @@ exports.readPoolsStatus = function( poolKey, callback ){
 
 exports.addMachine = function( poolKey , poolId, callback ){
     logger.info('adding machine to pool');
-    call.post('/admin/pools/${poolId}/addMachine', _args().poolId(poolId), callback );
+    call.post('/admin/pools/${poolId}/addMachine', _args().poolKey(poolKey).poolId(poolId), callback );
 };
 exports.bootstrapMachine = function( poolKey , poolId, nodeId,  callback ){
     logger.info('adding machine to pool');
-    call.post('/admin/pools/${poolId}/nodes/${nodeId}/bootstrap', _args().poolId(poolId).nodeId(nodeId), callback );
+    call.post('/admin/pools/${poolId}/nodes/${nodeId}/bootstrap', _args().poolKey(poolKey).poolId(poolId).nodeId(nodeId), callback );
 };
 exports.deleteMachine = function( poolKey , poolId, nodeId, callback ){
     logger.info('adding machine to pool');
-    call.post('/admin/pools/${poolId}/nodes/${nodeId}/delete', _args().poolId(poolId).nodeId(nodeId), callback );
+    call.post('/admin/pools/${poolId}/nodes/${nodeId}/delete', _args().poolKey(poolKey).poolId(poolId).nodeId(nodeId), callback );
 };
 
 

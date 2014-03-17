@@ -75,8 +75,8 @@ app.post('/backend/admin/accounts/:accountId/pools', controllers.pool.createAcco
 app.post('/backend/admin/accounts/:accountId/pools/:poolId', controllers.pool.updateAccountPools);
 app.post('/backend/admin/accounts/:accountId/pools/:poolId/delete', controllers.pool.deleteAccountPools);
 app.get('/backend/admin/accounts/:accountId/pools/:poolId', controllers.pool.adminReadAccountPool);
-app.get('/backend/admin/pools/:poolId/status', controllers.pool.readPoolStatus);
 app.get('/backend/admin/pools/status', controllers.pool.readPoolsStatus);
+app.get('/backend/admin/pools/:poolId/status', controllers.pool.readPoolStatus);
 app.post('/backend/admin/pools/:poolId/addMachine', controllers.pool.addMachine);
 app.post('/backend/admin/pools/:poolId/bootstrapMachine', controllers.pool.bootstrapMachine);
 app.post('/backend/admin/pools/:poolId/deleteMachine', controllers.pool.deleteMachine);

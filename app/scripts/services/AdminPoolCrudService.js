@@ -41,7 +41,7 @@ angular.module('cloudifyWidgetUiApp')
                 return $http.get('/backend/admin/pools/' + poolId + '/status');
             }
 
-            this.getPoolStatus = function () {
+            this.getPoolsStatus = function () {
                 return $http.get('/backend/admin/pools/status');
             }
         }

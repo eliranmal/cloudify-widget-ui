@@ -56,7 +56,7 @@ exports.readPoolStatus = function( req, res ){
 
 // general status
 exports.readPoolsStatus = function( req, res ){
-    managers.poolClient.readPoolStatus( req.user.poolKey, _callback(res))
+    managers.poolClient.readPoolsStatus( req.user.poolKey, _callback(res))
 };
 
 exports.addMachine = function( req, res ){

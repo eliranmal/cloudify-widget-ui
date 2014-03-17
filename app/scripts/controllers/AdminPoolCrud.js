@@ -5,10 +5,13 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.model = {
             accountId: $routeParams['accountId'],
+            poolId: $routeParams['poolId'],
             newPoolSettings: '',
             accountPools: [],
             pools: [],
-            users: []
+            users: [],
+            poolStatus: {},
+            poolsStatus: {}
         };
 
         $scope.getUsers = function () {
@@ -74,14 +77,15 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.getPoolStatus = function (poolId) {
             AdminPoolCrudService.getPoolStatus(poolId).then(function (result) {
-                $log.debug('got pool status ', result.data);
+                $log.debug('got pool detailed status ', result.data);
+                $scope.model.poolStatus = result.data;
             });
         };
 
         $scope.getPoolsStatus = function () {
             AdminPoolCrudService.getPoolsStatus().then(function (result) {
-                $log.debug('got pools status ', result.data);
-
+                $log.debug('got pools general status ', result.data);
+                $scope.model.poolsStatus = result.data;
             });
         };
 

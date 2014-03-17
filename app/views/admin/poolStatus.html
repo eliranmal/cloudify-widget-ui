@@ -1,20 +1,21 @@
 <div layout>
 
-    <h3>General status for all pools</h3>
+    <td><a href="#/admin/pools/status">back to general pools status</a></td>
 
-    <!--<pre ng-init="getPoolsStatus()">{{ model.poolsStatus | json }}</pre>-->
+    <h3>Detailed status for pool {{ model.poolId }}</h3>
 
-    <table ng-init="getPoolsStatus()">
+    <!--<pre ng-init="getPoolStatus(model.poolId)">{{ model.poolStatus }}</pre>-->
+
+    <table ng-init="getPoolStatus(model.poolId)">
         <thead>
             <tr>
                 <th>Pool ID</th>
                 <th>Pool Settings ID</th>
                 <th>Count Per Node Status</th>
-                <th>Detailed Status</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="(poolId, poolStatus) in model.poolsStatus">
+            <tr ng-repeat="(poolId, poolStatus) in model.poolStatus">
                 <td>{{ poolId }}</td>
                 <td>{{ poolStatus.poolId }}</td>
                 <td>
@@ -22,7 +23,6 @@
                         {{ status }}: <b>{{ count }}</b>
                     </div>
                 </td>
-                <td><a href="#/admin/pools/{{ poolId }}/status">detailed status</a></td>
             </tr>
         </tbody>
     </table>

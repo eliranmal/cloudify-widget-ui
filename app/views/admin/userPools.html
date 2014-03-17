@@ -6,11 +6,10 @@
     <table ng-init="getAccountPools()">
         <thead>
             <tr>
-                <td>Pool ID</td>
-                <td>Pool Settings</td>
-                <td>Edit Mode</td>
-                <td>Delete Pool</td>
-                <td>Pool Status</td>
+                <th>Pool ID</th>
+                <th>Pool Settings</th>
+                <th>Edit Mode</th>
+                <th>Delete Pool</th>
             </tr>
         </thead>
         <tbody>
@@ -26,11 +25,6 @@
                 </td>
                 <td>
                     <button ng-click="deleteAccountPool(pool.id)">delete pool</button>
-                </td>
-                <td>
-                    <button ng-click="getPoolStatus(pool.id)">status</button>
-                    <pre>{{ model.status }}</pre>
-                    <!--<pre>{{ getPoolStatus(pool.id) }}</pre>-->
                 </td>
             </tr>
         </tbody>

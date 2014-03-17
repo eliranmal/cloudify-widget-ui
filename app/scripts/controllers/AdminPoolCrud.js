@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('AdminPoolCrudCtrl', function ($scope, $log, $routeParams, AdminPoolCrudService) {
+    .controller('AdminPoolCrudCtrl', function ($scope, $log, $routeParams, $interval, AdminPoolCrudService) {
 
         $scope.model = {
             accountId: $routeParams['accountId'],
@@ -33,46 +33,47 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.getAccountPools = function () {
-            AdminPoolCrudService.getAccountPools($scope.model.accountId).then(function (result) {
-                $scope.model.accountPools = result.data;
-            });
+            angular.isDefined($scope.model.accountId) &&
+                AdminPoolCrudService.getAccountPools($scope.model.accountId).then(function (result) {
+                    $scope.model.accountPools = result.data;
+                });
         };
 
         $scope.getAccountPool = function (poolId) {
-            AdminPoolCrudService.getAccountPool($scope.model.accountId, poolId).then(function (result) {
-                $scope.model.singlePool = result.data;
-            });
+            angular.isDefined($scope.model.accountId) &&
+                AdminPoolCrudService.getAccountPool($scope.model.accountId, poolId).then(function (result) {
+                    $scope.model.singlePool = result.data;
+                });
         };
 
         $scope.addAccountPool = function () {
             $log.info('addAccountPool, accountId: ', $scope.model.accountId, ', newPoolSettings: ', $scope.model.newPoolSettings)
-            if (!$scope.model.newPoolSettings) {
-                return;
-            }
-            AdminPoolCrudService.addAccountPool($scope.model.accountId, $scope.model.newPoolSettings).then(function (result) {
-                $scope.getAccountPools();
-                $scope.model.newPoolSettings = '';
-            });
+            angular.isDefined($scope.model.accountId) && angular.isDefined($scope.model.newPoolSettings) &&
+                AdminPoolCrudService.addAccountPool($scope.model.accountId, $scope.model.newPoolSettings).then(function (result) {
+                    $scope.getAccountPools();
+                    $scope.model.newPoolSettings = '';
+                });
         };
 
         $scope.updateAccountPool = function (editMode, pool) {
-            $log.info('updateAccountPool: ', $scope.model.accountId, pool.id);
             if (editMode) {
                 // save current state before user starts to edit
                 $scope.model.originalPoolSettings = pool.poolSettings;
             } else if ($scope.model.originalPoolSettings !== pool.poolSettings) {
                 // update with new data
-                AdminPoolCrudService.updateAccountPool($scope.model.accountId, pool.id, pool.poolSettings).then(function (result) {
-                    $scope.getAccountPools();
-                });
+                angular.isDefined($scope.model.accountId) &&
+                    AdminPoolCrudService.updateAccountPool($scope.model.accountId, pool.id, pool.poolSettings).then(function (result) {
+                        $scope.getAccountPools();
+                    });
             }
         };
 
         $scope.deleteAccountPool = function (poolId) {
             $log.info('deleteAccountPool, accountId: ', $scope.model.accountId, ', poolId: ', poolId)
-            AdminPoolCrudService.deleteAccountPool($scope.model.accountId, poolId).then(function (result) {
-                $scope.getAccountPools();
-            });
+            angular.isDefined($scope.model.accountId) &&
+                AdminPoolCrudService.deleteAccountPool($scope.model.accountId, poolId).then(function (result) {
+                    $scope.getAccountPools();
+                });
         };
 
         $scope.getPoolStatus = function (poolId) {
@@ -113,5 +114,15 @@ angular.module('cloudifyWidgetUiApp')
                 $log.debug('machine bootstrapped, result data is ', result.data);
             });
         };
+
+
+        $interval(function () {
+            // TODO create child controllers and separate behaviors so we wouldn't have to call every getter
+            $scope.getUsers();
+            $scope.getPools();
+            $scope.getPoolsStatus();
+            $scope.getAccountPools();
+            angular.isDefined($scope.model.poolId) && $scope.getMachines($scope.model.poolId);
+        }, 1000 * 5);
 
     });

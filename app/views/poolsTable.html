@@ -1,0 +1,32 @@
+<table>
+    <thead>
+        <tr>
+            <!--<th>{{ model }}</th>-->
+            <th>Pool ID</th>
+            <th>Account ID</th>
+            <th>Pool Settings</th>
+            <th colspan="3">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="pool in pools">
+            <td>{{ pool.id }}</td>
+            <td>{{ pool.accountId }}</td>
+            <td>
+                <textarea json-binder ng-readonly="!editMode" ng-model="pool.poolSettings"></textarea>
+            </td>
+            <td>
+                <label>
+                    <input type="checkbox"
+                           ng-model="editMode"
+                           ng-change="updateAccountPool(editMode, pool)">
+                    edit pool
+                </label>
+            </td>
+            <td>
+                <button ng-click="deleteAccountPool(pool.accountId, pool.id)">delete pool</button>
+            </td>
+            <td><a href="#/admin/pools/{{ pool.id }}/machines">see machines</a></td>
+        </tr>
+    </tbody>
+</table>

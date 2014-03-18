@@ -1,13 +1,14 @@
 <div layout>
     <a href="#/admin/pools">back to all pools</a>
 
-    <!--<pre ng-init="getMachines(model.poolId)">{{ model.machines | json}}</pre>-->
+    <!--<pre ng-init="getMachines(model.poolId)">{{ model.nodes | json}}</pre>-->
 
     <h3>Machines for pool {{ model.poolId }}</h3>
-    <button ng-click="addMachine(model.poolId)">create machine</button>
-    <table ng-init="getMachines(model.poolId)">
+    <button ng-click="addPoolNode(model.poolId)">create node</button>
+    <table ng-init="getPoolNodes(model.poolId)">
         <thead>
             <tr>
+                <th>Node ID</th>
                 <th>Machine ID</th>
                 <th>Pool Settings ID</th>
                 <th>Machine Status</th>
@@ -15,24 +16,19 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="machine in model.machines">
-                <td>{{ machine.machineId }}</td>
-                <td>{{ machine.poolId }}</td>
-                <td>{{ machine.nodeStatus }}</td>
+            <tr ng-repeat="node in model.nodes">
+                <td>{{ node.id }}</td>
+                <td>{{ node.machineId }}</td>
+                <td>{{ node.poolId }}</td>
+                <td>{{ node.nodeStatus }}</td>
+                <!-- TODO how to perform actions when we only have the POOL SETTINGS ID ??? -->
                 <td>
-                    <button ng-click="bootstrapMachine(machine.poolId, machine.machineId)">bootstrap machine</button>
+                    <button ng-if="node.id" ng-click="bootstrapPoolNode(model.poolId, node.id)">bootstrap node</button>
                 </td>
                 <td>
-                    <button ng-click="deleteMachine(machine.poolId, machine.machineId)">delete machine</button>
+                    <button ng-if="node.id" ng-click="deletePoolNode(model.poolId, node.id)">delete node</button>
                 </td>
             </tr>
         </tbody>
     </table>
-
-    <!--
-        <label>show pool
-            <input type="text" placeholder="pool id" ng-model="singlePoolId" ng-change="getAccountPool(singlePoolId)">
-        </label>
-        <pre>{{ singlePool | json }}</pre>
-    -->
 </div>

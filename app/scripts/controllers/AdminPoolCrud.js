@@ -11,7 +11,8 @@ angular.module('cloudifyWidgetUiApp')
             pools: [],
             users: [],
             poolStatus: {},
-            poolsStatus: {}
+            poolsStatus: {},
+            nodes: []
         };
 
         $scope.getUsers = function () {
@@ -32,48 +33,44 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
-        $scope.getAccountPools = function () {
-            angular.isDefined($scope.model.accountId) &&
-                AdminPoolCrudService.getAccountPools($scope.model.accountId).then(function (result) {
-                    $scope.model.accountPools = result.data;
-                });
+        $scope.getAccountPools = function (accountId) {
+            AdminPoolCrudService.getAccountPools(accountId).then(function (result) {
+                $scope.model.accountPools = result.data;
+            });
         };
 
-        $scope.getAccountPool = function (poolId) {
-            angular.isDefined($scope.model.accountId) &&
-                AdminPoolCrudService.getAccountPool($scope.model.accountId, poolId).then(function (result) {
-                    $scope.model.singlePool = result.data;
-                });
+        $scope.getAccountPool = function (accountId, poolId) {
+            AdminPoolCrudService.getAccountPool(accountId, poolId).then(function (result) {
+                $scope.model.singlePool = result.data;
+            });
         };
 
-        $scope.addAccountPool = function () {
-            $log.info('addAccountPool, accountId: ', $scope.model.accountId, ', newPoolSettings: ', $scope.model.newPoolSettings)
-            angular.isDefined($scope.model.accountId) && angular.isDefined($scope.model.newPoolSettings) &&
-                AdminPoolCrudService.addAccountPool($scope.model.accountId, $scope.model.newPoolSettings).then(function (result) {
-                    $scope.getAccountPools();
-                    $scope.model.newPoolSettings = '';
-                });
+        $scope.addAccountPool = function (accountId, poolSettings) {
+            $log.info('addAccountPool, accountId: ', accountId, ', poolSettings: ', poolSettings)
+            AdminPoolCrudService.addAccountPool(accountId, poolSettings).then(function (result) {
+                $scope.getAccountPools(accountId);
+                $scope.model.newPoolSettings = '';
+            });
         };
 
         $scope.updateAccountPool = function (editMode, pool) {
+            $log.info('updateAccountPool, editMode: ', editMode, ', pool: ', pool);
             if (editMode) {
                 // save current state before user starts to edit
                 $scope.model.originalPoolSettings = pool.poolSettings;
             } else if ($scope.model.originalPoolSettings !== pool.poolSettings) {
                 // update with new data
-                angular.isDefined($scope.model.accountId) &&
-                    AdminPoolCrudService.updateAccountPool($scope.model.accountId, pool.id, pool.poolSettings).then(function (result) {
-                        $scope.getAccountPools();
-                    });
+                AdminPoolCrudService.updateAccountPool(pool.accountId, pool.id, pool.poolSettings).then(function (result) {
+                    $scope.getAccountPools(pool.accountId);
+                });
             }
         };
 
-        $scope.deleteAccountPool = function (poolId) {
-            $log.info('deleteAccountPool, accountId: ', $scope.model.accountId, ', poolId: ', poolId)
-            angular.isDefined($scope.model.accountId) &&
-                AdminPoolCrudService.deleteAccountPool($scope.model.accountId, poolId).then(function (result) {
-                    $scope.getAccountPools();
-                });
+        $scope.deleteAccountPool = function (accountId, poolId) {
+            $log.info('deleteAccountPool, accountId: ', accountId, ', poolId: ', poolId)
+            AdminPoolCrudService.deleteAccountPool(accountId, poolId).then(function (result) {
+                $scope.getAccountPools(accountId);
+            });
         };
 
         $scope.getPoolStatus = function (poolId) {
@@ -90,27 +87,32 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
-        $scope.getMachines = function (poolId) {
-            AdminPoolCrudService.getMachines(poolId).then(function (result) {
+        $scope.getPoolNodes = function (poolId) {
+            AdminPoolCrudService.getPoolNodes(poolId).then(function (result) {
                 $log.debug('got machines, result data is ', result.data);
-                $scope.model.machines = result.data;
+                angular.extend($scope.model.nodes, result.data, true);
             });
         };
 
-        $scope.addMachine = function (poolId) {
-            AdminPoolCrudService.addMachine(poolId).then(function (result) {
+        $scope.addPoolNode = function (poolId) {
+            AdminPoolCrudService.addPoolNode(poolId).then(function (result) {
                 $log.debug('machine created, result data is ', result.data);
+                angular.extend($scope.model.nodes, [{
+                    nodeStatus: 'creating...'
+                }], true);
             });
         };
 
-        $scope.deleteMachine = function (poolId, machineId) {
-            AdminPoolCrudService.deleteMachine(poolId, machineId).then(function (result) {
+        $scope.deletePoolNode = function (poolId, nodeId) {
+            $log.info('deletePoolNode, poolId: ', poolId, ', nodeId: ', nodeId);
+            AdminPoolCrudService.deletePoolNode(poolId, nodeId).then(function (result) {
                 $log.debug('machine deleted, result data is ', result.data);
             });
         };
 
-        $scope.bootstrapMachine = function (poolId, machineId) {
-            AdminPoolCrudService.bootstrapMachine(poolId, machineId).then(function (result) {
+        $scope.bootstrapPoolNode = function (poolId, nodeId) {
+            $log.info('bootstrapPoolNode, poolId: ', poolId, ', nodeId: ', nodeId);
+            AdminPoolCrudService.bootstrapPoolNode(poolId, nodeId).then(function (result) {
                 $log.debug('machine bootstrapped, result data is ', result.data);
             });
         };
@@ -118,11 +120,11 @@ angular.module('cloudifyWidgetUiApp')
 
         $interval(function () {
             // TODO create child controllers and separate behaviors so we wouldn't have to call every getter
-            $scope.getUsers();
-            $scope.getPools();
-            $scope.getPoolsStatus();
-            $scope.getAccountPools();
-            angular.isDefined($scope.model.poolId) && $scope.getMachines($scope.model.poolId);
-        }, 1000 * 5);
+//            $scope.getUsers();
+//            $scope.getPools();
+//            $scope.getPoolsStatus();
+//            $scope.getAccountPools(accountId);
+            angular.isDefined($scope.model.poolId) && $scope.getPoolNodes($scope.model.poolId);
+        }, 1000 * 10);
 
     });

@@ -12,7 +12,9 @@ table {
     }
   }
 }
-textarea {
+textarea,
+table pre {
   width: 400px;
-  min-height: 200px;
+  height: 200px;
+  overflow-y: auto;
 }

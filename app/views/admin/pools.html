@@ -1,23 +1,6 @@
 <div layout>
-    <h3>Pools for all accounts</h3>
-    <table ng-init="getPools()">
-        <thead>
-            <tr>
-                <th>Pool ID</th>
-                <th>Account ID</th>
-                <th>Pool Settings</th>
-                <th colspan="1">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="pool in model.pools">
-                <td>{{ pool.id }}</td>
-                <td>{{ pool.accountId }}</td>
-                <td>
-                    <pre>{{ pool.poolSettings | json }}</pre>
-                </td>
-                <td><a href="#/admin/pools/{{ pool.id }}/machines">see machines</a></td>
-            </tr>
-        </tbody>
-    </table>
+    <h3>Pools for all users</h3>
+    <!--<div ng-include="'views/poolsTable.html'" ng-init="getPools()"></div>-->
+    <div pools-table ng-init="getPools()" ng-model="model.pools" update-fn="updateAccountPool"></div>
+
 </div>

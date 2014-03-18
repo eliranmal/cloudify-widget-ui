@@ -4,5 +4,5 @@
     <!--<label for="poolSettingsTextarea">pool settings</label>-->
     <textarea placeholder="pool settings" id="poolSettingsTextarea" ng-model="model.newPoolSettings"></textarea>
     <br/>
-    <button ng-click="addAccountPool()">Add Pool</button>
+    <button ng-click="addAccountPool(model.accountId, model.newPoolSettings)">Add Pool</button>
 </div>

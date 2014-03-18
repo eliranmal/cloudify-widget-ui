@@ -45,20 +45,20 @@ angular.module('cloudifyWidgetUiApp')
                 return $http.get('/backend/admin/pools/status');
             };
 
-            this.getMachines = function (poolId) {
+            this.getPoolNodes = function (poolId) {
                 return $http.get('/backend/admin/pools/' + poolId + '/nodes')
             };
 
-            this.addMachine = function (poolId) {
+            this.addPoolNode = function (poolId) {
                 return $http.post('/backend/admin/pools/' + poolId + '/nodes');
             };
 
-            this.deleteMachine = function (poolId, machineId) {
-                return $http.post('/backend/admin/pools/' + poolId + '/nodes/' + machineId + '/delete');
+            this.deletePoolNode = function (poolId, nodeId) {
+                return $http.post('/backend/admin/pools/' + poolId + '/nodes/' + nodeId + '/delete');
             };
 
-            this.bootstrapMachine = function (poolId, machineId) {
-                return $http.post('/backend/admin/pools/' + poolId + '/nodes/' + machineId + '/bootstrap');
+            this.bootstrapPoolNode = function (poolId, nodeId) {
+                return $http.post('/backend/admin/pools/' + poolId + '/nodes/' + nodeId + '/bootstrap');
             };
         }
 

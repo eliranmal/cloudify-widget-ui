@@ -80,10 +80,10 @@ app.get('/backend/admin/accounts/:accountId/pools/:poolId', controllers.pool.adm
 app.get('/backend/admin/pools/status', controllers.pool.readPoolsStatus);
 app.get('/backend/admin/pools/:poolId/status', controllers.pool.readPoolStatus);
 
-app.get('/backend/admin/pools/:poolId/nodes', controllers.pool.readPoolMachines);
-app.post('/backend/admin/pools/:poolId/nodes', controllers.pool.addMachine);
-app.post('/backend/admin/pools/:poolId/nodes/:nodeId/bootstrap', controllers.pool.bootstrapMachine);
-app.post('/backend/admin/pools/:poolId/nodes/:nodeId/delete', controllers.pool.deleteMachine);
+app.get('/backend/admin/pools/:poolId/nodes', controllers.pool.readPoolNodes);
+app.post('/backend/admin/pools/:poolId/nodes', controllers.pool.createPoolNode);
+app.post('/backend/admin/pools/:poolId/nodes/:nodeId/delete', controllers.pool.deletePoolNode);
+app.post('/backend/admin/pools/:poolId/nodes/:nodeId/bootstrap', controllers.pool.bootstrapPoolNode);
 
 app.get('/backend/user/account/pools', controllers.pool.accountReadPools );
 app.post('/backend/user/account/pools', controllers.pool.createPool);

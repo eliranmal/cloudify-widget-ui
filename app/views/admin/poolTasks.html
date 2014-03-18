@@ -1,11 +1,11 @@
 <div layout>
     <a href="#/admin/pools">back to all pools</a>
 
-    <!--<pre ng-init="getMachines(model.poolId)">{{ model.nodes | json}}</pre>-->
+    <h3>Tasks running in pool {{ model.poolId }}</h3>
+    <pre ng-init="getPoolTasks(model.poolId)">{{ model.poolTasks | json }}</pre>
 
-    <h3>Machines for pool {{ model.poolId }}</h3>
-    <button ng-click="addPoolNode(model.poolId)">create node</button>
-    <table ng-init="getPoolNodes(model.poolId)">
+<!--
+    <table ng-init="getPoolTasks(model.poolId)">
         <thead>
             <tr>
                 <th>Node ID</th>
@@ -21,7 +21,6 @@
                 <td>{{ node.machineId }}</td>
                 <td>{{ node.poolId }}</td>
                 <td>{{ node.nodeStatus }}</td>
-                <!-- TODO how to perform actions when we only have the POOL SETTINGS ID ??? -->
                 <td>
                     <button ng-if="node.id" ng-click="bootstrapPoolNode(model.poolId, node.id)">bootstrap node</button>
                 </td>
@@ -31,4 +30,5 @@
             </tr>
         </tbody>
     </table>
+-->
 </div>

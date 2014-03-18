@@ -47,7 +47,7 @@ function Call() {
         if ( args instanceof ArgsBuilder){
             myArgs = args.done();
         }
-        logger.info('POST: ', arguments);
+        logger.info('POST: ', url);
         var myUrl = _url(url);
         var myCallback = _callbackWrapper(callback);
 
@@ -200,6 +200,15 @@ exports.deletePoolNode = function( poolKey , poolId, nodeId, callback ){
 exports.bootstrapPoolNode = function( poolKey , poolId, nodeId,  callback ){
     logger.info('bootstrapping machine');
     call.post('/admin/pools/${poolId}/nodes/${nodeId}/bootstrap', _args().poolKey(poolKey).poolId(poolId).nodeId(nodeId), callback );
+};
+
+exports.readPoolErrors = function( poolKey, poolId, callback ){
+    logger.info('reading pool errors [%s]', poolId );
+    call.get('/admin/pools/${poolId}/errors', _args().poolKey(poolKey).poolId(poolId), callback);
+};
+exports.readPoolTasks = function( poolKey, poolId, callback ){
+    logger.info('reading pool tasks [%s]', poolId );
+    call.get('/admin/pools/${poolId}/tasks', _args().poolKey(poolKey).poolId(poolId), callback);
 };
 
 

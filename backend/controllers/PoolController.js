@@ -53,7 +53,6 @@ exports.adminReadAccountPool = function( req, res ){
 exports.readPoolStatus = function( req, res ){
     managers.poolClient.readPoolStatus(req.user.poolKey, req.params.poolId, _callback(res));
 };
-
 // general status
 exports.readPoolsStatus = function( req, res ){
     managers.poolClient.readPoolsStatus(req.user.poolKey, _callback(res));
@@ -62,7 +61,6 @@ exports.readPoolsStatus = function( req, res ){
 exports.readPoolNodes = function( req, res ){
     managers.poolClient.readPoolNodes(req.user.poolKey, req.params.poolId, _callback(res));
 };
-
 exports.createPoolNode = function( req, res ){
     managers.poolClient.createPoolNode(req.user.poolKey, req.params.poolId, _callback(res));
 };
@@ -71,6 +69,13 @@ exports.deletePoolNode = function( req, res ){
 };
 exports.bootstrapPoolNode = function( req, res ){
     managers.poolClient.bootstrapPoolNode(req.user.poolKey, req.params.poolId, req.params.nodeId, _callback(res));
+};
+
+exports.readPoolErrors = function( req, res ){
+    managers.poolClient.readPoolErrors(req.user.poolKey, req.params.poolId, _callback(res));
+};
+exports.readPoolTasks = function( req, res ){
+    managers.poolClient.readPoolTasks(req.user.poolKey, req.params.poolId, _callback(res));
 };
 
 

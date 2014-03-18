@@ -97,9 +97,11 @@ angular.module('cloudifyWidgetUiApp')
         $scope.addPoolNode = function (poolId) {
             AdminPoolCrudService.addPoolNode(poolId).then(function (result) {
                 $log.debug('machine created, result data is ', result.data);
-                angular.extend($scope.model.nodes, [{
-                    nodeStatus: 'creating...'
-                }], true);
+                angular.extend($scope.model.nodes, [
+                    {
+                        nodeStatus: 'creating...'
+                    }
+                ], true);
             });
         };
 
@@ -117,14 +119,36 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.getPoolErrors = function (poolId) {
+            $log.info('getPoolErrors, poolId: ', poolId);
+            AdminPoolCrudService.getPoolErrors(poolId).then(function (result) {
+                $scope.model.poolErrors = result.data;
+            });
+        };
+
+        $scope.getPoolTasks = function (poolId) {
+            $log.info('getPoolTasks, poolId: ', poolId);
+            AdminPoolCrudService.getPoolTasks(poolId).then(function (result) {
+                $scope.model.poolTasks = result.data;
+            });
+        };
+
 
         $interval(function () {
             // TODO create child controllers and separate behaviors so we wouldn't have to call every getter
 //            $scope.getUsers();
 //            $scope.getPools();
-//            $scope.getPoolsStatus();
-//            $scope.getAccountPools(accountId);
-            angular.isDefined($scope.model.poolId) && $scope.getPoolNodes($scope.model.poolId);
-        }, 1000 * 10);
+            $scope.getPoolsStatus();
+            if (angular.isDefined($scope.model.poolId)) {
+                $scope.getPoolStatus($scope.model.poolId);
+                $scope.getPoolNodes($scope.model.poolId);
+            }
+            if (angular.isDefined($scope.model.accountId)) {
+                $scope.getAccountPools($scope.model.accountId);
+            }
+            if (angular.isDefined($scope.model.accountId) && angular.isDefined($scope.model.poolId)) {
+                $scope.getAccountPool($scope.model.accountId, $scope.model.poolId);
+            }
+        }, 1000 * 5);
 
     });

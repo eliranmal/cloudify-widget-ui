@@ -60,6 +60,15 @@ angular.module('cloudifyWidgetUiApp')
             this.bootstrapPoolNode = function (poolId, nodeId) {
                 return $http.post('/backend/admin/pools/' + poolId + '/nodes/' + nodeId + '/bootstrap');
             };
+
+            this.getPoolErrors = function (poolId) {
+                return $http.get('/backend/admin/pools/' + poolId + '/errors');
+            };
+
+            this.getPoolTasks = function (poolId) {
+                return $http.get('/backend/admin/pools/' + poolId + '/tasks');
+            };
+
         }
 
         return new AdminPoolCrudService();

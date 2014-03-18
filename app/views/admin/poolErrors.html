@@ -1,0 +1,25 @@
+<div layout>
+    <a href="#/admin/pools">back to all pools</a>
+
+    <h3>Errors for pool {{ model.poolId }}</h3>
+    <table ng-init="getPoolErrors(model.poolId)">
+        <thead>
+            <tr>
+                <th>Error ID</th>
+                <th>Task Name</th>
+                <th>Pool Settings ID</th>
+                <th>Message</th>
+                <th>Info</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="error in model.poolErrors">
+                <td>{{ error.id }}</td>
+                <td>{{ error.taskName }}</td>
+                <td>{{ error.poolId }}</td>
+                <td>{{ error.message }}</td>
+                <td>{{ error.info }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

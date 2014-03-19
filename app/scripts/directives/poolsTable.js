@@ -7,7 +7,8 @@ angular.module('cloudifyWidgetUiApp')
             templateUrl: 'views/poolsTable.html',
             scope: {
                 pools: '=ngModel',
-                updateAccountPool: '=updateFn'
+                updateAccountPool: '=updateFn',
+                deleteAccountPool: '=deleteFn'
             }
         };
     });

@@ -90,18 +90,13 @@ angular.module('cloudifyWidgetUiApp')
         $scope.getPoolNodes = function (poolId) {
             AdminPoolCrudService.getPoolNodes(poolId).then(function (result) {
                 $log.debug('got machines, result data is ', result.data);
-                angular.extend($scope.model.nodes, result.data, true);
+                $scope.model.nodes = result.data;
             });
         };
 
         $scope.addPoolNode = function (poolId) {
             AdminPoolCrudService.addPoolNode(poolId).then(function (result) {
                 $log.debug('machine created, result data is ', result.data);
-                angular.extend($scope.model.nodes, [
-                    {
-                        nodeStatus: 'creating...'
-                    }
-                ], true);
             });
         };
 

@@ -122,21 +122,23 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.getPoolTasks = function (poolId) {
-            $log.info('getPoolTasks, poolId: ', poolId);
+            $log.debug('getPoolTasks, poolId: ', poolId);
             AdminPoolCrudService.getPoolTasks(poolId).then(function (result) {
                 $scope.model.poolTasks = result.data;
             });
         };
 
 
-        $interval(function () {
+        var refreshInterval = $interval(function () {
             // TODO create child controllers and separate behaviors so we wouldn't have to call every getter
 //            $scope.getUsers();
 //            $scope.getPools();
+            $log.debug('- - - refresh interval - - -')
             $scope.getPoolsStatus();
             if (angular.isDefined($scope.model.poolId)) {
                 $scope.getPoolStatus($scope.model.poolId);
                 $scope.getPoolNodes($scope.model.poolId);
+                $scope.getPoolTasks($scope.model.poolId);
             }
             if (angular.isDefined($scope.model.accountId)) {
                 $scope.getAccountPools($scope.model.accountId);
@@ -145,5 +147,9 @@ angular.module('cloudifyWidgetUiApp')
                 $scope.getAccountPool($scope.model.accountId, $scope.model.poolId);
             }
         }, 1000 * 5);
+
+        $scope.$on('$destroy', function () {
+            $interval.cancel(refreshInterval);
+        });
 
     });

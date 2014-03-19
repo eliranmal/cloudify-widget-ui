@@ -2,33 +2,23 @@
     <a href="#/admin/pools">back to all pools</a>
 
     <h3>Tasks running in pool {{ model.poolId }}</h3>
-    <pre ng-init="getPoolTasks(model.poolId)">{{ model.poolTasks | json }}</pre>
-
-<!--
+    <!--<pre ng-init="getPoolTasks(model.poolId)">{{ model.poolTasks | json }}</pre>-->
     <table ng-init="getPoolTasks(model.poolId)">
         <thead>
             <tr>
+                <th>Task ID</th>
+                <th>Task Name</th>
                 <th>Node ID</th>
-                <th>Machine ID</th>
-                <th>Pool Settings ID</th>
-                <th>Machine Status</th>
-                <th colspan="2">Actions</th>
+                <th>Pool ID</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="node in model.nodes">
-                <td>{{ node.id }}</td>
-                <td>{{ node.machineId }}</td>
-                <td>{{ node.poolId }}</td>
-                <td>{{ node.nodeStatus }}</td>
-                <td>
-                    <button ng-if="node.id" ng-click="bootstrapPoolNode(model.poolId, node.id)">bootstrap node</button>
-                </td>
-                <td>
-                    <button ng-if="node.id" ng-click="deletePoolNode(model.poolId, node.id)">delete node</button>
-                </td>
+            <tr ng-repeat="task in model.poolTasks">
+                <td>{{ task.id }}</td>
+                <td>{{ task.taskName }}</td>
+                <td>{{ task.nodeId }}</td>
+                <td>{{ task.poolId }}</td>
             </tr>
         </tbody>
     </table>
--->
 </div>

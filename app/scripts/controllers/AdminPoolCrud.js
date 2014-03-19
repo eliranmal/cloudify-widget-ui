@@ -115,7 +115,7 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.getPoolErrors = function (poolId) {
-            $log.info('getPoolErrors, poolId: ', poolId);
+            $log.debug('getPoolErrors, poolId: ', poolId);
             AdminPoolCrudService.getPoolErrors(poolId).then(function (result) {
                 $scope.model.poolErrors = result.data;
             });

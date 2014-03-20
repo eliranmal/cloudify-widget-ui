@@ -1,9 +1,11 @@
-<div>
+<div id="logged-in-layout">
+<div class="logged-in-layout nested-hidden">
     hello {{user.email}},
     <button ng-click="logout()">logout</button>
     <a admin ng-href="#/admin/users">manage users</a>
     <a admin ng-href="#/admin/pools">manage pools</a>
     <a admin ng-href="#/admin/pools/status">pools status</a>
 </div>
-<hr />
-<div ng-transclude></div>
+<hr class="logged-in-layout nested-hidden"/>
+<div ng-transclude class="logged-in-layout"></div>
+</div>

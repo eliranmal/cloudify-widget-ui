@@ -21,6 +21,15 @@ angular.module('cloudifyWidgetUiApp')
                     }
                 };
 
+                function createBitmask() {
+                    var arr = arguments[0] instanceof Array ? arguments[0] : arguments,
+                        nMask = 0, nFlag = 0, nLen = arr.length > 32 ? 32 : arr.length;
+                    for (nFlag; nFlag < nLen; nMask |= arr[nFlag] << nFlag++);
+                    return nMask;
+                }
+
+                var mask;
+
                 $scope.$watch('pools', function (newVal, oldVal) {
 
                     if (angular.isDefined(newVal)) {
@@ -32,6 +41,12 @@ angular.module('cloudifyWidgetUiApp')
                         }
                         // refresh our local instance
                         $scope.editModeStatusArray = $rootScope.editModeStatusArray;
+
+                        var toMask = new Array(newVal.length + 1).join('0').split('').map(function (val, ind, arr) {
+                            return (ind % 2 !== 0) ? false : true;
+                        });
+                        mask = createBitmask(toMask);
+                        $log.info('mask: ', parseInt(mask,2));
                     }
 
 
@@ -54,17 +69,7 @@ angular.module('cloudifyWidgetUiApp')
                      $log.info('scrollTop: ', scrollTop);
                      }
                      */
-                });
-
-                // TODO create bitmask for editMode states
-                /*
-                 function createMask () {
-                 var nMask = 0, nFlag = 0, nLen = arguments.length > 32 ? 32 : arguments.length;
-                 for (nFlag; nFlag < nLen; nMask |= arguments[nFlag] << nFlag++);
-                 return nMask;
-                 }
-                 */
-
+                }, true);
             }
         };
     });

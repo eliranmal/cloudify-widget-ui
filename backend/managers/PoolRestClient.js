@@ -32,6 +32,7 @@ function Call() {
 
     function _callbackWrapper(callback) {
         return function (data, response) {
+            logger.info(' in callback');
             if (response.statusCode == 200) {
                 callback(null, data);
             } else {
@@ -52,11 +53,22 @@ function Call() {
         var myCallback = _callbackWrapper(callback);
 
 
+        try{
+            if ( method == 'get'){
+//
+                var req = client.get(myUrl, myArgs, myCallback);
 
-        if ( method == 'get'){
-            client.get(myUrl, myArgs, myCallback)
-        }else if ( method == 'post'){
-            client.post(myUrl, myArgs, myCallback);
+//
+            }else if ( method == 'post'){
+                var req = client.post(myUrl, myArgs, myCallback);
+            }
+
+            req.on('error', function(){
+                logger.error('got request error',arguments);
+            })
+        }catch(e){
+            logger.error('got error from client',e);
+            callback(e);
         }
 
 

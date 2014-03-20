@@ -13,13 +13,13 @@
             <td>{{ pool.id }}</td>
             <td>{{ pool.accountId }}</td>
             <td>
-                <textarea json-binder ng-readonly="!editMode" ng-model="pool.poolSettings"></textarea>
+                <textarea json-binder ng-readonly="!editModeStatusArray[$index]" ng-model="pool.poolSettings"></textarea>
             </td>
             <td>
                 <label>
                     <input type="checkbox"
-                           ng-model="editMode"
-                           ng-change="updateAccountPool(editMode, pool)">
+                           ng-model="editModeStatusArray[$index]"
+                           ng-change="callUpdateAccountPool(editModeStatusArray[$index], pool)">
                     edit pool
                 </label>
             </td>

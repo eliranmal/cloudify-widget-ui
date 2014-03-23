@@ -123,6 +123,9 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 templateUrl: 'views/widget/themes/widgetEmbed.html',
                 controller: 'WidgetEmbedCtrl'
             })
+            .when('/admin/pools/:poolId/combinedView', {
+                templateUrl: 'views/pools/combinedStatusView.html'
+            })
             .when('/login', {
                 templateUrl: 'views/login.html',
                 controller: 'LoginCtrl'

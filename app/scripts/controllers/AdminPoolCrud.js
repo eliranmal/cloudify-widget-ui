@@ -53,17 +53,12 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
-        $scope.updateAccountPool = function (editMode, pool) {
-            $log.info('updateAccountPool, editMode: ', editMode, ', pool: ', pool);
-            if (editMode) {
-                // save current state before user starts to edit
-                $scope.model.originalPoolSettings = pool.poolSettings;
-            } else if ($scope.model.originalPoolSettings !== pool.poolSettings) {
-                // update with new data
-                AdminPoolCrudService.updateAccountPool(pool.accountId, pool.id, pool.poolSettings).then(function (result) {
-                    $scope.getAccountPools(pool.accountId);
-                });
-            }
+        $scope.updateAccountPool = function (pool) {
+            $log.info('updateAccountPool, pool: ', pool);
+            // update with new data
+            AdminPoolCrudService.updateAccountPool(pool.accountId, pool.id, pool.poolSettings).then(function (result) {
+                $scope.getAccountPools(pool.accountId);
+            });
         };
 
         $scope.deleteAccountPool = function (accountId, poolId) {
@@ -115,7 +110,7 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.getPoolErrors = function (poolId) {
-            $log.info('getPoolErrors, poolId: ', poolId);
+            $log.debug('getPoolErrors, poolId: ', poolId);
             AdminPoolCrudService.getPoolErrors(poolId).then(function (result) {
                 $scope.model.poolErrors = result.data;
             });

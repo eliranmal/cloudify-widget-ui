@@ -7,12 +7,12 @@ describe('Service: WidgetThemesService', function () {
 
   // instantiate service
   var WidgetThemesService;
-  beforeEach(inject(function (_WidgetThemesService_) {
-    WidgetThemesService = _WidgetThemesService_;
-  }));
-
-  it('should do something', function () {
-    expect(!!WidgetThemesService).toBe(true);
-  });
+//  beforeEach(inject(function (_WidgetThemesService_) {
+//    WidgetThemesService = _WidgetThemesService_;
+//  }));
+//
+//  it('should do something', function () {
+//    expect(!!WidgetThemesService).toBe(true);
+//  });
 
 });

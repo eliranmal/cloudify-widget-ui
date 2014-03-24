@@ -8,15 +8,15 @@ describe('Controller: WidgetViewCtrl', function () {
   var WidgetViewCtrl,
     scope;
 
-  // Initialize the controller and a mock scope
-  beforeEach(inject(function ($controller, $rootScope) {
-    scope = $rootScope.$new();
-    WidgetViewCtrl = $controller('WidgetViewCtrl', {
-      $scope: scope
-    });
-  }));
-
-  it('should attach a list of awesomeThings to the scope', function () {
-    expect(scope.awesomeThings.length).toBe(3);
-  });
+//  // Initialize the controller and a mock scope
+//  beforeEach(inject(function ($controller, $rootScope) {
+//    scope = $rootScope.$new();
+//    WidgetViewCtrl = $controller('WidgetViewCtrl', {
+//      $scope: scope
+//    });
+//  }));
+//
+//  it('should attach a list of awesomeThings to the scope', function () {
+//    expect(scope.awesomeThings.length).toBe(3);
+//  });
 });

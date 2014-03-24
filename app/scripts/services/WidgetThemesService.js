@@ -4,22 +4,22 @@ angular.module('cloudifyWidgetUiApp')
   .service('WidgetThemesService', function WidgetThemesService() {
         this.themes = [
             {
-                "id": "default",
-                "label": "Default",
-                "height" : "463px",
-                "width" : "600px"
+                'id': 'default',
+                'label': 'Default',
+                'height' : '463px',
+                'width' : '600px'
             },
             {
-                "id" : "softlayer",
-                "label" : "Softlayer",
-                "height" : "463px",
-                "width" : "600px"
+                'id' : 'softlayer',
+                'label' : 'Softlayer',
+                'height' : '463px',
+                'width' : '600px'
             },
             {
-                "id" : "hp",
-                "label" : "HP Cloud",
-                "height" : "463px",
-                "width" : "600px"
+                'id' : 'hp',
+                'label' : 'HP Cloud',
+                'height' : '463px',
+                'width' : '600px'
             }
         ];
 
@@ -30,7 +30,7 @@ angular.module('cloudifyWidgetUiApp')
                     return obj;
                 }
             }
-            throw new Error("no theme with id [" + themeId + "]");
-        }
+            throw new Error('no theme with id [' + themeId + ']');
+        };
 
     });

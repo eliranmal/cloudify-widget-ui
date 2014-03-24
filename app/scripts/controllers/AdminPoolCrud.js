@@ -4,8 +4,8 @@ angular.module('cloudifyWidgetUiApp')
     .controller('AdminPoolCrudCtrl', function ($scope, $log, $routeParams, $interval, AdminPoolCrudService) {
 
         $scope.model = {
-            accountId: $routeParams['accountId'],
-            poolId: $routeParams['poolId'],
+            accountId: $routeParams.acountId,
+            poolId: $routeParams.poolId,
             newPoolSettings: '',
             accountPools: [],
             pools: [],
@@ -22,7 +22,7 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.addUser = function () {
-            AdminPoolCrudService.addUser().then(function (result) {
+            AdminPoolCrudService.addUser().then(function (/*result*/) {
                 $scope.getUsers();
             });
         };
@@ -46,8 +46,8 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.addAccountPool = function (accountId, poolSettings) {
-            $log.info('addAccountPool, accountId: ', accountId, ', poolSettings: ', poolSettings)
-            AdminPoolCrudService.addAccountPool(accountId, poolSettings).then(function (result) {
+            $log.info('addAccountPool, accountId: ', accountId, ', poolSettings: ', poolSettings);
+            AdminPoolCrudService.addAccountPool(accountId, poolSettings).then(function (/*result*/) {
                 $scope.getAccountPools(accountId);
                 $scope.model.newPoolSettings = '';
             });
@@ -56,14 +56,14 @@ angular.module('cloudifyWidgetUiApp')
         $scope.updateAccountPool = function (pool) {
             $log.info('updateAccountPool, pool: ', pool);
             // update with new data
-            AdminPoolCrudService.updateAccountPool(pool.accountId, pool.id, pool.poolSettings).then(function (result) {
+            AdminPoolCrudService.updateAccountPool(pool.accountId, pool.id, pool.poolSettings).then(function (/*result*/) {
                 $scope.getAccountPools(pool.accountId);
             });
         };
 
         $scope.deleteAccountPool = function (accountId, poolId) {
-            $log.info('deleteAccountPool, accountId: ', accountId, ', poolId: ', poolId)
-            AdminPoolCrudService.deleteAccountPool(accountId, poolId).then(function (result) {
+            $log.info('deleteAccountPool, accountId: ', accountId, ', poolId: ', poolId);
+            AdminPoolCrudService.deleteAccountPool(accountId, poolId).then(function (/*result*/) {
                 $scope.getAccountPools(accountId);
             });
         };
@@ -128,7 +128,7 @@ angular.module('cloudifyWidgetUiApp')
             // TODO create child controllers and separate behaviors so we wouldn't have to call every getter
 //            $scope.getUsers();
 //            $scope.getPools();
-            $log.debug('- - - refresh interval - - -')
+            $log.debug('- - - refresh interval - - -');
             $scope.getPoolsStatus();
             if (angular.isDefined($scope.model.poolId)) {
                 $scope.getPoolStatus($scope.model.poolId);

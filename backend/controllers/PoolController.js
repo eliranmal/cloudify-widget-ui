@@ -78,6 +78,10 @@ exports.readPoolTasks = function( req, res ){
     managers.poolClient.readPoolTasks(req.user.poolKey, req.params.poolId, _callback(res));
 };
 
+exports.readCloudNodes = function( req, res ){
+    managers.poolClient.readCloudNodes(req.user.poolKey, req.params.poolId, _callback(res));
+};
+
 
 /**************** ACCOUNT LEVEL CALLS ***************************/
 

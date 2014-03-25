@@ -69,6 +69,10 @@ angular.module('cloudifyWidgetUiApp')
                 return $http.get('/backend/admin/pools/' + poolId + '/tasks');
             };
 
+            this.getCloudNodes = function (poolId) {
+                return $http.get('/backend/admin/pools/' + poolId + '/cloud/nodes');
+            };
+
         }
 
         return new AdminPoolCrudService();

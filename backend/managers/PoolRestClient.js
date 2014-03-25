@@ -33,7 +33,6 @@ function Call() {
 
     function _callbackWrapper(callback) {
         return function (data, response) {
-            logger.info(' in callback');
             if (response.statusCode == 200) {
                 callback(null, data);
             } else {
@@ -211,6 +210,11 @@ exports.readPoolErrors = function (poolKey, poolId, callback) {
 exports.readPoolTasks = function (poolKey, poolId, callback) {
     logger.info('reading pool tasks [%s]', poolId);
     call.get('/admin/pools/${poolId}/tasks', _args().poolKey(poolKey).poolId(poolId), callback);
+};
+
+exports.readCloudNodes = function (poolKey, poolId, callback) {
+    logger.info('reading cloud nodes for pool [%s]', poolId);
+    call.get('/admin/pools/${poolId}/cloud/nodes', _args().poolKey(poolKey).poolId(poolId), callback);
 };
 
 

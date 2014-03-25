@@ -123,6 +123,14 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.getCloudNodes = function (poolId) {
+            $log.debug('getCloudNodes, poolId: ', poolId);
+            $scope.model.poolCloudNodes = 0;
+            AdminPoolCrudService.getCloudNodes(poolId).then(function (result) {
+                $scope.model.poolCloudNodes = result.data;
+            });
+        };
+
 
         var refreshInterval = $interval(function () {
             // TODO create child controllers and separate behaviors so we wouldn't have to call every getter

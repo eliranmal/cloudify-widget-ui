@@ -1,0 +1,27 @@
+<div layout>
+
+    <h3>Cloud node mappings for pool {{ model.poolId }}</h3>
+    <button ng-click="getCloudNodes(model.poolId)">refresh</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Node ID</th>
+                <th>Machine ID</th>
+                <th>Machine IP</th>
+            </tr>
+        </thead>
+        <tbody ng-show="model.poolCloudNodes">
+            <tr ng-repeat="cloudNode in model.poolCloudNodes">
+                <td>{{ cloudNode.nodeId }}</td>
+                <td>{{ cloudNode.machineId }}</td>
+                <td><pre>{{ cloudNode.ip | json }}</pre></td>
+            </tr>
+        </tbody>
+        <tbody ng-show="model.poolCloudNodes === 0">
+            <tr>
+                <td colspan="3">Loading...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

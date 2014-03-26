@@ -5,8 +5,6 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.model = {};
 
-        var element;
-
         // see: http://stackoverflow.com/questions/12197880/angularjs-how-to-make-angular-load-script-inside-ng-include
         $scope.$on('$viewContentLoaded', function cloudifyWidgetOnLoadHandler() {
                 var api_key = '879aae73-e3eb-43c8-9142-7c699689454d';
@@ -16,12 +14,10 @@ angular.module('cloudifyWidgetUiApp')
                 var params = ['apiKey=' + api_key, 'title=' + title, 'origin_page_url=' + window.location.href, 'video_url=' + (video_url || '')];
 
                 var iframe = document.createElement('iframe');
-                element = document.getElementById('cloudify-widget');
-                element.parentNode.insertBefore(iframe, element.nextSibling);
+                var element = document.getElementById('cloudify-widget');
+                element.appendChild(iframe);
 
                 iframe.setAttribute('src', '//' + host + '/widget/widget?' + params.join('&'));
-                iframe.setAttribute('width', '600px');
-                iframe.setAttribute('height', '463px');
                 iframe.setAttribute('frameborder', 'no');
             }
         );
@@ -41,16 +37,16 @@ angular.module('cloudifyWidgetUiApp')
 
 
         $scope.$watch('model.appFrameUrl', function (n, o, s) {
+            console.debug('> model.appFrameUrl updated: ', n);
             if (element && n) {
                 console.log('app frame url: ', n);
 
                 var appFrame = document.createElement('iframe');
                 appFrame.setAttribute('src', n);
-                appFrame.setAttribute('width', '600px');
-                appFrame.setAttribute('height', '463px');
                 appFrame.setAttribute('frameborder', 'no');
 
-                element.parentNode.appendChild(appFrame, element.nextSibling);
+                var element = document.getElementById('app-frame');
+                element.appendChild(appFrame);
             }
         }, true);
 

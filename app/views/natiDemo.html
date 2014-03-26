@@ -1,17 +1,61 @@
 <section id="nati-demo">
 
     <style>
-        #nati-demo iframe {
-            width: 600px;
-            height: 463px;
-            border: 0 none;
-            float: left;
+        #nati-demo {
+            margin: 1em;
         }
+        #nati-demo .frames {
+            position: relative;
+            margin: 1em 0;
+        }
+        #nati-demo .frame-box {
+            position: absolute;
+            left: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 463px;
+        }
+        #nati-demo .frame-box#cloudify-widget {
+            width: 600px;
+        }
+        #nati-demo .frame-box#app-frame {
+            margin-left: 620px;
+            right: 0;
+            background-color: #ddd;
+        }
+        #nati-demo .frame-box iframe {
+            border: 0 none;
+            width: 100%;
+            height: 100%;
+            display: block;
+            margin: 0 1em 0 0;
+        }
+        #nati-demo .frame-box#app-frame .message {
+            margin-top: 180px;
+            text-align: center;
+            font-size: 2em;
+            line-height: 1.4;
+            text-shadow: 1px 1px #fff;
+            color: #555;
+        }
+
     </style>
 
     <h1>Chef Demo</h1>
 
-    <div id="cloudify-widget">
+    <div class="frames">
+        <div class="frame-box" id="cloudify-widget"></div>
+        <div class="frame-box" id="app-frame">
+            <div ng-hide="model.appFrameUrl" class="message">
+                <p>
+                    Click the play button to launch.
+                </p>
+                <p>
+                    The app page will appear here when it is installed.
+                </p>
+            </div>
+        </div>
     </div>
 
 </section>

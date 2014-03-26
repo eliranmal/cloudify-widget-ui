@@ -17,7 +17,7 @@ cat <<END
 
 source /etc/sysconfig/widget-pool-manager
 
-SCRIPT=$INSTALL_LOCATION/build/start.sh
+SCRIPT=$INSTALL_LOCATION/start.sh
 RUNAS=root
 
 PIDFILE=/var/run/widgetui.pid

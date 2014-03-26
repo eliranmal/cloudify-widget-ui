@@ -55,6 +55,10 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 templateUrl: 'views/demo.html',
                 controller: 'DemoCtrl'
             })
+            .when('/natidemo', {
+                templateUrl: 'views/natiDemo.html',
+                controller: 'NatiDemoCtrl'
+            })
             .when('/dashboard', {
                 templateUrl: 'views/dashboard.html',
                 controller: 'DashboardCtrl'

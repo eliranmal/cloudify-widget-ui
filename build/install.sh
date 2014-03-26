@@ -7,7 +7,7 @@ install_main(){
     eval "`wget --no-cache --no-check-certificate -O - http://get.gsdev.info/gsat/1.0.0/install_gsat.sh | dos2unix`"
 
 
-    install_mysql
+    install_mongo
 
     install_node
 

@@ -16,8 +16,8 @@
         <tbody>
             <tr ng-repeat="task in model.poolTasks">
                 <td>{{ task.id }}</td>
-                <td>{{ task.startTime | date:'medium'}}</td>
                 <td>{{ task.taskName }}</td>
+                <td>{{ task.startTime | date:'medium'}}</td>
                 <td>{{ task.nodeId }}</td>
                 <td>{{ task.poolId }}</td>
             </tr>

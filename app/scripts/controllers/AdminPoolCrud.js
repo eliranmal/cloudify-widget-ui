@@ -4,7 +4,7 @@ angular.module('cloudifyWidgetUiApp')
     .controller('AdminPoolCrudCtrl', function ($scope, $log, $routeParams, $interval, AdminPoolCrudService) {
 
         $scope.model = {
-            accountId: $routeParams.acountId,
+            accountId: $routeParams.accountId,
             poolId: $routeParams.poolId,
             newPoolSettings: '',
             accountPools: [],

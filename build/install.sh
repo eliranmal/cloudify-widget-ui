@@ -18,16 +18,19 @@ install_main(){
 }
 
 upgrade_main(){
+    echo "start upgrade_main"
      eval "`wget --no-cache --no-check-certificate -O - http://get.gsdev.info/gsat/1.0.0/install_gsat.sh | dos2unix`"
-
+    echo "upgrade_main, before SYSCONFIG_FILE"
     SYSCONFIG_FILE=widget-ui read_sysconfig
-
+    echo "upgrade_main, before mkdir -p"
      mkdir -p /opt/cloudify-widget-ui
+     echo "upgrade_main, before npm install"
      npm install http://get.gsdev.info/cloudify-widget-ui/1.0.0/cloudify-widget-ui-1.0.0.tgz -g --prefix /opt/cloudify-widget-ui
-
+    echo "upgrade_main, before dos2unix"
      dos2unix /opt/cloudify-widget-ui/**/*.sh
+     echo "start upgrade_main"
      chmod +x /opt/cloudify-widget-ui/**/*.sh
-
+    echo "start upgrade_main"
     INSTALL_LOCATION=/opt/cloudify-widget-ui/lib/node_modules/cloudify-widget-ui
     echo "installing service script under widget-pool"
     SERVICE_NAME=widget-ui SERVICE_FILE=$INSTALL_LOCATION/build/service.sh install_initd_script

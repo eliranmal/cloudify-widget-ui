@@ -14,7 +14,7 @@ angular.module('cloudifyWidgetUiApp')
                 var params = ['apiKey=' + api_key, 'title=' + title, 'origin_page_url=' + window.location.href, 'video_url=' + (video_url || '')];
 
                 var iframe = document.createElement('iframe');
-                var element = document.getElementById('cloudify-widget');
+                var element = document.getElementById('widget-frame');
                 element.appendChild(iframe);
 
                 iframe.setAttribute('src', '//' + host + '/widget/widget?' + params.join('&'));
@@ -38,7 +38,8 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.$watch('model.appFrameUrl', function (n, o, s) {
             console.debug('> model.appFrameUrl updated: ', n);
-            if (element && n) {
+
+            if (n) {
                 console.log('app frame url: ', n);
 
                 var appFrame = document.createElement('iframe');

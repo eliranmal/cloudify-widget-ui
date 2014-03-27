@@ -46,7 +46,7 @@ angular.module('cloudifyWidgetUiApp')
             };
 
             this.getPoolNodes = function (poolId) {
-                return $http.get('/backend/admin/pools/' + poolId + '/nodes')
+                return $http.get('/backend/admin/pools/' + poolId + '/nodes');
             };
 
             this.addPoolNode = function (poolId) {

@@ -7,6 +7,6 @@ angular.module('cloudifyWidgetUiApp')
             AdminService.getPools().then(function (result) {
                 $scope.pools = result.data;
             });
-        }
+        };
 
     });

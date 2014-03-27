@@ -7,12 +7,12 @@ describe('Service: PostParentService', function () {
 
   // instantiate service
   var PostParentService;
-  beforeEach(inject(function (_PostParentService_) {
-    PostParentService = _PostParentService_;
-  }));
-
-  it('should do something', function () {
-    expect(!!PostParentService).toBe(true);
-  });
+//  beforeEach(inject(function (_PostParentService_) {
+//    PostParentService = _PostParentService_;
+//  }));
+//
+//  it('should do something', function () {
+//    expect(!!PostParentService).toBe(true);
+//  });
 
 });

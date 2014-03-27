@@ -63,7 +63,7 @@ angular.module('cloudifyWidgetUiApp')
                     $log.error(['status error', result]);
                 });
             } else {
-                $log.info("removing widget status");
+                $log.info('removing widget status');
                 delete $localStorage.widgetStatus;
             }
         }
@@ -80,7 +80,7 @@ angular.module('cloudifyWidgetUiApp')
                     _pollStatus(1);
                 }, function (result) {
                     console.log(['play error', result]);
-                    _resetWidgetStatus("We are so hot that we ran out of instances. Please try again later.");
+                    _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
                 });
         };
 
@@ -93,5 +93,5 @@ angular.module('cloudifyWidgetUiApp')
 
         WidgetsService.getWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;
-        })
+        });
     });

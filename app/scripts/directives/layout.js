@@ -6,8 +6,8 @@ angular.module('cloudifyWidgetUiApp')
             templateUrl: 'views/loggedInLayout.html',
             transclude: true,
             restrict: 'A',
-            link: function postLink(scope, element, attrs) {
-                if ( $rootScope.user == null ){
+            link: function postLink(scope/*, element, attrs*/) {
+                if ( $rootScope.user === null ){
                     $http.get('/backend/user/loggedIn').then(function ( data ) {
                         $rootScope.user = data.data;
                     });
@@ -22,8 +22,8 @@ angular.module('cloudifyWidgetUiApp')
                         function error(  ){
                             $log.error('unable to logout');
                         }
-                    )
-                }
+                    );
+                };
             }
         };
     });

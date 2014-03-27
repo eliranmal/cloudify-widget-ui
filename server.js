@@ -98,6 +98,7 @@ app.get('/backend/user/account/pools/:poolId/status', controllers.pool.accountRe
 app.get('/backend/user/account/pools/status', controllers.pool.accountReadPoolsStatus);
 
 
-var server = app.listen(9001, function(){
+var widgetPort = process.argv[2] || 9001;
+var server = app.listen(widgetPort, function(){
     console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
 });

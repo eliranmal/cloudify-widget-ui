@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('LoginCtrl', function ($scope, $log, $http, $rootScope, $location, $cookieStore) {
+    .controller('LoginCtrl', function ($scope, $log, $http, $rootScope, $location) {
 
         $scope.needsLogin = false;
-        $http.get('/backend/user/loggedIn').then(function ( user ) {
+        $http.get('/backend/user/loggedIn').then(function (/*user*/) {
             $location.path('/widgets');
         }, function () {
             $scope.needsLogin = true;
@@ -12,8 +12,8 @@ angular.module('cloudifyWidgetUiApp')
         });
 
         $scope.page = {
-            "email": null,
-            "password": null
+            'email': null,
+            'password': null
         };
 
 
@@ -28,6 +28,6 @@ angular.module('cloudifyWidgetUiApp')
                     $log.error('unable to login');
                     $scope.pageError = result.data.message;
                 }
-            )
-        }
+            );
+        };
     });

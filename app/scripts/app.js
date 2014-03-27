@@ -28,9 +28,9 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
             // optional method
             'response': function (response) {
 
-                if (response.status == 401) {
-                    $location.path('/login')
-                } else if (response.status == 500 && response.data.hasOwnProperty('message')) {
+                if (response.status === 401) {
+                    $location.path('/login');
+                } else if (response.status === 500 && response.data.hasOwnProperty('message')) {
                     $scope.pageError = response.data.message;
                 }
 

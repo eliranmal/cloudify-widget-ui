@@ -7,12 +7,12 @@ describe('Service: WidgetsService', function () {
 
   // instantiate service
   var WidgetsService;
-  beforeEach(inject(function (_WidgetsService_) {
-    WidgetsService = _WidgetsService_;
-  }));
-
-  it('should do something', function () {
-    expect(!!WidgetsService).toBe(true);
-  });
+//  beforeEach(inject(function (_WidgetsService_) {
+//    WidgetsService = _WidgetsService_;
+//  }));
+//
+//  it('should do something', function () {
+//    expect(!!WidgetsService).toBe(true);
+//  });
 
 });

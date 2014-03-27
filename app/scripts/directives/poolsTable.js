@@ -17,7 +17,7 @@ angular.module('cloudifyWidgetUiApp')
                         // save current state before user starts to edit
                         $scope.originalPoolSettings = pool.poolSettings;
                     } else if ($scope.originalPoolSettings !== pool.poolSettings) {
-                        $scope.updateAccountPool && $scope.updateAccountPool(pool);
+                        if ( !!$scope.updateAccountPool) { $scope.updateAccountPool(pool); }
                     }
                 };
 
@@ -27,7 +27,7 @@ angular.module('cloudifyWidgetUiApp')
                         if (newVal.length !== oldVal.length) {
                             // create an array of booleans in top of the scope hierarchy so we won't lose it
                             $rootScope.editModeStatusArray = new Array(newVal.length + 1).join('0').split('').map(function (val) {
-                                return !!+val;
+                                return val === '1';
                             });
                         }
                         // refresh our local instance

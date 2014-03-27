@@ -4,8 +4,8 @@ angular.module('cloudifyWidgetUiApp')
     .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, WidgetsService, $location, WidgetThemesService ) {
         $scope.clouds = [
             {
-                "label": "Softlayer",
-                "id": "softlayer"
+                'label': 'Softlayer',
+                'id': 'softlayer'
             }
         ];
 
@@ -40,12 +40,12 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.widgetAsJson = function(){
             return JSON.stringify($scope.widget, {}, 4);
-        }
+        };
 
         $scope.view = function(){
             $scope.update().then(function(){
                 $location.path('/widgets/' + $scope.widget._id + '/read');
-            })
+            });
         };
 
 
@@ -79,6 +79,6 @@ angular.module('cloudifyWidgetUiApp')
                     $log.info('error creating widget');
                 }
 
-            )
-        }
+            );
+        };
     });

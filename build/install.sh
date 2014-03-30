@@ -27,7 +27,8 @@ upgrade_main(){
      echo "upgrade_main, before npm install"
      npm install http://get.gsdev.info/cloudify-widget-ui/1.0.0/cloudify-widget-ui-1.0.0.tgz -g --prefix /opt/cloudify-widget-ui
     echo "upgrade_main, before dos2unix"
-     dos2unix /opt/cloudify-widget-ui/**/*.sh
+     #dos2unix /opt/cloudify-widget-ui/**/*.sh
+     find /opt/cloudify-widget-ui -type f -print0 | xargs -0 dos2unix
      echo "start upgrade_main"
      chmod +x /opt/cloudify-widget-ui/**/*.sh
     echo "start upgrade_main"

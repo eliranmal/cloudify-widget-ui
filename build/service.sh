@@ -1,10 +1,3 @@
-
-
-check_exists INSTALL_LOCATION
-
-
-cat <<END
-
 #!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          cwpm
@@ -19,9 +12,9 @@ source /etc/sysconfig/widget-pool-manager
 
 SCRIPT=$INSTALL_LOCATION/start.sh
 RUNAS=root
-
-PIDFILE=/var/run/widgetui.pid
-LOGFILE=/var/log/widgetui.log
+PIDNAME=widgetui
+PIDFILE=/var/run/$PIDNAME.pid
+LOGFILE=/var/log/$PIDNAME.log
 
 start() {
     echo "pidname is [$PIDNAME]"
@@ -47,14 +40,16 @@ stop() {
 
 status(){
 
-    if [ ! -f $(cat "/proc/$PIDFILE"); then
-        echo "service is stopped"
+    PROC_FILE=/proc/`cat $PIDFILE`
+    if [ -e $PROC_FILE ]; then
+        echo "service is running"
         return 0
     else
-        echo "service is running"
+        echo "service is stopped"
         return 0
     fi
 }
+
 
 upgrade(){
     $INSTALL_LOCATION/build/upgrade.sh
@@ -74,7 +69,7 @@ case "$1" in
   status)
     status
     ;;
-  retart)
+  restart)
     stop
     start
     ;;
@@ -82,4 +77,3 @@ case "$1" in
     echo "Usage: $0 {start|stop|restart}"
 esac
 
-END

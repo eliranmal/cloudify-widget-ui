@@ -8,7 +8,7 @@
 # Description:       A pool manager for cloudify widget
 ### END INIT INFO
 
-source /etc/sysconfig/widget-pool-manager
+source /etc/sysconfig/widget-ui
 
 SCRIPT=$INSTALL_LOCATION/start.sh
 RUNAS=root

@@ -284,7 +284,7 @@ module.exports = function (grunt) {
                     {
                         expand: true,
                         dest: '<%= yeoman.dist %>',
-                        src: [ '*.js', '*.sh','package.json', 'build/**/*', 'backend', 'conf' ]
+                        src: [ '*.js', '*.sh','package.json', 'build/**/*', 'backend/**/*', 'conf/**/*' ]
                     }
                 ]
             }

@@ -6,9 +6,11 @@ var prodConf = 'conf/prod.json';
 
 var conf;
 
-
 var data = fs.readFileSync(prodConf, 'utf8');
-_.assign(module.exports, JSON.parse(data));
+if (!!data) {
+    _.assign(module.exports, JSON.parse(data));
+}
 data = fs.readFileSync(meConf, 'utf8');
-_.assign(module.exports, JSON.parse(data));
-
+if (!!data) {
+    _.assign(module.exports, JSON.parse(data));
+}

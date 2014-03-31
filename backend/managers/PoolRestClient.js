@@ -123,7 +123,12 @@ function ArgsBuilder() {
     this.nodeId = function (_nodeId) {
         this.path({"nodeId": _nodeId});
         return this;
-    }
+    };
+
+    this.taskId = function (_taskId) {
+        this.path({"taskId": _taskId});
+        return this;
+    };
 }
 
 
@@ -210,6 +215,10 @@ exports.readPoolErrors = function (poolKey, poolId, callback) {
 exports.readPoolTasks = function (poolKey, poolId, callback) {
     logger.info('reading pool tasks [%s]', poolId);
     call.get('/admin/pools/${poolId}/tasks', _args().poolKey(poolKey).poolId(poolId), callback);
+};
+exports.deletePoolTask = function (poolKey, poolId, taskId, callback) {
+    logger.info('deleting pool task [%s] from pool [%s]', taskId, poolId);
+    call.post('/admin/pools/${poolId}/tasks/${taskId}/delete', _args().poolKey(poolKey).poolId(poolId).taskId(taskId), callback);
 };
 
 exports.readCloudNodes = function (poolKey, poolId, callback) {

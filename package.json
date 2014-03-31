@@ -45,6 +45,15 @@
     "karma": "~0.10.9",
     "grunt-connect-proxy": "~0.1.6"
   },
+    "bundledDependencies": [
+        "express",
+        "log4js",
+        "lodash",
+        "async",
+        "sha1",
+        "mongodb",
+        "node-rest-client"
+    ],
   "engines": {
     "node": ">=0.8.0"
   }

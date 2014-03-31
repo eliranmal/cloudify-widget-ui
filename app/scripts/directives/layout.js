@@ -7,7 +7,8 @@ angular.module('cloudifyWidgetUiApp')
             transclude: true,
             restrict: 'A',
             link: function postLink(scope/*, element, attrs*/) {
-                if ( $rootScope.user === null ){
+                console.log("layout directive :: " + $rootScope.user);
+                if ( !$rootScope.user ){
                     $http.get('/backend/user/loggedIn').then(function ( data ) {
                         $rootScope.user = data.data;
                     });

@@ -1,10 +1,26 @@
-@import "bootstrap-sass/lib/bootstrap";
+//@import "bootstrap-sass/lib/bootstrap";
 
 @import "./baseline";
 @import "./widgetView";
 @import "./widgetThemeDefault";
+@import "./login";
 
 // hide multiple layouts layers for "logged-in-layout" - means that if I have 2 pages one within another with the layout, the other layout will be hidden.
-#logged-in-layout .logged-in-layout .logged-in-layout.nested-hidden{
+#logged-in-layout {
+
+ .logged-in-layout .logged-in-layout.nested-hidden{
+
   display:none;
+
+ }
+  .require-login{ display:none }
+
+  &.logged-in{
+    display:default;
+    .require-login{ display:block}
+    .logged-out{ display:none}
+
+
+  }
+
 }

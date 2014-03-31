@@ -1,4 +1,5 @@
-<div class="container" id="logged-in-layout">
+<div class="container" id="logged-in-layout" ng-class="{'logged-in' : !!$root.user}">
+<div class="require-login">
 <div class="logged-in-layout nested-hidden">
     hello {{user.email}},
     <button ng-click="logout()">logout</button>
@@ -7,5 +8,6 @@
     <a admin ng-href="#/admin/pools/status">pools status</a>
 </div>
 <hr class="logged-in-layout nested-hidden"/>
+</div>
 <div ng-transclude class="logged-in-layout"></div>
 </div>

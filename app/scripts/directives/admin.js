@@ -7,10 +7,10 @@ angular.module('cloudifyWidgetUiApp')
             link: function postLink(scope, element/*, attrs*/) {
 
                 function update() {
-                    if (!!$rootScope.user) {
-                        if (!$rootScope.user.isAdmin) {
-                            element.remove();
-                        }
+                    if (!!$rootScope.user && !!$rootScope.user.isAdmin) {
+                            $(element).show();
+                    }else{
+                            $(element).hide();
                     }
                 }
 

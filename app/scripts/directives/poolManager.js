@@ -6,10 +6,10 @@ angular.module('cloudifyWidgetUiApp')
             restrict: 'A',
             link: function postLink(scope, element/*, attrs*/) {
                 function update() {
-                    if (!!$rootScope.user) {
-                        if (!$rootScope.user.isPoolManager) {
-                            element.remove();
-                        }
+                    if (!!$rootScope.user && !!$rootScope.user.isPoolManager) {
+                        $(element).show();
+                    }else{
+                        $(element).hide();
                     }
                 }
 

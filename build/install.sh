@@ -1,5 +1,5 @@
 # use this script by running
-# wget --no-cache --no-check-certificate -O - http://get.gsdev.info/cloudify-widget-ui/1.0.0/install.sh | dos2unix | bash
+# yum -y install dos2unix && wget --no-cache --no-check-certificate -O - http://get.gsdev.info/cloudify-widget-ui/1.0.0/install.sh | dos2unix | bash
 
 
 install_main(){
@@ -18,20 +18,32 @@ install_main(){
 }
 
 upgrade_main(){
+    echo "start upgrade_main"
      eval "`wget --no-cache --no-check-certificate -O - http://get.gsdev.info/gsat/1.0.0/install_gsat.sh | dos2unix`"
 
+    echo "upgrade_main, before SYSCONFIG_FILE"
     SYSCONFIG_FILE=widget-ui read_sysconfig
 
+
+
+     echo "installing ui npm package from [ $PACKAGE_URL ]"
+    PACKAGE_URL=http://get.gsdev.info/cloudify-widget-ui/1.0.0/cloudify-widget-ui-1.0.0.tgz
      mkdir -p /opt/cloudify-widget-ui
-     npm install http://get.gsdev.info/cloudify-widget-ui/1.0.0/cloudify-widget-ui-1.0.0.tgz -g --prefix /opt/cloudify-widget-ui
+     npm install $PACKAGE_URL -g --prefix /opt/cloudify-widget-ui
 
-     dos2unix /opt/cloudify-widget-ui/**/*.sh
-     chmod +x /opt/cloudify-widget-ui/**/*.sh
+    echo "converting files to unix format"
+     find /opt/cloudify-widget-ui -name "*.sh" -type f -print0 | xargs -0 dos2unix
 
+     echo "chmodding shell scripts for execution"
+     find /opt/cloudify-widget-ui -name "*.sh" -type f -print0 -exec chmod +x {} \;
+
+
+    echo "installing initd script"
     INSTALL_LOCATION=/opt/cloudify-widget-ui/lib/node_modules/cloudify-widget-ui
     echo "installing service script under widget-pool"
     SERVICE_NAME=widget-ui SERVICE_FILE=$INSTALL_LOCATION/build/service.sh install_initd_script
 
+    echo "installing me.conf"
     check_exists ME_CONF_URL;
     check_exists SYSCONF_URL;
 
@@ -40,11 +52,11 @@ upgrade_main(){
     run_wget -O $INSTALL_LOCATION/conf/dev/me.json $ME_CONF_URL
     dos2unix $INSTALL_LOCATION/conf/dev/me.json
 
-    echo "upgrading sysconfig file"
-    SYSCONFIG_FILE=/etc/sysconfig/widget-ui.sh
-    run_wget -O $SYSCONFIG_FILE $SYSCONF_URL
-    dos2unix  $SYSCONFIG_FILE
-    chmod +x $SYSCONFIG_FILE
+    echo "installing/upgrading cloudify from [ $CLOUDIFY_URL ]"
+    install_cloudify
+
+    echo "service widget-ui"
+    service widget-ui
 
 }
 

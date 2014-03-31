@@ -2,3 +2,6 @@ ME_CONF_URL=url_for_auto_updating_me_conf
 SYSCONF_URL=url_for_auto_updating_me_conf
 PORT=9056
 DOMAIN=widgetui.gsdev.info
+
+# alternatively, you can put the sysconfig available somewhere online and simply write
+# eval "`wget --no-cache --no-check-certificate -O - url_to_sysconfig | dos2unix`"

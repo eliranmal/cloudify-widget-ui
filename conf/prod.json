@@ -1,6 +1,6 @@
 {
     "name": "new-widget",
-    "mongodbUrl": null,
+    "mongodbUrl": "mongodb://127.0.0.1:27017/widget-ui",
     "adminUser": null,
     "poolRestUrl": {
         "protocol": "http",

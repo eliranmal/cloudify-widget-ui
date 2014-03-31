@@ -64,6 +64,12 @@ exports.delete = function ( req, res ){
     });
 };
 
+exports.play = function ( req, res ) {
+    managers.poolClient.createPoolNode(req.poolKey, req.poolId, function (result) {
+        logger.info('> > > play > got result ', result);
+    });
+};
+
 function verifyRequiredFields( fields, widget, errors  ){
 
     for ( var i in fields ){

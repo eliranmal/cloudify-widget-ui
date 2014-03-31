@@ -36,7 +36,7 @@ function Call() {
             if (response.statusCode == 200) {
                 callback(null, data);
             } else {
-                logger.info('got an error from rest client', data, response);
+                logger.info('got an error from rest client', response.statusCode);
                 callback(responseError(response, data));
             }
         }

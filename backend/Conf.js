@@ -2,7 +2,7 @@ var fs = require('fs');
 var async = require('async');
 var _  = require('lodash');
 var meConf = 'conf/dev/me.json';
-var prodConf = 'conf/dev/prod.json';
+var prodConf = 'conf/prod.json';
 
 var conf;
 

@@ -7,11 +7,11 @@ angular.module('cloudifyWidgetUiApp')
 
         // see: http://stackoverflow.com/questions/12197880/angularjs-how-to-make-angular-load-script-inside-ng-include
         $scope.$on('$viewContentLoaded', function cloudifyWidgetOnLoadHandler() {
-                var api_key = '879aae73-e3eb-43c8-9142-7c699689454d';
+                var apiKey = '879aae73-e3eb-43c8-9142-7c699689454d';
                 var host = 'launch.cloudifysource.org' || 'launch.cloudifysource.org';  // backward compatibility
                 var title = 'GigaSpaces XAP';
-                var video_url = '//www.youtube.com/embed/P0rTANBRuWE';
-                var params = ['apiKey=' + api_key, 'title=' + title, 'origin_page_url=' + window.location.href, 'video_url=' + (video_url || '')];
+                var videoUrl = '//www.youtube.com/embed/P0rTANBRuWE';
+                var params = ['apiKey=' + apiKey, 'title=' + title, 'origin_page_url=' + window.location.href, 'video_url=' + (videoUrl || '')];
 
                 var iframe = document.createElement('iframe');
                 var element = document.getElementById('widget-frame');
@@ -36,7 +36,7 @@ angular.module('cloudifyWidgetUiApp')
         });
 
 
-        $scope.$watch('model.appFrameUrl', function (n, o, s) {
+        $scope.$watch('model.appFrameUrl', function (n /*,o, s*/) {
             console.debug('> model.appFrameUrl updated: ', n);
 
             if (n) {

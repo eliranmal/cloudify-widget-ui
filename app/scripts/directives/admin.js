@@ -8,9 +8,9 @@ angular.module('cloudifyWidgetUiApp')
 
                 function update() {
                     if (!!$rootScope.user && !!$rootScope.user.isAdmin) {
-                            $(element).show();
-                    }else{
-                            $(element).hide();
+                        $(element).show();
+                    } else {
+                        $(element).hide();
                     }
                 }
 

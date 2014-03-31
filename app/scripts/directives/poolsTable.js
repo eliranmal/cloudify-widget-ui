@@ -26,7 +26,7 @@ angular.module('cloudifyWidgetUiApp')
                     if (angular.isDefined(newVal)) {
                         if (newVal.length !== oldVal.length) {
                             // create an array of booleans in top of the scope hierarchy so we won't lose it
-                            $rootScope.editModeStatusArray = Array.apply(null, new Array(newVal.length)).map(Boolean.prototype.valueOf, false);;
+                            $rootScope.editModeStatusArray = Array.apply(null, new Array(newVal.length)).map(Boolean.prototype.valueOf, false);
                         }
                         // refresh our local instance
                         $scope.editModeStatusArray = $rootScope.editModeStatusArray;

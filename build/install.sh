@@ -52,7 +52,6 @@ upgrade_main(){
     run_wget -O $INSTALL_LOCATION/conf/dev/me.json $ME_CONF_URL
     dos2unix $INSTALL_LOCATION/conf/dev/me.json
 
-
     echo "installing/upgrading cloudify from [ $CLOUDIFY_URL ]"
     install_cloudify
 

@@ -17,7 +17,7 @@ angular.module('cloudifyWidgetUiApp')
                         // save current state before user starts to edit
                         $scope.originalPoolSettings = pool.poolSettings;
                     } else if ($scope.originalPoolSettings !== pool.poolSettings) {
-                        if ( !!$scope.updateAccountPool) { $scope.updateAccountPool(pool); }
+                        $scope.updateAccountPool && $scope.updateAccountPool(pool);
                     }
                 };
 
@@ -26,9 +26,7 @@ angular.module('cloudifyWidgetUiApp')
                     if (angular.isDefined(newVal)) {
                         if (newVal.length !== oldVal.length) {
                             // create an array of booleans in top of the scope hierarchy so we won't lose it
-                            $rootScope.editModeStatusArray = new Array(newVal.length + 1).join('0').split('').map(function (val) {
-                                return val === '1';
-                            });
+                            $rootScope.editModeStatusArray = Array.apply(null, new Array(newVal.length)).map(Boolean.prototype.valueOf, false);;
                         }
                         // refresh our local instance
                         $scope.editModeStatusArray = $rootScope.editModeStatusArray;
@@ -54,17 +52,8 @@ angular.module('cloudifyWidgetUiApp')
                      $log.info('scrollTop: ', scrollTop);
                      }
                      */
-                });
 
-                // TODO create bitmask for editMode states
-                /*
-                 function createMask () {
-                 var nMask = 0, nFlag = 0, nLen = arguments.length > 32 ? 32 : arguments.length;
-                 for (nFlag; nFlag < nLen; nMask |= arguments[nFlag] << nFlag++);
-                 return nMask;
-                 }
-                 */
-
+                }, true);
             }
         };
     });

@@ -11,15 +11,17 @@
                 <th>Start Time</th>
                 <th>Node ID</th>
                 <th>Pool ID</th>
+                <th colspan="1">Actions</th>
             </tr>
         </thead>
         <tbody>
             <tr ng-repeat="task in model.poolTasks">
                 <td>{{ task.id }}</td>
-                <td>{{ task.startTime | date:'medium'}}</td>
                 <td>{{ task.taskName }}</td>
+                <td>{{ task.startTime | date:'medium'}}</td>
                 <td>{{ task.nodeId }}</td>
                 <td>{{ task.poolId }}</td>
+                <td><button ng-click="deletePoolTask(task.poolId, task.id)">delete task</button></td>
             </tr>
         </tbody>
     </table>

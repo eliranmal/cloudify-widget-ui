@@ -87,6 +87,9 @@ app.post('/backend/admin/pools/:poolId/nodes/:nodeId/bootstrap', controllers.poo
 
 app.get('/backend/admin/pools/:poolId/errors', controllers.pool.readPoolErrors);
 app.get('/backend/admin/pools/:poolId/tasks', controllers.pool.readPoolTasks);
+app.get('/backend/admin/pools/:poolId/tasks/:taskId/delete', controllers.pool.deletePoolTask);
+
+app.get('/backend/admin/pools/:poolId/cloud/nodes', controllers.pool.readCloudNodes);
 
 app.get('/backend/user/account/pools', controllers.pool.accountReadPools );
 app.post('/backend/user/account/pools', controllers.pool.createPool);

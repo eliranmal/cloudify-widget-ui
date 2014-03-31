@@ -55,6 +55,10 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 templateUrl: 'views/demo.html',
                 controller: 'DemoCtrl'
             })
+            .when('/natidemo', {
+                templateUrl: 'views/natiDemo.html',
+                controller: 'NatiDemoCtrl'
+            })
             .when('/dashboard', {
                 templateUrl: 'views/dashboard.html',
                 controller: 'DashboardCtrl'
@@ -89,6 +93,10 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
             })
             .when('/admin/pools/:poolId/errors', {
                 templateUrl: 'views/admin/poolErrors.html',
+                controller: 'AdminPoolCrudCtrl'
+            })
+            .when('/admin/pools/:poolId/cloud/nodes', {
+                templateUrl: 'views/admin/poolCloudNodes.html',
                 controller: 'AdminPoolCrudCtrl'
             })
             .when('/admin/accounts/:accountId/pools', {

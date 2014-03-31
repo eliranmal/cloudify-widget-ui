@@ -1,0 +1,73 @@
+<section id="nati-demo">
+
+    <style>
+        #nati-demo {
+            margin: 1em;
+        }
+        #nati-demo .frames {
+            position: relative;
+            margin: 1em 0;
+        }
+        #nati-demo .frame-box {
+            position: absolute;
+            left: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 463px;
+        }
+        #nati-demo .frame-box#widget-frame {
+            width: 600px;
+        }
+        #nati-demo .frame-box#app-frame {
+            margin-left: 620px;
+            right: 0;
+            background-color: #ddd;
+        }
+        #nati-demo .frame-box iframe {
+            border: 0 none;
+            width: 100%;
+            height: 100%;
+            display: block;
+            margin: 0 1em 0 0;
+        }
+        #nati-demo .frame-box#app-frame .message {
+            margin-top: 180px;
+            text-align: center;
+            font-size: 2em;
+            line-height: 1.4;
+            text-shadow: 1px 1px #fff;
+            color: #555;
+        }
+
+    </style>
+
+    <h1>Chef Demo</h1>
+
+    <div class="frames">
+        <div class="frame-box" id="widget-frame"></div>
+        <div class="frame-box" id="app-frame">
+            <div ng-hide="model.appFrameUrl" class="message">
+                <p>
+                    Click the play button to launch.
+                </p>
+                <p>
+                    The app page will appear here when it is installed.
+                </p>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+
+<!--
+    <script type="text/javascript"
+            id="cloudify-widget"
+            data-api-key="879aae73-e3eb-43c8-9142-7c699689454d"
+            data-title="GigaSpaces XAP"
+            data-host="launch.cloudifysource.org"
+            data-video_url="//www.youtube.com/embed/P0rTANBRuWE"
+            src="//launch.cloudifysource.org/js/get_widget.js"></script>
+-->

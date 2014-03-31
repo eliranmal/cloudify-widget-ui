@@ -4,7 +4,7 @@ angular.module('cloudifyWidgetUiApp')
     .controller('AdminPoolCrudCtrl', function ($scope, $log, $routeParams, $interval, AdminPoolCrudService) {
 
         $scope.model = {
-            accountId: $routeParams.acountId,
+            accountId: $routeParams.accountId,
             poolId: $routeParams.poolId,
             newPoolSettings: '',
             accountPools: [],
@@ -120,6 +120,21 @@ angular.module('cloudifyWidgetUiApp')
             $log.debug('getPoolTasks, poolId: ', poolId);
             AdminPoolCrudService.getPoolTasks(poolId).then(function (result) {
                 $scope.model.poolTasks = result.data;
+            });
+        };
+
+        $scope.deletePoolTask = function (poolId, taskId) {
+            $log.debug('deletePoolTask, poolId: ', poolId, ', taskId: ', taskId);
+            AdminPoolCrudService.deletePoolTask(poolId, taskId).then(function () {
+                $log.debug('deleted pool task');
+            });
+        };
+
+        $scope.getCloudNodes = function (poolId) {
+            $log.debug('getCloudNodes, poolId: ', poolId);
+            $scope.model.poolCloudNodes = 0;
+            AdminPoolCrudService.getCloudNodes(poolId).then(function (result) {
+                $scope.model.poolCloudNodes = result.data;
             });
         };
 

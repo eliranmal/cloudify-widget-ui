@@ -9,7 +9,7 @@
 ### END INIT INFO
 
 source /etc/sysconfig/widget-ui
-INSTALL_LOCATION=/opt/cloudify-widget-ui/lib/node_modules/cloudify-widget-ui
+INSTALL_LOCATION=/var/www/cloudify-widget-ui/lib/node_modules/cloudify-widget-ui
 SCRIPT=$INSTALL_LOCATION/start.sh
 RUNAS=root
 PIDNAME=widgetui

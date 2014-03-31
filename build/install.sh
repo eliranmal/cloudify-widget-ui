@@ -10,6 +10,8 @@ install_main(){
 
     install_mongo
 
+    install_nginx
+
     install_node
 
     upgrade_main
@@ -28,18 +30,18 @@ upgrade_main(){
 
      echo "installing ui npm package from [ $PACKAGE_URL ]"
     PACKAGE_URL=http://get.gsdev.info/cloudify-widget-ui/1.0.0/cloudify-widget-ui-1.0.0.tgz
-     mkdir -p /opt/cloudify-widget-ui
-     npm install $PACKAGE_URL -g --prefix /opt/cloudify-widget-ui
+     mkdir -p /var/www/cloudify-widget-ui
+     npm install $PACKAGE_URL -g --prefix /var/www/cloudify-widget-ui
 
     echo "converting files to unix format"
-     find /opt/cloudify-widget-ui -name "*.sh" -type f -print0 | xargs -0 dos2unix
+     find /var/www/cloudify-widget-ui -name "*.sh" -type f -print0 | xargs -0 dos2unix
 
      echo "chmodding shell scripts for execution"
-     find /opt/cloudify-widget-ui -name "*.sh" -type f -print0 -exec chmod +x {} \;
+     find /var/www/cloudify-widget-ui -name "*.sh" -type f -print0 -exec chmod +x {} \;
 
 
     echo "installing initd script"
-    INSTALL_LOCATION=/opt/cloudify-widget-ui/lib/node_modules/cloudify-widget-ui
+    INSTALL_LOCATION=/var/www/cloudify-widget-ui/lib/node_modules/cloudify-widget-ui
     echo "installing service script under widget-pool"
     SERVICE_NAME=widget-ui SERVICE_FILE=$INSTALL_LOCATION/build/service.sh install_initd_script
 

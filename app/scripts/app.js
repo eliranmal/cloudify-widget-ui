@@ -107,6 +107,7 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 templateUrl: 'views/admin/createUserPool.html',
                 controller: 'AdminPoolCrudCtrl'
             })
+
             .when('/widgets', {
                 templateUrl: 'views/dashboard.html',
                 controller: 'DashboardCtrl'
@@ -131,6 +132,7 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 templateUrl: 'views/widget/themes/widgetEmbed.html',
                 controller: 'WidgetEmbedCtrl'
             })
+
             .when('/admin/pools/:poolId/combinedView', {
                 templateUrl: 'views/pools/combinedStatusView.html'
             })

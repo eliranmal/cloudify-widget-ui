@@ -16,9 +16,6 @@ exports.login = function(req, res){
             if ( !!obj ){
                 logger.info('user ' + credentials.email + ' logged in');
                 req.session.userId = obj._id.toString();
-
-                // TODO should we do that, or is there a method of getting user by its id?
-
                 res.send( managers.users.getPublicUserDetails( obj ) );
                 done();
                 return;

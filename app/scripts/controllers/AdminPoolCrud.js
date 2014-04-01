@@ -139,6 +139,13 @@ angular.module('cloudifyWidgetUiApp')
         };
 
 
+
+        $scope.asJson = function (jsonString) {
+            return angular.fromJson(jsonString);
+        };
+
+
+
         var refreshInterval = $interval(function () {
             // TODO create child controllers and separate behaviors so we wouldn't have to call every getter
 //            $scope.getUsers();

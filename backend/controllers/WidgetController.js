@@ -84,7 +84,8 @@ exports.play = function ( req, res ) {
 
     logger.info('reading account pools');
     managers.poolClient.accountReadPools(req.user.poolKey, _callback(res, function (result) {
-        var data = JSON.parse(result);
+        var data;
+        result && (data = JSON.parse(result));
         data && data.length && data.forEach(function (d) {
             if (d.poolSettings.provider.name === req.params.cloudId) {
                 var poolId = d.id;

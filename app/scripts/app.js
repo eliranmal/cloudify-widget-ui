@@ -146,5 +146,5 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
 
         $httpProvider.interceptors.push('myHttpInterceptor');
 
-        $logProvider.debugEnabled(true);
+        $logProvider.debugEnabled(false);
     });

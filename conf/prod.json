@@ -1,10 +1,11 @@
 {
-    "name": "new-widget",
-    "mongodbUrl": "mongodb://127.0.0.1:27017/widget-ui",
-    "adminUser": null,
-    "poolRestUrl": {
-        "protocol": "http",
-        "domain": "http://15.185.166.99",
-        "port": "8011"
+    "name" : "new-widget",
+    "mongodbUrl": null,
+    "adminUserExample" :  { "email" : "admin@gigaspaces.com" , "password" : "1q2w3e4r" , "poolKey" : "7859674589673489567"},
+    "adminUser" : null,
+    "poolRestUrl" :{
+        "protocol" : "http",
+        "domain" : "localhost",
+        "port" : "8011"
     }
 }

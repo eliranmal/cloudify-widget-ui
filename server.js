@@ -17,7 +17,7 @@ if ( !!conf.adminUser ){
     conf.adminUser.passwordConfirm = conf.adminUser.password;
     conf.adminUser.firstName = 'admin';
     conf.adminUser.lastName = 'admin';
-    conf.adminUser.poolKey = '7859674589673489567';
+    conf.adminUser.poolKey = conf.adminUser.poolKey;
     conf.adminUser.isAdmin = true;
     managers.users.createUser(conf.adminUser, function(err, user){
         if ( !!err && err.indexOf('exists') < 0 ){
@@ -60,7 +60,7 @@ app.post('/backend/user/widgets', controllers.widgets.create);
 app.post('/backend/user/widgets/:widgetId/delete', controllers.widgets.delete);
 app.get('/backend/user/widgets/:widgetId', controllers.widgets.read);
 app.post('/backend/user/widgets/:widgetId/update', controllers.widgets.update);
-app.post('/backend/widgets/:widgetId/play', function(req, res){  res.send(500, 'TBD')});
+app.post('/backend/user/widgets/:widgetId/play/:cloudId', controllers.widgets.play);
 app.post('/backend/widgets/:widgetId/stop', function(req, res){ res.send(500, 'TBD')} );
 app.post('/backend/widgets/:widgetId/status', function(req, res){ res.send(500, 'TBD')} );
 // a route to check if user logged in. relies on middleware to do the actual verification.

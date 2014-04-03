@@ -64,6 +64,39 @@ exports.delete = function ( req, res ){
     });
 };
 
+
+function _callback( res, callback ){
+    return function( err, data ){
+        if ( !!err ){
+            res.send(err.response.statusCode, err.data);
+        }
+        if ( !!callback ){
+            callback(data);
+        }
+        else{
+            res.send(data);
+        }
+    }
+}
+
+exports.play = function ( req, res ) {
+    logger.info('calling widget play for user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
+
+    logger.info('reading account pools');
+    managers.poolClient.accountReadPools(req.user.poolKey, _callback(res, function (result) {
+        var data;
+        result && (data = JSON.parse(result));
+        data && data.length && data.forEach(function (d) {
+            if (d.poolSettings.provider.name === req.params.cloudId) {
+                var poolId = d.id;
+                logger.info('found pool [%s] matching cloud [%s]', poolId, req.params.cloudId);
+                managers.poolClient.occupyPoolNode(req.user.poolKey, poolId, _callback(res));
+            }
+        });
+    }));
+
+};
+
 function verifyRequiredFields( fields, widget, errors  ){
 
     for ( var i in fields ){

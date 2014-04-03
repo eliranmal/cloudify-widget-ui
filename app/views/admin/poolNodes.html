@@ -10,6 +10,7 @@
                 <th>Machine ID</th>
                 <th>Pool Settings ID</th>
                 <th>Machine Status</th>
+                <th>Machine SSH Details</th>
                 <th colspan="2">Actions</th>
             </tr>
         </thead>
@@ -19,6 +20,7 @@
                 <td>{{ node.machineId }}</td>
                 <td>{{ node.poolId }}</td>
                 <td>{{ node.nodeStatus }}</td>
+                <td><pre>{{ asJson(node.machineSshDetails) | json }}</pre></td>
                 <td>
                     <button ng-if="node.id" ng-click="bootstrapPoolNode(model.poolId, node.id)">bootstrap node</button>
                 </td>

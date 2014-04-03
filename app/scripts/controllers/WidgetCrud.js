@@ -6,6 +6,14 @@ angular.module('cloudifyWidgetUiApp')
             {
                 'label': 'Softlayer',
                 'id': 'softlayer'
+            },
+            {
+                'label': 'HP',
+                'id': 'hp'
+            },
+            {
+                'label': 'EC2',
+                'id': 'ec2'
             }
         ];
 

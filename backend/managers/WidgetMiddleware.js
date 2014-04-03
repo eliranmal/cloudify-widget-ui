@@ -23,7 +23,6 @@ exports.loggedUser = function ( req, res, next ){
         return;
     }
     var userId = req.session.userId;
-    console.log(JSON.stringify(req.session));
     if ( !userId ){
         res.send(401, {'message':'need to login'});
         return;

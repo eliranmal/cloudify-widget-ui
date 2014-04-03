@@ -36,7 +36,7 @@ function Call() {
             if (response.statusCode == 200) {
                 callback(null, data);
             } else {
-                logger.info('got an error from rest client', data, response);
+                logger.info('got an error from rest client', response.statusCode);
                 callback(responseError(response, data));
             }
         }
@@ -129,6 +129,16 @@ function ArgsBuilder() {
         this.path({"taskId": _taskId});
         return this;
     };
+
+    this.widgetId = function (_widgetId) {
+        this.path({"widgetId": _widgetId});
+        return this;
+    };
+
+    this.cloudId = function (_cloudId) {
+        this.path({"cloudId": _cloudId});
+        return this;
+    };
 }
 
 
@@ -206,6 +216,10 @@ exports.deletePoolNode = function (poolKey, poolId, nodeId, callback) {
 exports.bootstrapPoolNode = function (poolKey, poolId, nodeId, callback) {
     logger.info('bootstrapping machine');
     call.post('/admin/pools/${poolId}/nodes/${nodeId}/bootstrap', _args().poolKey(poolKey).poolId(poolId).nodeId(nodeId), callback);
+};
+exports.occupyPoolNode = function (poolKey, poolId, callback) {
+    logger.info('occupying machine in pool');
+    call.get('/account/pools/${poolId}/occupy', _args().poolKey(poolKey).poolId(poolId), callback);
 };
 
 exports.readPoolErrors = function (poolKey, poolId, callback) {

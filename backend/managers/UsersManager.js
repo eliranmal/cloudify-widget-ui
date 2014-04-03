@@ -35,7 +35,7 @@ exports.createUser = function( user, callback ){
                 done();
                 return;
             }else{
-                delete user['confirmPassword'];
+                delete user['confirmPassword']; // TODO fix - change to 'passwordConfirm' - this is persisted!
                 user.password = sha1(user.password);
                 collection.insert(user, function( err, obj ){
                     if ( !!err ){

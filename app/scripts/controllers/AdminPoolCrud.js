@@ -141,7 +141,7 @@ angular.module('cloudifyWidgetUiApp')
 
 
         $scope.asJson = function (jsonString) {
-            return angular.fromJson(jsonString);
+            return angular.fromJson(jsonString) || '';
         };
 
 

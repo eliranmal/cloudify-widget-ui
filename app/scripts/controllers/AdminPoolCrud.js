@@ -156,6 +156,7 @@ angular.module('cloudifyWidgetUiApp')
                 $scope.getPoolStatus($scope.model.poolId);
                 $scope.getPoolNodes($scope.model.poolId);
                 $scope.getPoolTasks($scope.model.poolId);
+                $scope.getPoolErrors($scope.model.poolId);
             }
             if (angular.isDefined($scope.model.accountId)) {
                 $scope.getAccountPools($scope.model.accountId);

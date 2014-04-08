@@ -124,7 +124,7 @@
                             if (!window.appFrameUrl &&
                                     data.status.consoleLink && data.status.consoleLink.url) {
                                 // get the app frame url
-                                window.appFrameUrl = '//' + data.status.publicIp + ':8080';
+                                window.appFrameUrl = '//' + data.status.publicIp + ':8080' + '/wd/root/gigaspaces-cloudify-2.7.0-rc/work/processing-units/xap9x-tiny_butterfly_1_1845431522/ext/';
                                 console.log('app frame url: ', window.appFrameUrl);
                                 // create a frame for the app and inject it
                                 var appFrame = document.createElement('iframe');

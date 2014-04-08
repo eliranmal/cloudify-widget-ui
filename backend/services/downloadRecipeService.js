@@ -63,9 +63,14 @@ if ( require.main === module ) {
 
     logger.info('running main file, download recipe');
     try{
-        var params = '{ "distDir": ".", "cloudifyRecipeUrl": "https://dl.dropboxusercontent.com/s/u51vae4947uto0u/biginsights_solo.zip?dl=1&token_hash=AAEi1Dx3f2AFvkYXRe3FgfpspkBkQCZLLaRJb7DYHe-y1w" }';
+        var params = {
+            distDir: "downloaded",
+            cloudifyRecipeUrl: "https://dl.dropboxusercontent.com/s/u51vae4947uto0u/biginsights_solo.zip?dl=1&token_hash=AAEi1Dx3f2AFvkYXRe3FgfpspkBkQCZLLaRJb7DYHe-y1w"
+        };
         logger.info('start....');
-        var execConfiguration = exports.donwloadRecipe( JSON.parse(params), function(){logger.info('finished...');} );
+        exports.donwloadRecipe(params, function () {
+            logger.info('finished...');
+        });
 
     }catch(e){
         logger.error('error while running donwloadRecipe',e);

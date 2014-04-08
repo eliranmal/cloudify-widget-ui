@@ -1,5 +1,5 @@
 //include///
-var logger = require('log4js').getLogger('CloudifyCliService');
+var logger = require('log4js').getLogger('DownloadRecipeService');
 
 var fs = require('fs');
 var path = require('path');
@@ -20,10 +20,10 @@ function mkdirp( directory ){
     }
 }
 
-exports.donwloadRecipe = function( command, callback ){
+exports.downloadRecipe = function( options, callback ){
 
-    var distDir = command.distDir;
-    var cloudifyRecipeUrl = command.cloudifyRecipeUrl;
+    var distDir = options.distDir;
+    var cloudifyRecipeUrl = options.cloudifyRecipeUrl;
 
     if ( !distDir ){
         throw new Error('Distination directory parameter is missing');
@@ -42,7 +42,7 @@ exports.donwloadRecipe = function( command, callback ){
 
     var file = fs.createWriteStream( recipeZipFile );
 
-    var request = https.get(cloudifyRecipeUrl, function(response) {
+    https.get(cloudifyRecipeUrl, function(response) {
         logger.info('before zip save');
         response.pipe(file);
         file.on('finish', function() {
@@ -68,11 +68,11 @@ if ( require.main === module ) {
             cloudifyRecipeUrl: "https://dl.dropboxusercontent.com/s/u51vae4947uto0u/biginsights_solo.zip?dl=1&token_hash=AAEi1Dx3f2AFvkYXRe3FgfpspkBkQCZLLaRJb7DYHe-y1w"
         };
         logger.info('start....');
-        exports.donwloadRecipe(params, function () {
+        exports.downloadRecipe(params, function () {
             logger.info('finished...');
         });
 
     }catch(e){
-        logger.error('error while running donwloadRecipe',e);
+        logger.error('error while running downloadRecipe',e);
     }
 }

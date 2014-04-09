@@ -63,10 +63,9 @@
     <textarea ng-model="widget.endOfTrialSnippet"></textarea>
 </p>
 
-
-
-
-
-
-
-
+<strong>Bootstrap</strong>
+<p>
+    Active  : <input type="checkbox" ng-model="widget.remoteBootstrap.active"/><br/>
+    Form : <select ng-model="widget.remoteBootstrap.cloudifyForm" ng-options="c.id as c.label for c in remoteBootstrapForms"></select><br/>
+    Cloudify Cloud : <input ng-model="widget.remoteBootstrap.cloudifyCloud" type="text"/><br/>
+</p>

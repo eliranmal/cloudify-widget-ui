@@ -17,6 +17,17 @@ angular.module('cloudifyWidgetUiApp')
             }
         ];
 
+        $scope.remoteBootstrapForms = [
+            {
+                'label': 'HP  Folsom',
+                'id': 'hp_folsom'
+            },
+            {
+                'label': 'Softlayer',
+                'id': 'softlayer'
+            }
+        ];
+
 
         $scope.themes = WidgetThemesService.themes;
 

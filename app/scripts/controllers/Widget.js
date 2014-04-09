@@ -3,7 +3,7 @@
 angular.module('cloudifyWidgetUiApp')
     .controller('WidgetCtrl', function ($scope, WidgetsService, $log, $routeParams, PostParentService, $localStorage, $timeout) {
 
-        $scope.collapseAdvanced = true;
+        $scope.collapseAdvanced = false;
         $scope.widgetStatus = {};
         var play = 'RUNNING';
         var stop = 'STOPPED';
@@ -90,6 +90,10 @@ angular.module('cloudifyWidgetUiApp')
             _resetWidgetStatus();
         };
 
+
+        $scope.calculateFormPath = function (widget) {
+            return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html'
+        };
 
         WidgetsService.getWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;

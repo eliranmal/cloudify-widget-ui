@@ -2,8 +2,8 @@ var fs = require('fs');
 var logger = require('log4js').getLogger('TestConf');
 var async = require('async');
 var _  = require('lodash');
-var meConf = 'test/conf/dev/overrides.json';
-var prodConf = 'test/conf/defaults.json';
+var meConf = 'backendTests/conf/dev/overrides.json';
+var prodConf = 'backendTests/conf/defaults.json';
 
 var data;
 if ( fs.existsSync(prodConf) ){

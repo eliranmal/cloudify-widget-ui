@@ -1,7 +1,0 @@
-{
-    "executable": "/home/guym/cloudify/bin/cloudify.sh",
-    "arguments" : "--version",
-    "logFile": "testOutput/execution.log",
-    "statusFile" :  "testOutput/status"
-
-}

@@ -20,21 +20,25 @@
     <span>
         To enable the widget to stop on remote bootstrap
     </span>
+    <br/>
 
-    Recipe Root Path : <inpyt type="text" ng-model="widget.recipeRootPath"/><br/>
+    Recipe Root Path : <input type="text" ng-model="widget.recipeRootPath"/><br/>
+    Recipe Type : <select ng-model="widget.recipeType" ng-options="t.label for t in recipeTypes"></select><br/>
 
 
 </p>
 
 <p>
     Show advanced  : <input type="checkbox" ng-model="widget.showAdvanced"/><br/>
-    Cloud : <select ng-model="widget.cloud" ng-options="c.id as c.label for c in clouds"></select><br/>
     Theme : <select ng-model="theme" ng-options="c.label for c in themes"></select><br/>
     HTML Snippet in Advanced Location ( Use only if show advanced is false, this HTML will display once the widget is played in the same location advanced form is displayed ):
     <textarea ng-model="widget.advancedMessage"></textarea>
 </p>
 
 
+<p>
+    Pool Id : <input type="text" ng-model="widget.poolId"/>
+</p>
 
 
 <p>

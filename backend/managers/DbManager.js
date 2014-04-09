@@ -1,5 +1,6 @@
 
 var conf = require('../Conf');
+var ObjectID = require('mongodb').ObjectID;
 var MongoClient = require('mongodb').MongoClient
     , format = require('util').format;
 
@@ -16,3 +17,7 @@ exports.connect = function( collectionName, callback ){
         });
     })
 };
+
+exports.toObjectId = function( idString ){
+    return new ObjectID(idString);
+}

@@ -26,8 +26,8 @@ angular.module('cloudifyWidgetUiApp')
             return $http.post('/backend/user/widgets/' + widget._id + '/update', widget);
         };
 
-        this.playWidget = function( widget/*, options */){
-            return $http.post('/backend/user/widgets/' + widget._id + '/play/' + widget.cloud);
+        this.playWidget = function( widget/*, options */ ){
+            return $http.post('/backend/user/widgets/' + widget._id + '/play');
         };
 
         this.stopWidget = function( widget ){

@@ -60,7 +60,7 @@ app.post('/backend/user/widgets', controllers.widgets.create);
 app.post('/backend/user/widgets/:widgetId/delete', controllers.widgets.delete);
 app.get('/backend/user/widgets/:widgetId', controllers.widgets.read);
 app.post('/backend/user/widgets/:widgetId/update', controllers.widgets.update);
-app.post('/backend/user/widgets/:widgetId/play/:cloudId', controllers.widgets.play);
+app.post('/backend/user/widgets/:widgetId/play', controllers.widgets.play);
 app.post('/backend/widgets/:widgetId/stop', function(req, res){ res.send(500, 'TBD')} );
 app.post('/backend/widgets/:widgetId/status', function(req, res){ res.send(500, 'TBD')} );
 // a route to check if user logged in. relies on middleware to do the actual verification.

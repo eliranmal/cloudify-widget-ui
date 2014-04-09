@@ -1,6 +1,5 @@
 var managers = require('../managers');
 var logger = require('log4js').getLogger('WidgetController');
-var ObjectID = require('mongodb').ObjectID;
 
 exports.list = function (req, res) {
 
@@ -29,7 +28,7 @@ exports.read = function( req, res ){
         return;
     }
     managers.db.connect('widgets', function(db, collection, done){
-       collection.findOne({'_id' : new ObjectID(widgetId), 'userId' : req.user._id }, function (err, result){
+       collection.findOne({'_id' : managers.db.toObjectId(widgetId), 'userId' : req.user._id }, function (err, result){
            if ( !!err ){
                res.send(500, {'message' : 'unable to find widget ' + err.message});
                done();
@@ -52,9 +51,9 @@ exports.read = function( req, res ){
 exports.delete = function ( req, res ){
     var widgetId = req.params.widgetId;
     managers.db.connect('widgets', function(db, collection,done){
-        collection.remove({'userId' : req.user._id, '_id' : new ObjectID(widgetId)}, function(err){
+        collection.remove({'userId' : req.user._id, '_id' : managers.db.asJsonObject(widgetId)}, function(err){
             if ( !!err ){
-                res.send(500, {'message' : 'unable to delete widget ' + widgetId + " :: " + err.message});
+                res.send(500, {'message' : 'unable to delete widget ' + widgetId + ' :: ' + err.message});
                 done();
                 return;
             }
@@ -65,82 +64,35 @@ exports.delete = function ( req, res ){
 };
 
 
-function _callback( res, callback ){
-    return function( err, data ){
-        if ( !!err ){
-            res.send(err.response.statusCode, err.data);
-        }
-        if ( !!callback ){
-            callback(data);
-        }
-        else{
-            res.send(data);
-        }
-    }
-}
-
 exports.play = function ( req, res ) {
-    logger.info('calling widget play for user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
+    logger.info('calling widget play for user id [%s], widget id [%s], pool id [%s], recipe url [%s]', req.user._id, req.params.widgetId, req.body.poolId, req.body.recipeUrl);
 
-    logger.info('reading account pools');
-    managers.poolClient.accountReadPools(req.user.poolKey, _callback(res, function (result) {
+    if (!req.body.poolId) {
+        res.send(500, {message : 'no pool found on request body'});
+        return;
+    }
 
-        if (!result) {
-            res.send(500, {'message' : 'malformed result returned when fetched pools for account [' + req.accountId + ']'});
-            done();
+    if (!req.body.recipeUrl) {
+        res.send(500, {message : 'no recipe url found on request body'});
+        return;
+    }
+
+    managers.widget.play(req.params.widgetId, req.user.poolKey , function (err, result) {
+        if (!!err) {
+            res.send(500, {message: 'play request failed. error is ' + err});
             return;
         }
-
-        var data;
-        try {
-            data = JSON.parse(result);
-        } catch (e) {
-            res.send(500, {'message' : 'failed to parse pools for account [' + req.accountId + ']. json parse error: ' + e});
-            done();
-            return;
-        }
-
-        var dataIndex = data.length,
-            poolId;
-
-        // find a pool with the desired provider
-        if (data.length) {
-            while (dataIndex--) {
-                var d = data[dataIndex];
-                if (d.poolSettings.provider.name === req.params.cloudId) {
-                    poolId = d.id;
-                    break;
-                }
-            }
-        }
-
-        if (poolId) {
-
-            logger.info('found pool [%s] matching cloud [%s]', poolId, req.params.cloudId);
-            // download recipe zip
-            managers.download.downloadRecipe({
-                distDir: "downloaded",
-                cloudifyRecipeUrl: "https://dl.dropboxusercontent.com/s/u51vae4947uto0u/biginsights_solo.zip?dl=1&token_hash=AAEi1Dx3f2AFvkYXRe3FgfpspkBkQCZLLaRJb7DYHe-y1w"
-            }, function (result) {
-                logger.info('downloaded recipe, result is: ', result);
-            });
-            // get bootstrapped machine
-            managers.poolClient.occupyPoolNode(req.user.poolKey, poolId, _callback(res, function (result) {
-                logger.info('node occupied');
-            }));
-            // install recipe
-            // TODO
-        }
-    }));
-
+        res.send(200, {message: 'play finished successfully'});
+    });
 };
+
 
 function verifyRequiredFields( fields, widget, errors  ){
 
     for ( var i in fields ){
         var field = fields[i];
         if ( !widget.hasOwnProperty(field) || widget[field].trim().length == 0 ){
-            errors.push({ 'message' : (field + ' is missing')});
+            errors.push({ message : (field + ' is missing')});
         }
 
     }
@@ -193,7 +145,7 @@ exports.update = function( req, res ){
     }
 
     managers.db.connect('widgets', function(db, collection, done){
-        collection.findOne( {_id: new ObjectID(updatedWidget._id), userId: req.user._id }, function(err, object){
+        collection.findOne( {_id: managers.db.toObjectId(updatedWidget._id), userId: req.user._id }, function(err, object){
             if ( !!err ){
                 logger.error('unable to check if widget exists or not');
                 res.send(500, {'message' : err.message});
@@ -209,8 +161,8 @@ exports.update = function( req, res ){
             }
 
             logger.info('found the widget, it really does belong to the user. I am updating it');
-            updatedWidget._id = new ObjectID(updatedWidget._id);
-            updatedWidget.userId = new ObjectID( updatedWidget.userId);
+            updatedWidget._id = managers.db.toObjectId(updatedWidget._id);
+            updatedWidget.userId = managers.db.toObjectId( updatedWidget.userId);
             collection.update({_id : updatedWidget._id}, updatedWidget , {}, function( err, count ){
 
                 if ( !!err || count != 1 )  {
@@ -234,7 +186,7 @@ exports.update = function( req, res ){
 exports.getWidgetForPlayer = function (req, res) {
     var widgetId = req.params.widgetId;
     managers.db.connect('widgets', function (db, collection, done) {
-        collection.findOne({_id: new ObjectID(widgetId)}, function (err, result) {
+        collection.findOne({_id: managers.db.toObjectId(widgetId)}, function (err, result) {
             if (!!err) {
                 res.send(500, {'message': 'unable to get widget ' + err.message});
                 done();

@@ -1,7 +1,10 @@
 {
     "name" : "new-widget",
+    "cloudifyExecutable" : "cloudify-folder/bin/cloudify.sh",
+    "logFile" : "/var/log/cloudify-widget/output.log",
+    "statusFile" : "/var/log/cloudify-widget/status.log",
+    "downloadDir" : "downloaded",
     "mongodbUrl": null,
-    "adminUserExample" :  { "email" : "admin@gigaspaces.com" , "password" : "1q2w3e4r" , "poolKey" : "7859674589673489567"},
     "adminUser" : null,
     "poolRestUrl" :{
         "protocol" : "http",

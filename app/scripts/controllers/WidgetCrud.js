@@ -2,23 +2,20 @@
 
 angular.module('cloudifyWidgetUiApp')
     .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, WidgetsService, $location, WidgetThemesService ) {
-        $scope.clouds = [
-            {
-                'label': 'Softlayer',
-                'id': 'softlayer'
-            },
-            {
-                'label': 'HP',
-                'id': 'hp'
-            },
-            {
-                'label': 'EC2',
-                'id': 'ec2'
-            }
-        ];
-
 
         $scope.themes = WidgetThemesService.themes;
+
+        $scope.recipeTypes = [{
+            'label':'Application',
+            'id':'application',
+            'installCommand' : 'install-application'
+        },
+            {
+                'label':'Service',
+                'id':'service',
+                'installCommand':'install-service'
+            }
+        ]
 
         $scope.widget = {};
         var widgetId = $routeParams.widgetId;

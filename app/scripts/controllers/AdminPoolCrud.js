@@ -123,13 +123,6 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
-        $scope.deletePoolTask = function (poolId, taskId) {
-            $log.debug('deletePoolTask, poolId: ', poolId, ', taskId: ', taskId);
-            AdminPoolCrudService.deletePoolTask(poolId, taskId).then(function () {
-                $log.debug('deleted pool task');
-            });
-        };
-
         $scope.getCloudNodes = function (poolId) {
             $log.debug('getCloudNodes, poolId: ', poolId);
             $scope.model.poolCloudNodes = 0;

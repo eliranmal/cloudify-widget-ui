@@ -84,15 +84,53 @@ exports.play = function ( req, res ) {
 
     logger.info('reading account pools');
     managers.poolClient.accountReadPools(req.user.poolKey, _callback(res, function (result) {
+
+        if (!result) {
+            res.send(500, {'message' : 'malformed result returned when fetched pools for account [' + req.accountId + ']'});
+            done();
+            return;
+        }
+
         var data;
-        result && (data = JSON.parse(result));
-        data && data.length && data.forEach(function (d) {
-            if (d.poolSettings.provider.name === req.params.cloudId) {
-                var poolId = d.id;
-                logger.info('found pool [%s] matching cloud [%s]', poolId, req.params.cloudId);
-                managers.poolClient.occupyPoolNode(req.user.poolKey, poolId, _callback(res));
+        try {
+            data = JSON.parse(result);
+        } catch (e) {
+            res.send(500, {'message' : 'failed to parse pools for account [' + req.accountId + ']. json parse error: ' + e});
+            done();
+            return;
+        }
+
+        var dataIndex = data.length,
+            poolId;
+
+        // find a pool with the desired provider
+        if (data.length) {
+            while (dataIndex--) {
+                var d = data[dataIndex];
+                if (d.poolSettings.provider.name === req.params.cloudId) {
+                    poolId = d.id;
+                    break;
+                }
             }
-        });
+        }
+
+        if (poolId) {
+
+            logger.info('found pool [%s] matching cloud [%s]', poolId, req.params.cloudId);
+            // download recipe zip
+            managers.download.downloadRecipe({
+                distDir: "downloaded",
+                cloudifyRecipeUrl: "https://dl.dropboxusercontent.com/s/u51vae4947uto0u/biginsights_solo.zip?dl=1&token_hash=AAEi1Dx3f2AFvkYXRe3FgfpspkBkQCZLLaRJb7DYHe-y1w"
+            }, function (result) {
+                logger.info('downloaded recipe, result is: ', result);
+            });
+            // get bootstrapped machine
+            managers.poolClient.occupyPoolNode(req.user.poolKey, poolId, _callback(res, function (result) {
+                logger.info('node occupied');
+            }));
+            // install recipe
+            // TODO
+        }
     }));
 
 };
@@ -170,7 +208,6 @@ exports.update = function( req, res ){
                 return;
             }
 
-            debugger;
             logger.info('found the widget, it really does belong to the user. I am updating it');
             updatedWidget._id = new ObjectID(updatedWidget._id);
             updatedWidget.userId = new ObjectID( updatedWidget.userId);

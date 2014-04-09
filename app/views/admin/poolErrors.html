@@ -17,8 +17,8 @@
                 <td>{{ error.id }}</td>
                 <td>{{ error.taskName }}</td>
                 <td>{{ error.poolId }}</td>
-                <td>{{ error.message }}</td>
-                <td>{{ error.info }}</td>
+                <td><pre>{{ error.message }}</pre></td>
+                <td><pre>{{ asJson(error.info) | json }}</pre></td>
             </tr>
         </tbody>
     </table>

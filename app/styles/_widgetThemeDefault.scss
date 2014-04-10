@@ -125,16 +125,21 @@
     font-family: "Helvetica Neue";
   }
 
-  #log {
+  ul#log {
     font-size: 14px;
     list-style-type: none;
     position: absolute;
-    color: white;
-    left: -10px;
-    width: 440px;
-    top: 63px;
-    height: 110px;
+    color: #FFF;
+    left: 40px;
+    top: 88px;
+    width: 420px;
+    height: 100px;
+    margin: 0;
+    padding: 0;
     overflow-y: hidden;
+    li {
+      word-break: break-all;
+    }
   }
 
   #log li.error {

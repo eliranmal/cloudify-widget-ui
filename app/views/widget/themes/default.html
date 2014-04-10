@@ -5,9 +5,14 @@
 
     <a herf="javascript:void(0)" id="start_btn" class="button" ng-show="showPlay()" ng-click="play()"></a>
     <a herf="javascript:void(0)" id="stop_btn" class="button" ng-show="showStop()" ng-click="stop()" ng-class="{'executing':!widgetStatus.instanceIsAvailable}"></a>
+
+    <!--<button ng-click="getOutput()">get output</button>-->
+    <!--<div id="log">{{ output }}</div>-->
     <ul id="log">
-        <li ng-repeat="output in getOutput()" ng-class="output {{output.class}}">Acquiring machine. This might take a few seconds, please wait...</li>
+        <!--<li ng-repeat="output in getOutput()" ng-class="output {{output.class}}">Acquiring machine. This might take a few seconds, please wait...</li>-->
+        <li ng-repeat="line in output track by $index">{{ line }}</li>
     </ul>
+
     <ul id="links">
         <li ng-show="!!widgetStatus.instanceIsAvailable"><a href="{{widgetStatus.consoleLink.url}}" class="track" target="_blank">{{widgetStatus.consoleLink.title}}</a></li>
         <li><span ng-show="!widgetStatus.cloudifyUiIsAvailable">Cloudify</span><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable" class="track">Cloudify</a></li>

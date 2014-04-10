@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .directive('widgetEmbed', function () {
+    .directive('widgetEmbed', function ($log) {
         return {
             template: '<div><iframe style="height: {{theme.height}} ; width: {{theme.width}}" scrolling="no" ng-src="{{getIframeSrc()}}"></iframe></div>',
             restrict: 'A',

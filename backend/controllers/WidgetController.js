@@ -65,7 +65,7 @@ exports.delete = function ( req, res ){
 
 
 exports.play = function ( req, res ) {
-    logger.info('calling widget play for user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
+    logger.info('calling widget play. user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
 
     if (!req.params.widgetId) {
         logger.error('unable to play, no widget id found on request');
@@ -79,9 +79,35 @@ exports.play = function ( req, res ) {
             res.send(500, {message: 'play request failed. ' + err});
             return;
         }
+
+        logger.info('returning play finished');
         res.send(200, {message: 'play finished successfully'});
     });
 };
+
+exports.stop = function (req, res) {
+    res.send(500, 'TBD');
+};
+
+exports.getOutput = function (req, res) {
+    logger.info('calling widget get output. user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
+
+    if (!req.params.widgetId) {
+        logger.error('unable to get output, no widget id found on request');
+        res.send(500, {message : 'no widget id found on request'});
+        return;
+    }
+
+    managers.widget.getOutput(function (err, result) {
+        if (!!err) {
+            logger.error('get output failed', err);
+            res.send(500, {message: 'get output request failed. ' + err});
+            return;
+        }
+        res.send(200, result);
+    });
+};
+
 
 
 function verifyRequiredFields( fields, widget, errors  ){

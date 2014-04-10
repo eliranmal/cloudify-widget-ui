@@ -1,4 +1,5 @@
 var logger = require('log4js').getLogger('WidgetManager');
+var fs = require('fs');
 var path = require('path');
 var async = require('async');
 var services = require('../services');
@@ -77,9 +78,13 @@ exports.play = function (widgetId, poolKey, playCallback) {
                     return;
                 }
 
-                nodeModel = JSON.parse(result);
+                try {
+                    nodeModel = JSON.parse(result);
+                } catch (e) {
+                    callback(e);
+                }
 
-                callback();
+                callback(null, result);
             },
 
             function runCliCommand(result, callback) {
@@ -94,7 +99,10 @@ exports.play = function (widgetId, poolKey, playCallback) {
                         path.join(downloadPath, widget.recipeRootPath)
                     ]
                 };
-                services.cloudifyCli.executeCommand(command, callback);
+                services.cloudifyCli.executeCommand(command);
+
+                callback();
+
             }
 
         ],
@@ -118,4 +126,34 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
 exports.getOutput = function (callback) {
 
+    var file = conf.logFile;
+
+    if (!file) {
+        callback(new Error('unable to get output, no log file is found in configuration'));
+        return;
+    }
+
+    fs.readFile(file, function (err, data) {
+        if (!!err) {
+            callback(err);
+            return;
+        }
+        callback(null, data);
+    });
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

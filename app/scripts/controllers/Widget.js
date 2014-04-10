@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCtrl', function ($scope, WidgetsService, $log, $routeParams, PostParentService, $localStorage, $timeout) {
+    .controller('WidgetCtrl', function ($scope, WidgetsService, $log, $routeParams, PostParentService, $localStorage, $timeout, $window) {
 
         $scope.collapseAdvanced = false;
         $scope.widgetStatus = {};
@@ -48,6 +48,9 @@ angular.module('cloudifyWidgetUiApp')
             ellipsisIndex = ellipsisIndex +1;
             $scope.widgetStatus = status;
             $timeout(_pollStatus, myTimeout || 3000) ;
+
+            $scope.getOutput($scope.widget);
+
             _scrollLog();
         }
 
@@ -76,10 +79,9 @@ angular.module('cloudifyWidgetUiApp')
                 .then(function (result) {
                     console.log(['play result', result]);
                     $scope.widgetStatus = result.status;
-
                     _pollStatus(1);
-                }, function (result) {
-                    console.log(['play error', result]);
+                }, function (err) {
+                    console.log(['play error', err]);
                     _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
                 });
         };
@@ -88,6 +90,27 @@ angular.module('cloudifyWidgetUiApp')
             PostParentService.post({'name': 'widget_stop'});
             $scope.widgetStatus.state = stop;
             _resetWidgetStatus();
+        };
+
+        var emptyList = [];
+        $scope.output;
+
+        $scope.getOutput = function (widget) {
+            $log.info('getOutput for widget ', widget);
+
+            if (!widget) {
+                $scope.output = emptyList;
+            }
+
+            WidgetsService.getOutput(widget)
+                .then(function (result) {
+                    $log.info('- - - - - getOutput finished successfully')
+                    $log.info(result.data.split('\n'));
+                    $scope.output = result.data.split('\n');
+                }, function (err) {
+                    $log.info('- - - - - getOutput failed')
+                    $log.error(err);
+                });
         };
 
 
@@ -101,4 +124,12 @@ angular.module('cloudifyWidgetUiApp')
         WidgetsService.getWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;
         });
+
+
+
+        $window.addEventListener('message', function (newVal, oldVal) {
+            $log.info('message received: ', newVal);
+            // TODO get output!
+        }, true);
+
     });

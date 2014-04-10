@@ -17,10 +17,6 @@ exports.mkdirp = function (directory) {
     }
 };
 
-exports.readFile = function (file, callback) {
-
-};
-
 /**
  * walks a directory tree and returns file paths as a list.
  * when order of results is important, pass {@code true} to serial,

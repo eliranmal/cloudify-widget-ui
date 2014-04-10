@@ -61,8 +61,9 @@ app.post('/backend/user/widgets/:widgetId/delete', controllers.widgets.delete);
 app.get('/backend/user/widgets/:widgetId', controllers.widgets.read);
 app.post('/backend/user/widgets/:widgetId/update', controllers.widgets.update);
 app.post('/backend/user/widgets/:widgetId/play', controllers.widgets.play);
-app.post('/backend/widgets/:widgetId/stop', function(req, res){ res.send(500, 'TBD')} );
-app.post('/backend/widgets/:widgetId/status', function(req, res){ res.send(500, 'TBD')} );
+app.post('/backend/user/widgets/:widgetId/stop', function(req, res){ res.send(500, 'TBD')} );
+app.get('/backend/user/widgets/:widgetId/status', controllers.widgets.status );
+app.get('/backend/user/widgets/:widgetId/output', controllers.widgets.getOutput);
 // a route to check if user logged in. relies on middleware to do the actual verification.
 app.get('/backend/user/loggedIn', function(req, res){ res.send(managers.users.getPublicUserDetails( req.user ) );} );
 

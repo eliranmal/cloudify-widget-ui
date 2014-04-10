@@ -2,7 +2,7 @@
 var conf = require('../Conf');
 var ObjectID = require('mongodb').ObjectID;
 var MongoClient = require('mongodb').MongoClient
-    , format = require('util').format;
+var format = require('util').format;
 
 
 

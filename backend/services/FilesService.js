@@ -1,11 +1,11 @@
-var logger = require('log4js').getLogger('FilesService'),
-    fs = require('fs'),
-    path = require('path');
+var logger = require('log4js').getLogger('FilesService');
+var fs = require('fs');
+var path = require('path');
 
 exports.mkdirp = function (directory) {
     var outputDirPathItems = directory.split(path.sep);
     if (outputDirPathItems.length > 0 && directory.indexOf('/') === 0) {
-        outputDirPathItems[0] = '/' + outputDirPathItems[0]
+        outputDirPathItems[0] = '/' + outputDirPathItems[0];
     }
     var item = '';
     for (var i = 0; i < outputDirPathItems.length; i++) {
@@ -15,6 +15,10 @@ exports.mkdirp = function (directory) {
             fs.mkdirSync(item);
         }
     }
+};
+
+exports.readFile = function (file, callback) {
+
 };
 
 /**

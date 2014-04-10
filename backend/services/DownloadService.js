@@ -1,11 +1,11 @@
 
-var logger = require('log4js').getLogger('DownloadRecipeService'),
-    fs = require('fs'),
-    path = require('path'),
-    https = require('https'),
-    http = require('http'),
-    AdmZip = require('adm-zip'),
-    files = require('./FilesService');
+var logger = require('log4js').getLogger('DownloadService');
+var fs = require('fs');
+var path = require('path');
+var https = require('https');
+var http = require('http');
+var AdmZip = require('adm-zip');
+var files = require('./FilesService');
 
 exports.downloadRecipe = function (options, callback) {
 
@@ -20,11 +20,11 @@ exports.downloadRecipe = function (options, callback) {
         throw new Error('Cloudify Recipe url parameter is missing');
     }
 
-    logger.info('making destination dir [' + destDir + ']');
+    logger.debug('making destination dir [' + destDir + ']');
     files.mkdirp(destDir);
     var recipeZipFile = destDir + path.sep + 'recipe.zip';
 
-    logger.info('fetching zip from url [' + cloudifyRecipeUrl + ']');
+    logger.debug('fetching zip from url [' + cloudifyRecipeUrl + ']');
 
     var file = fs.createWriteStream(recipeZipFile);
 
@@ -33,14 +33,14 @@ exports.downloadRecipe = function (options, callback) {
         protocol = https;
     }
     protocol.get(cloudifyRecipeUrl, function (response) {
-        logger.info('saving zip');
+        logger.debug('saving zip');
         response.pipe(file);
         file.on('finish', function () {
             file.close();
-            logger.info('zip saved successfully [' + recipeZipFile + ']');
+            logger.debug('zip saved successfully [' + recipeZipFile + ']');
             var zip = new AdmZip(recipeZipFile);
             zip.extractAllTo(destDir, true);
-            logger.info('zip extracted to [' + destDir + ']');
+            logger.debug('zip extracted to [' + destDir + ']');
             callback && typeof callback === 'function' && callback(null);
         });
     });

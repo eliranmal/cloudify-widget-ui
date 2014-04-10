@@ -4,42 +4,9 @@ var fs = require('fs');
 var path = require('path');
 var spawn = require('child_process').spawn;
 var files = require('./FilesService');
+var conf = require('../Conf');
 var _ = require('lodash');
 
-
-/**
- * opts = {
- *  "newDir" : "new tasks directory"
- * }
- * @param opts
- * @returns {null}
- */
-exports.readConfigurationFromFile = function (opts) {
-
-    var newDir = opts.newDir;
-    logger.debug(' reading execConfiguration from file', opts);
-    if (!fs.existsSync(newDir)) {
-        logger.debug('[%s] directory does not exist. nothing to do', newDir);
-        return null;
-    }
-    var files = fs.readdirSync(newDir);
-
-    if (files.length == 0 || files.indexOf('stop') >= 0) {
-        return null;
-    }
-
-    var workfile = files[0];
-
-    if (!fs.existsSync(workfile)) {
-        fs.mkdirSync(workfile);
-    }
-
-    fs.renameSync(newDir + workfile, executingDir + workfile);
-
-    var fileContent = fs.readFileSync(executingDir + workfile);
-
-    return JSON.parse(fileContent);
-};
 
 
 /**
@@ -51,11 +18,7 @@ exports.readConfigurationFromFile = function (opts) {
  *          statusFile: conf.statusFile
  *      }
  */
-exports.executeCommand = function (cmd) {
-
-    if (!('arguments' in cmd)) {
-        throw new Error('command arguments are mandatory');
-    }
+exports.executeCommand = function (cmd, callback) {
 
     var defaultOptions = {
         executable: conf.cloudifyExecutable,
@@ -96,6 +59,12 @@ exports.executeCommand = function (cmd) {
         throw new Error('status file is missing');
     }
 
+
+    if (callback && typeof callback !== 'function') {
+        throw new Error('callback must be a function');
+    }
+
+
     var myCmd = spawn(executable, commandArgs);
 
     function appendToLogFile(data) {
@@ -118,13 +87,63 @@ exports.executeCommand = function (cmd) {
         writeStatusJsonFile({'error': err})
     });
 
+    myCmd.on('exit', function (code, signal) {
+        logger.info('finished running command. exit code is [%s], exit signal is [%s]', code, signal);
+        if (callback) {
+            if (code !== 0) {
+                callback(new Error('command failed with exit code [' + code + '] and exit signal [' + signal + ']'));
+            } else {
+                callback();
+            }
+        }
+    });
+
     myCmd.on('close', function (code) {
         writeStatusJsonFile({'code': code})
     });
 
     logger.info('running command [%s] [%s]. log file is [%s]', executable, commandArgs, logFile);
 
+};
 
+
+
+
+
+/**
+ * only used in main!
+ *
+ * opts = {
+ *  "newDir" : "new tasks directory"
+ * }
+ * @param opts
+ * @returns {null}
+ */
+exports.readConfigurationFromFile = function (opts) {
+
+    var newDir = opts.newDir;
+    logger.debug(' reading execConfiguration from file', opts);
+    if (!fs.existsSync(newDir)) {
+        logger.debug('[%s] directory does not exist. nothing to do', newDir);
+        return null;
+    }
+    var files = fs.readdirSync(newDir);
+
+    if (files.length == 0 || files.indexOf('stop') >= 0) {
+        return null;
+    }
+
+    var workfile = files[0];
+
+    if (!fs.existsSync(workfile)) {
+        fs.mkdirSync(workfile);
+    }
+
+    fs.renameSync(newDir + workfile, executingDir + workfile);
+
+    var fileContent = fs.readFileSync(executingDir + workfile);
+
+    return JSON.parse(fileContent);
 };
 
 

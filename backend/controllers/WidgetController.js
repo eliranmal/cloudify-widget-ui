@@ -65,21 +65,18 @@ exports.delete = function ( req, res ){
 
 
 exports.play = function ( req, res ) {
-    logger.info('calling widget play for user id [%s], widget id [%s], pool id [%s], recipe url [%s]', req.user._id, req.params.widgetId, req.body.poolId, req.body.recipeUrl);
+    logger.info('calling widget play for user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
 
-    if (!req.body.poolId) {
-        res.send(500, {message : 'no pool found on request body'});
-        return;
-    }
-
-    if (!req.body.recipeUrl) {
-        res.send(500, {message : 'no recipe url found on request body'});
+    if (!req.params.widgetId) {
+        logger.error('unable to play, no widget id found on request');
+        res.send(500, {message : 'no widget id found on request'});
         return;
     }
 
     managers.widget.play(req.params.widgetId, req.user.poolKey , function (err, result) {
         if (!!err) {
-            res.send(500, {message: 'play request failed. error is ' + err});
+            logger.error('play failed', err);
+            res.send(500, {message: 'play request failed. ' + err});
             return;
         }
         res.send(200, {message: 'play finished successfully'});

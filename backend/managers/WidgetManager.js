@@ -1,9 +1,9 @@
-var logger = require('log4js').getLogger('WidgetManager'),
-    path = require('path'),
-    async = require('async'),
-    services = require('../services'),
-    managers = require('../managers'),
-    conf = require('../Conf');
+var logger = require('log4js').getLogger('WidgetManager');
+var path = require('path');
+var async = require('async');
+var services = require('../services');
+var managers = require('../managers');
+var conf = require('../Conf');
 
 
 exports.play = function (widgetId, poolKey, playCallback) {
@@ -73,9 +73,10 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
                 if (!result) {
                     logger.error('result is null for occupy node');
-                    playCallback(new Error('could not occupy node'));
+                    playCallback(new Error('could not occupy node, no bootstrapped nodes found'));
                     return;
                 }
+
                 nodeModel = JSON.parse(result);
 
                 callback();
@@ -93,21 +94,28 @@ exports.play = function (widgetId, poolKey, playCallback) {
                         path.join(downloadPath, widget.recipeRootPath)
                     ]
                 };
-                services.cloudifyCli.executeCommand(command);
+                services.cloudifyCli.executeCommand(command, callback);
             }
 
         ],
 
 
         function (err, result) {
-            logger.info('waterfall is done!');
+            logger.trace('-play waterfall- finished!');
 
             if (!!err) {
                 logger.error('failed to play widget with id [%s]', widgetId);
                 playCallback(err);
                 return;
             }
+
+            playCallback(null, result);
         }
     );
+
+};
+
+
+exports.getOutput = function (callback) {
 
 };

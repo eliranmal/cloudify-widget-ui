@@ -106,11 +106,9 @@
   }
 
   .beta-ribbon{
-    margin-top: -6px;
-    margin-right: -6px;
-    left: 536px;
-    top: 8px;
     position: absolute;
+    top: 10px;
+    right: 16px;
   }
 
   .button:hover {
@@ -167,7 +165,8 @@
     color: #F09927;
     font-size: 28px;
     font-weight: bold;
-    margin-left: 10px;
+    margin-left: 16px;
+    line-height: 50px;
   }
 
   #time_left {

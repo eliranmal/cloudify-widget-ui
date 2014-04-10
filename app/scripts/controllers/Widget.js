@@ -91,8 +91,11 @@ angular.module('cloudifyWidgetUiApp')
         };
 
 
-        $scope.calculateFormPath = function (widget) {
-            return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html'
+        $scope.getFormPath = function (widget) {
+            if (widget.remoteBootstrap && widget.remoteBootstrap.cloudifyForm) {
+                return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html'
+            }
+            return '';
         };
 
         WidgetsService.getWidget($routeParams.widgetId).then(function (result) {

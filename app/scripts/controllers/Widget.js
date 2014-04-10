@@ -93,10 +93,7 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         var emptyList = [];
-        $scope.output;
-
         $scope.getOutput = function (widget) {
-            $log.info('getOutput for widget ', widget);
 
             if (!widget) {
                 $scope.output = emptyList;
@@ -104,11 +101,8 @@ angular.module('cloudifyWidgetUiApp')
 
             WidgetsService.getOutput(widget)
                 .then(function (result) {
-                    $log.info('- - - - - getOutput finished successfully')
-                    $log.info(result.data.split('\n'));
                     $scope.output = result.data.split('\n');
                 }, function (err) {
-                    $log.info('- - - - - getOutput failed')
                     $log.error(err);
                 });
         };
@@ -124,12 +118,5 @@ angular.module('cloudifyWidgetUiApp')
         WidgetsService.getWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;
         });
-
-
-
-        $window.addEventListener('message', function (newVal, oldVal) {
-            $log.info('message received: ', newVal);
-            // TODO get output!
-        }, true);
 
     });

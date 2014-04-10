@@ -61,7 +61,7 @@ angular.module('cloudifyWidgetUiApp')
                     if (!result) {
                         return;
                     }
-                    _handleStatus(result.data.status, myTimeout);
+                    _handleStatus(result.data, myTimeout);
                 }, function (result) {
                     $log.error(['status error', result]);
                 });

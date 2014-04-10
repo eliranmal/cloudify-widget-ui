@@ -86,7 +86,12 @@ exports.play = function ( req, res ) {
 };
 
 exports.stop = function (req, res) {
-    res.send(500, 'TBD');
+    res.send(500, 'TBD')
+};
+
+exports.getStatus = function (req, res) {
+    logger.info('calling widget status. user id [%s], params [%s]', req.user._id, req.params);
+    res.send(200, {state: 'RUNNING'});
 };
 
 exports.getOutput = function (req, res) {

@@ -14,28 +14,33 @@ var _ = require('lodash');
  *      {
  *          executable: conf.cloudifyExecutable,
  *          arguments: ['connect', nodeModel.machineSshDetails.publicIp, ';', widget.recipeType.installCommand, path.join(downloadPath, widget.recipeRootPath) ],
- *          logFile: conf.logFile,
+ *          logsDir: conf.logsDir,
  *          statusFile: conf.statusFile
  *      }
  */
 exports.executeCommand = function (cmd, callback) {
 
+    var command = cmd;
+    if (_.isArray(cmd)) {
+        command = {arguments: cmd};
+    }
+
     var defaultOptions = {
         executable: conf.cloudifyExecutable,
-        logFile: conf.logFile,
+        logsDir: conf.logsDir,
         statusFile: conf.statusFile
     };
-    var command = _.extend(defaultOptions, cmd);
+    var commandOptions = _.extend(defaultOptions, command);
 
-    var executable = command.executable;
+    var executable = commandOptions.executable;
     // converts commandArgs to list if it is not a list. otherwise keeps it as a list
     // http://stackoverflow.com/questions/4775722/check-if-object-is-array
-    var commandArgs = [].concat(command.arguments);
+    var commandArgs = [].concat(commandOptions.arguments);
 
-    var logFile = command.logFile;
-    files.mkdirp(path.dirname(logFile));
+    var logsDir = commandOptions.logsDir;
+    files.mkdirp(path.dirname(logsDir));
 
-    var statusFile = command.statusFile;
+    var statusFile = commandOptions.statusFile;
     files.mkdirp(path.dirname(statusFile));
 
     if (!executable) {
@@ -51,8 +56,8 @@ exports.executeCommand = function (cmd, callback) {
     }
 
 
-    if (!logFile) {
-        throw new Error('log file is missing');
+    if (!logsDir) {
+        throw new Error('logs dir is missing');
     }
 
     if (!statusFile) {
@@ -66,17 +71,19 @@ exports.executeCommand = function (cmd, callback) {
 
 
     var myCmd = spawn(executable, commandArgs);
+    var outputLogFile = path.join(logsDir, 'output.log');
+    var statusLogFile = path.join(logsDir, 'status.log');
 
     function appendToLogFile(data) {
-        fs.appendFile(logFile, data, function (err) {
+        fs.appendFile(outputLogFile, data, function (err) {
             if (!!err) {
-                logger.error('unable to write to log file', logFile, data.toString(), err);
+                logger.error('unable to write to log file', outputLogFile, data.toString(), err);
             }
         });
     }
 
     function writeStatusJsonFile(status) {
-        fs.writeFile(statusFile, JSON.stringify(status, null, 4));
+        fs.writeFile(statusLogFile, JSON.stringify(status, null, 4));
     }
 
     myCmd.stdout.on('data', appendToLogFile);
@@ -102,7 +109,7 @@ exports.executeCommand = function (cmd, callback) {
         writeStatusJsonFile({'code': code})
     });
 
-    logger.info('running command [%s] [%s]. log file is [%s]', executable, commandArgs, logFile);
+    logger.info('running command [%s] [%s]. output log file is [%s]', executable, commandArgs, outputLogFile);
 
 };
 

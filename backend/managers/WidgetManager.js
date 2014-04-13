@@ -11,14 +11,13 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
     // TODO : add different download destination per widget
     // TODO : make sure it's absolute using path.resolve()
-    var downloadPath, widget, executionObjectId, nodeModel;
+    var executionDownloadPath, widget, executionObjectId, nodeModel;
 
     async.waterfall([
 
             function getWidget(callback) {
                 logger.trace('-play waterfall- getWidget');
                 managers.db.connect('widgets', function (db, collection, done) {
-                    logger.trace('-play waterfall- db.connect');
                     collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {
                         if (!!err) {
                             logger.error('unable to find widget', err);
@@ -47,7 +46,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
                 managers.db.connect('widgetExecutions', function (db, collection, done) {
                     // instantiate the execution model with the widget data
                     collection.insert(widget, function (err, docsInserted) {
-                        if (err) {
+                        if (!!err) {
                             logger.error('failed creating widget execution model', err);
                             callback(err);
                             done();
@@ -72,10 +71,10 @@ exports.play = function (widgetId, poolKey, playCallback) {
                 logger.info('execution ObjectId is [%s]', result);
                 // now that we have an auto generated model id, insert new fields based on it
                 managers.db.connect('widgetExecutions', function (db, collection, done) {
-                    downloadPath = conf.downloadDir + path.sep + result.toHexString(); // recipes are downloaded per execution
+                    executionDownloadPath = path.join(conf.downloadDir, result.toHexString()); // recipes are downloaded per execution
                     collection.update(
                         { _id: result },
-                        { $set: { downloadPath: downloadPath } },
+                        { $set: { downloadPath: executionDownloadPath } },
                         function (err, nUpdated) {
                             if (err) {
                                 logger.error('failed updating widget execution model', err);
@@ -102,7 +101,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
                 logger.info('downloading recipe from ', widget.recipeUrl);
                 // download recipe zip
                 var options = {
-                    destDir: downloadPath,
+                    destDir: executionDownloadPath,
                     recipeUrl: widget.recipeUrl
                 };
                 services.dl.downloadRecipe(options, function () {
@@ -144,15 +143,13 @@ exports.play = function (widgetId, poolKey, playCallback) {
             function runCliCommand(result, callback) {
                 logger.trace('-play waterfall- runCliCommand');
 
-                var command = {
-                    arguments: [
-                        'connect',
-                        nodeModel.machineSshDetails.publicIp,
-                        ';',
-                        widget.recipeType.installCommand,
-                        path.join(downloadPath, widget.recipeRootPath)
-                    ]
-                };
+                var command = [
+                    'connect',
+                    nodeModel.machineSshDetails.publicIp,
+                    ';',
+                    widget.recipeType.installCommand,
+                    path.join(executionDownloadPath, widget.recipeRootPath)
+                ];
                 services.cloudifyCli.executeCommand(command);
 
                 callback(null, executionObjectId.toHexString());
@@ -176,25 +173,39 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
 };
 
-
-exports.getOutput = function (callback) {
-
-    var file = conf.logFile;
-
-    if (!file) {
-        callback(new Error('unable to get output, no log file is found in configuration'));
-        return;
-    }
-
-    fs.readFile(file, function (err, data) {
-        if (!!err) {
-            callback(err);
-            return;
-        }
-        callback(null, data);
-    });
+exports.getOutput = function (executionId, callback) {
+    _getLog(executionId, managers.logs.getOutput, callback);
 };
 
+exports.getStatus = function (executionId, callback) {
+    _getLog(executionId, managers.logs.getStatus, callback);
+};
+
+
+function _getLog (executionId, logFn, callback) {
+    if (!executionId) {
+        callback(new Error('unable to get log, execution id is null'));
+    }
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
+
+            if (!!err) {
+                callback(err);
+                done();
+                return;
+            }
+
+            if (!result) {
+                callback(new Error('unable to get log. cannot to find execution model with id [' + executionId + ']'));
+                done();
+                return;
+            }
+
+            logFn(executionId, callback);
+            done();
+        });
+    });
+};
 
 
 

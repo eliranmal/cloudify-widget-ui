@@ -1,5 +1,6 @@
 {
     "name" : "new-widget",
+    "cloudifyCloudsDir" : "cloudify-folder/clouds",
     "cloudifyExecutable" : "cloudify-folder/bin/cloudify.sh",
     "logFile" : "/var/log/cloudify-widget/output.log",
     "statusFile" : "/var/log/cloudify-widget/status.log",

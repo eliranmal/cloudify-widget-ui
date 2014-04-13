@@ -127,7 +127,8 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
     // TODO : add different download destination per widget
     // TODO : make sure it's absolute using path.resolve()
     var downloadPath = conf.downloadDir;
-    var widget, nodeModel;
+    var widget;
+    var cloudDistFolder;
 
     logger.trace('-playRemote !!!!!!');
 
@@ -175,6 +176,45 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
                     callback(null, result);
                 });
             },
+
+            function copyCloudFolder( result, callback ){
+                logger.info('copyCloudFolder, widget:', widget );
+                var cloudifyCloudsDir = conf.cloudifyCloudsDir;
+                logger.info('cloudifyCloudsDir:' , cloudifyCloudsDir );
+                var cloudSourceFolder = cloudifyCloudsDir + path.sep + widget.remoteBootstrap.cloudifyCloud;
+                cloudDistFolderName = widget.remoteBootstrap.cloudifyCloud + '_new';//TODO use here UUID generator for cloud name
+                var cloudDistFolder = cloudifyCloudsDir + path.sep + cloudDistFolderName;
+                logger.info('cloudSourceFolder:', cloudSourceFolder , ', cloudDistFolder', cloudDistFolder, 'cloudDistFolderName', cloudDistFolderName );
+
+                var ncp = require('ncp').ncp;
+                ncp.limit = 16;
+
+                ncp(cloudSourceFolder, cloudDistFolder, function (err) {
+                    if( err ) {
+                        logger.info(err);
+                        return;
+                    }
+                    logger.info( 'Folder []', cloudSourceFolder, ' was successfully copied into []', cloudDistFolder );
+                    callback(null, cloudDistFolderName);
+                });
+            },
+
+            function runCliBootstrapCommand(cloudDistFolderName, callback) {
+                logger.info('-playRemote waterfall- runCliBootstrapCommand');
+
+                var command = {
+                    arguments: [
+                        'bootstrap-cloud',
+                        cloudDistFolderName
+                    ]
+                };
+
+                logger.info( '-command', command );
+
+                services.cloudifyCli.executeCommand(command);
+
+                callback();
+            }
         ],
         function (err, result) {
             logger.trace('-playRemote waterfall- finished!!!');
@@ -187,6 +227,7 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
 
             playCallback(null, result);
         }
+
     );
 };
 

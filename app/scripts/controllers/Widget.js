@@ -47,10 +47,8 @@ angular.module('cloudifyWidgetUiApp')
             $localStorage.widgetStatus = status;
             ellipsisIndex = ellipsisIndex +1;
             $scope.widgetStatus = status;
+            _getOutput($scope.widget);
             $timeout(_pollStatus, myTimeout || 3000) ;
-
-            $scope.getOutput($scope.widget);
-
             _scrollLog();
         }
 
@@ -78,8 +76,9 @@ angular.module('cloudifyWidgetUiApp')
             WidgetsService.playWidget($scope.widget, _hasAdvanced() ? _getAdvanced() : null)
                 .then(function (result) {
                     console.log(['play result', result]);
-                    $scope.widgetStatus = result.status;
-                    _pollStatus(1);
+                    $scope.widgetExecution = result.data;
+
+                    _pollStatus(1); // TODO should be _pollExecution - this will unify all details (output, status etc.)
                 }, function (err) {
                     console.log(['play error', err]);
                     _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
@@ -93,7 +92,8 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         var emptyList = [];
-        $scope.getOutput = function (widget) {
+
+        function _getOutput (widget) {
 
             if (!widget) {
                 $scope.output = emptyList;

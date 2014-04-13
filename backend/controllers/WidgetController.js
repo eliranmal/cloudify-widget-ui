@@ -76,12 +76,18 @@ exports.play = function ( req, res ) {
     managers.widget.play(req.params.widgetId, req.user.poolKey , function (err, result) {
         if (!!err) {
             logger.error('play failed', err);
-            res.send(500, {message: 'play request failed. ' + err});
+            res.send(500, {message: 'play failed. ' + err});
             return;
         }
 
-        logger.info('returning play finished');
-        res.send(200, {message: 'play finished successfully'});
+        if (!result) {
+            logger.error('unable to get execution id');
+            res.send(500, {message: 'unable to get execution id'});
+            return;
+        }
+
+        logger.info('widget play initiated successfully, execution id is [%s]', result)
+        res.send(200, result);
     });
 };
 

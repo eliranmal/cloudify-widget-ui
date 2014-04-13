@@ -75,15 +75,29 @@ angular.module('cloudifyWidgetUiApp')
         $scope.play = function () {
             _resetWidgetStatus();
             $scope.widgetStatus.state = play;
-            WidgetsService.playWidget($scope.widget, _hasAdvanced() ? _getAdvanced() : null)
-                .then(function (result) {
-                    console.log(['play result', result]);
-                    $scope.widgetStatus = result.status;
-                    _pollStatus(1);
-                }, function (err) {
-                    console.log(['play error', err]);
-                    _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
-                });
+            var options = {advanced: _hasAdvanced() ? _getAdvanced() : null};
+            if ($scope.widget.remoteBootstrap.active) {
+                WidgetsService.playRemoteWidget($scope.widget, options)
+                    .then(function (result) {
+                        console.log(['play result', result]);
+                        $scope.widgetStatus = result.status;
+                        _pollStatus(1);
+                    }, function (err) {
+                        console.log(['play error', err]);
+                        _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
+                    });
+            }
+            else {
+                WidgetsService.playWidget($scope.widget, options)
+                    .then(function (result) {
+                        console.log(['play result', result]);
+                        $scope.widgetStatus = result.status;
+                        _pollStatus(1);
+                    }, function (err) {
+                        console.log(['play error', err]);
+                        _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
+                    });
+            }
         };
 
         $scope.stop = function () {

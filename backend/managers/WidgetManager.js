@@ -107,7 +107,6 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
         ],
 
-
         function (err, result) {
             logger.trace('-play waterfall- finished!');
 
@@ -120,9 +119,76 @@ exports.play = function (widgetId, poolKey, playCallback) {
             playCallback(null, result);
         }
     );
-
 };
 
+
+exports.playRemote = function (widgetId, poolKey, playCallback) {
+
+    // TODO : add different download destination per widget
+    // TODO : make sure it's absolute using path.resolve()
+    var downloadPath = conf.downloadDir;
+    var widget, nodeModel;
+
+    logger.trace('-playRemote !!!!!!');
+
+    async.waterfall([
+
+            function getWidget(callback) {
+                logger.trace('-playRemote waterfall- getWidget');
+                managers.db.connect('widgets', function (db, collection, done) {
+                    logger.trace('-playRemote waterfall- db.connect');
+                    collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {
+
+                        logger.trace('Within findOne:', err, result );
+
+                        if (!!err) {
+                            logger.error('unable to find widget', err);
+                            playCallback(err);
+                            done();
+                            return;
+                        }
+
+                        if (!result) {
+                            logger.error('result is null for widget find');
+                            playCallback(new Error('could not find widget'));
+                            done();
+                            return;
+                        }
+
+                        widget = result;
+                        callback(null, result);
+                    });
+                });
+            },
+
+            function downloadRecipe(result, callback) {
+                logger.trace('-play waterfall- downloadRecipe');
+
+                // TODO : add validation if destination download not already exists otherwise simply call callback.
+                logger.info('downloading recipe from ', widget.recipeUrl);
+                // download recipe zip
+                var options = {
+                    destDir: downloadPath,
+                    recipeUrl: widget.recipeUrl
+                };
+                services.dl.downloadRecipe(options, function () {
+                    callback(null, result);
+                });
+            },
+        ],
+        function (err, result) {
+            logger.trace('-playRemote waterfall- finished!!!');
+
+            if (!!err) {
+                logger.error('failed to playRemote widget with id [%s]', widgetId);
+                playCallback(err);
+                return;
+            }
+
+            playCallback(null, result);
+        }
+    );
+};
 
 exports.getOutput = function (callback) {
 
@@ -141,19 +207,3 @@ exports.getOutput = function (callback) {
         callback(null, data);
     });
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -27,7 +27,11 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         this.playWidget = function( widget/*, options */ ){
-            return $http.post('/backend/user/widgets/' + widget._id + '/play');
+            return $http.post('/backend/user/widgets/' + widget._id + '/play' );
+        };
+
+        this.playRemoteWidget = function( widget ){
+            return $http.post('/backend/user/widgets/' + widget._id + '/play/remote' );
         };
 
         this.stopWidget = function( widget ){

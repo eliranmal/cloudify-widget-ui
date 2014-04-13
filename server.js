@@ -61,6 +61,7 @@ app.post('/backend/user/widgets/:widgetId/delete', controllers.widgets.delete);
 app.get('/backend/user/widgets/:widgetId', controllers.widgets.read);
 app.post('/backend/user/widgets/:widgetId/update', controllers.widgets.update);
 app.post('/backend/user/widgets/:widgetId/play', controllers.widgets.play);
+app.post('/backend/user/widgets/:widgetId/play/remote', controllers.widgets.playRemote);
 app.post('/backend/user/widgets/:widgetId/stop', controllers.widgets.stop );
 app.get('/backend/user/widgets/:widgetId/status', controllers.widgets.getStatus );
 app.get('/backend/user/widgets/:widgetId/output', controllers.widgets.getOutput);

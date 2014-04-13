@@ -63,6 +63,26 @@ exports.delete = function ( req, res ){
     });
 };
 
+exports.playRemote = function ( req, res ) {
+    logger.info('calling widget playRemote. user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
+
+    if (!req.params.widgetId) {
+        logger.error('unable to playRemote, no widget id found on request');
+        res.send(500, {message : 'no widget id found on request'});
+        return;
+    }
+
+    managers.widget.playRemote(req.params.widgetId, req.user.poolKey , function (err, result) {
+        if (!!err) {
+            logger.error('playRemote failed', err);
+            res.send(500, {message: 'playRemote request failed. ' + err});
+            return;
+        }
+
+        logger.info('returning playRemote finished');
+        res.send(200, {message: 'playRemote finished successfully'});
+    });
+};
 
 exports.play = function ( req, res ) {
     logger.info('calling widget play. user id [%s], widget id [%s]', req.user._id, req.params.widgetId);

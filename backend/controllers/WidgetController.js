@@ -51,7 +51,7 @@ exports.read = function( req, res ){
 exports.delete = function ( req, res ){
     var widgetId = req.params.widgetId;
     managers.db.connect('widgets', function(db, collection,done){
-        collection.remove({'userId' : req.user._id, '_id' : managers.db.asJsonObject(widgetId)}, function(err){
+        collection.remove({'userId' : req.user._id, '_id' : managers.db.toObjectId(widgetId)}, function(err){
             if ( !!err ){
                 res.send(500, {'message' : 'unable to delete widget ' + widgetId + ' :: ' + err.message});
                 done();

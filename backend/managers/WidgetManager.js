@@ -76,8 +76,10 @@ exports.play = function (widgetId, poolKey, playCallback) {
                     collection.update(
                         { _id: result },
                         {
-                            $set: { downloadsPath: executionDownloadsPath },
-                            $set: { logsPath: executionLogsPath }
+                            $set: {
+                                downloadsPath: executionDownloadsPath,
+                                logsPath: executionLogsPath
+                            }
                         },
                         function (err, nUpdated) {
                             if (err) {

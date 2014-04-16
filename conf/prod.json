@@ -1,8 +1,8 @@
 {
     "name" : "new-widget",
     "cloudifyExecutable" : "cloudify-folder/bin/cloudify.sh",
-    "logsDir" : "/var/log/cloudify-widget",
-    "downloadDir" : "/var/opt/cloudify-widget",
+    "logsDir" : "/var/log/cloudify-widget/logs",
+    "downloadsDir" : "/var/opt/cloudify-widget/downloads",
     "mongodbUrl": null,
     "adminUser" : null,
     "poolRestUrl" :{

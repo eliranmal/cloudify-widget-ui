@@ -11,7 +11,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
     // TODO : add different download destination per widget
     // TODO : make sure it's absolute using path.resolve()
-    var executionDownloadPath, widget, executionObjectId, nodeModel;
+    var executionDownloadsPath, executionLogsPath, widget, executionObjectId, nodeModel;
 
     async.waterfall([
 
@@ -71,10 +71,14 @@ exports.play = function (widgetId, poolKey, playCallback) {
                 logger.info('execution ObjectId is [%s]', result);
                 // now that we have an auto generated model id, insert new fields based on it
                 managers.db.connect('widgetExecutions', function (db, collection, done) {
-                    executionDownloadPath = path.join(conf.downloadDir, result.toHexString()); // recipes are downloaded per execution
+                    executionDownloadsPath = path.join(conf.downloadsDir, result.toHexString());
+                    executionLogsPath = path.join(conf.logsDir, result.toHexString());
                     collection.update(
                         { _id: result },
-                        { $set: { downloadPath: executionDownloadPath } },
+                        {
+                            $set: { downloadsPath: executionDownloadsPath },
+                            $set: { logsPath: executionLogsPath }
+                        },
                         function (err, nUpdated) {
                             if (err) {
                                 logger.error('failed updating widget execution model', err);
@@ -101,7 +105,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
                 logger.info('downloading recipe from ', widget.recipeUrl);
                 // download recipe zip
                 var options = {
-                    destDir: executionDownloadPath,
+                    destDir: executionDownloadsPath,
                     recipeUrl: widget.recipeUrl
                 };
                 services.dl.downloadRecipe(options, function () {
@@ -143,13 +147,16 @@ exports.play = function (widgetId, poolKey, playCallback) {
             function runCliCommand(result, callback) {
                 logger.trace('-play waterfall- runCliCommand');
 
-                var command = [
-                    'connect',
-                    nodeModel.machineSshDetails.publicIp,
-                    ';',
-                    widget.recipeType.installCommand,
-                    path.join(executionDownloadPath, widget.recipeRootPath)
-                ];
+                var command = {
+                    arguments: [
+                        'connect',
+                        nodeModel.machineSshDetails.publicIp,
+                        ';',
+                        widget.recipeType.installCommand,
+                        path.join(executionDownloadsPath, widget.recipeRootPath)
+                    ],
+                    logsDir: executionLogsPath
+                };
                 services.cloudifyCli.executeCommand(command);
 
                 callback(null, executionObjectId.toHexString());
@@ -160,6 +167,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
         function (err, result) {
             logger.trace('-play waterfall- finished!');
+            logger.info('result is ', result);
 
             if (!!err) {
                 logger.error('failed to play widget with id [%s]', widgetId);
@@ -174,11 +182,13 @@ exports.play = function (widgetId, poolKey, playCallback) {
 };
 
 exports.getOutput = function (executionId, callback) {
-    _getLog(executionId, managers.logs.getOutput, callback);
+    logger.info('- - - - -');
+    _getLog(executionId, services.logs.getOutput, callback);
 };
 
 exports.getStatus = function (executionId, callback) {
-    _getLog(executionId, managers.logs.getStatus, callback);
+    logger.info('- - - - -');
+    _getLog(executionId, services.logs.getStatus, callback);
 };
 
 

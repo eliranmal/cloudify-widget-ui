@@ -34,11 +34,11 @@ angular.module('cloudifyWidgetUiApp')
             return $http.post('/backend/widgets/' + widget._id + '/stop');
         };
 
-        this.getOutput = function ( widget ) {
-            return $http.get('/backend/user/widgets/'  + widget._id + '/output');
+        this.getStatus = function( instanceId, executionId ){
+            return $http.get('/backend/user/widgets/'  + instanceId + '/status/' + executionId);
         };
 
-        this.getStatus = function( instanceId ){
-            return $http.get('/backend/user/widgets/'  + instanceId + '/status');
+        this.getOutput = function ( widget, executionId ) {
+            return $http.get('/backend/user/widgets/'  + widget._id + '/output/' + executionId);
         };
     });

@@ -95,31 +95,6 @@ exports.stop = function (req, res) {
     res.send(500, 'TBD')
 };
 
-exports.getStatus = function (req, res) {
-    logger.info('calling widget status. user id [%s], params [%s]', req.user._id, req.params);
-    res.send(200, {state: 'RUNNING'});
-};
-
-exports.getOutput = function (req, res) {
-    logger.info('calling widget get output. user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
-
-    if (!req.params.widgetId) {
-        logger.error('unable to get output, no widget id found on request');
-        res.send(500, {message : 'no widget id found on request'});
-        return;
-    }
-
-    managers.widget.getOutput(function (err, result) {
-        if (!!err) {
-            logger.error('get output failed', err);
-            res.send(500, {message: 'get output request failed. ' + err});
-            return;
-        }
-        res.send(200, result);
-    });
-};
-
-
 
 function verifyRequiredFields( fields, widget, errors  ){
 
@@ -237,5 +212,29 @@ exports.getWidgetForPlayer = function (req, res) {
             done();
             return;
         });
+    });
+};
+
+exports.getStatus = function (req, res) {
+    logger.info('calling widget status. user id [%s], params [%s]', req.user._id, req.params);
+    res.send(200, {state: 'RUNNING'});
+};
+
+exports.getOutput = function (req, res) {
+    logger.info('calling widget get output. user id [%s], widget id [%s], execution id [%s]', req.user._id, req.params.widgetId, req.params.executionId);
+
+    if (!req.params.widgetId) {
+        logger.error('unable to get output, no widget id found on request');
+        res.send(500, {message : 'no widget id found on request'});
+        return;
+    }
+
+    managers.widget.getOutput(req.params.executionId, function (err, result) {
+        if (!!err) {
+            logger.error('get output failed', err);
+            res.send(500, {message: 'get output request failed. ' + err});
+            return;
+        }
+        res.send(200, result);
     });
 };

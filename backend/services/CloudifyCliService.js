@@ -14,8 +14,7 @@ var _ = require('lodash');
  *      {
  *          executable: conf.cloudifyExecutable,
  *          arguments: ['connect', nodeModel.machineSshDetails.publicIp, ';', widget.recipeType.installCommand, path.join(downloadPath, widget.recipeRootPath) ],
- *          logsDir: conf.logsDir,
- *          statusFile: conf.statusFile
+ *          logsDir: conf.logsDir
  *      }
  */
 exports.executeCommand = function (cmd, callback) {
@@ -27,8 +26,7 @@ exports.executeCommand = function (cmd, callback) {
 
     var defaultOptions = {
         executable: conf.cloudifyExecutable,
-        logsDir: conf.logsDir,
-        statusFile: conf.statusFile
+        logsDir: conf.logsDir
     };
     var commandOptions = _.extend(defaultOptions, command);
 
@@ -38,10 +36,7 @@ exports.executeCommand = function (cmd, callback) {
     var commandArgs = [].concat(commandOptions.arguments);
 
     var logsDir = commandOptions.logsDir;
-    files.mkdirp(path.dirname(logsDir));
-
-    var statusFile = commandOptions.statusFile;
-    files.mkdirp(path.dirname(statusFile));
+    files.mkdirp(logsDir);
 
     if (!executable) {
         throw new Error('exectuable is missing from command');
@@ -58,10 +53,6 @@ exports.executeCommand = function (cmd, callback) {
 
     if (!logsDir) {
         throw new Error('logs dir is missing');
-    }
-
-    if (!statusFile) {
-        throw new Error('status file is missing');
     }
 
 

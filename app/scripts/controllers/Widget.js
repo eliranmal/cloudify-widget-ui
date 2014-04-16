@@ -41,25 +41,29 @@ angular.module('cloudifyWidgetUiApp')
             log.scrollTop = log.scrollHeight;
         }
 
-        function _handleStatus( status, myTimeout ) {
+        function _handleStatus( status, executionId, myTimeout ) {
 
             $log.info(['got status', status]);
             $localStorage.widgetStatus = status;
             ellipsisIndex = ellipsisIndex +1;
             $scope.widgetStatus = status;
-            _getOutput($scope.widget);
-            $timeout(_pollStatus, myTimeout || 3000) ;
+            _getOutput($scope.widget, executionId);
+
+            $timeout(function () {
+                _pollStatus(null, executionId)
+            }, myTimeout || 3000);
+
             _scrollLog();
         }
 
-        function _pollStatus(myTimeout) {
+        function _pollStatus(myTimeout, executionId) {
 
             if ($scope.widgetStatus.state !== stop) { // keep polling until widget stops ==> mainly for timeleft..
-                WidgetsService.getStatus( $scope.widgetStatus.instanceId ).then(function (result) {
+                WidgetsService.getStatus( $scope.widgetStatus.instanceId, executionId ).then(function (result) {
                     if (!result) {
                         return;
                     }
-                    _handleStatus(result.data, myTimeout);
+                    _handleStatus(result.data, executionId, myTimeout);
                 }, function (result) {
                     $log.error(['status error', result]);
                 });
@@ -76,9 +80,8 @@ angular.module('cloudifyWidgetUiApp')
             WidgetsService.playWidget($scope.widget, _hasAdvanced() ? _getAdvanced() : null)
                 .then(function (result) {
                     console.log(['play result', result]);
-                    $scope.widgetExecution = result.data;
-
-                    _pollStatus(1); // TODO should be _pollExecution - this will unify all details (output, status etc.)
+                    var executionId = result.data;
+                    _pollStatus(1, executionId);
                 }, function (err) {
                     console.log(['play error', err]);
                     _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
@@ -93,13 +96,14 @@ angular.module('cloudifyWidgetUiApp')
 
         var emptyList = [];
 
-        function _getOutput (widget) {
+        function _getOutput (widget, executionId) {
+            $log.debug('> > > get output, widget id: ', widget ? widget._id : '', ', execution id: ', executionId);
 
-            if (!widget) {
+            if (!widget || !executionId) {
                 $scope.output = emptyList;
             }
 
-            WidgetsService.getOutput(widget)
+            WidgetsService.getOutput(widget, executionId)
                 .then(function (result) {
                     $scope.output = result.data.split('\n');
                 }, function (err) {

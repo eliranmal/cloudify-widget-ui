@@ -1,0 +1,7 @@
+#widgetForm {
+  .loginTypeButton{
+    &.selected{
+      font-weight: bolder;
+    }
+  }
+}

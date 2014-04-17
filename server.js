@@ -7,6 +7,12 @@ var express = require('express')
     , logger = require('log4js').getLogger('server')
     , managers = require('./backend/managers');
 
+var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
+var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
+var errorHandler = require('errorhandler');
+
 var app = module.exports = express();
 
 // Configuration
@@ -28,27 +34,21 @@ if ( !!conf.adminUser ){
     })
 }
 
-app.configure(function(){
+
+
     app.set('views', __dirname + '/views');
     app.set('view engine', 'jade');
-    app.use(express.bodyParser());
-    app.use(express.methodOverride());
-    app.use(express.cookieParser());
-    app.use(express.cookieSession({ secret: 'your secret here' }));
+    app.use(bodyParser());
+    app.use(methodOverride());
+    app.use(cookieParser());
+    logger.info('configuring express');
+    app.use(cookieSession({ 'secret': 'somesecret' }));
     app.use('/backend/user', managers.middleware.loggedUser);
     app.use('/backend/admin', managers.middleware.loggedUser);
     app.use('/backend/admin', managers.middleware.adminUser);
-    app.use(app.router);
 
-});
 
-app.configure('development', function(){
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-});
 
-app.configure('production', function(){
-    app.use(express.errorHandler());
-});
 
 // Routes
 
@@ -100,7 +100,11 @@ app.get('/backend/user/account/pools/:poolId/status', controllers.pool.accountRe
 app.get('/backend/user/account/pools/status', controllers.pool.accountReadPoolsStatus);
 
 
+app.get('/backend/widgets/login/google', controllers.widgetLogin.googleLogin);
+app.get('/backend/widgets/login/google/callback', controllers.widgetLogin.googleLoginCallback);
+
 var widgetPort = process.argv[2] || 9001;
 var server = app.listen(widgetPort, function(){
     console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
 });
+app.use(errorHandler({ dumpExceptions: true, showStack: true }));

@@ -1,7 +1,27 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, WidgetsService, $location, WidgetThemesService ) {
+    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, LoginTypesService, WidgetsService, $location, WidgetThemesService) {
+
+
+       $scope.loginTypes = LoginTypesService.getAll();
+
+        $scope.toggleLoginType = function( loginType ){
+
+              if ( !$scope.widget.loginTypes ){
+                  $scope.widget.loginTypes = [];
+              }
+
+            if ( !$scope.loginTypeSelected(loginType)) {
+                $scope.widget.loginTypes.push(loginType.id);
+            }else{
+                $scope.widget.loginTypes.splice( $scope.widget.loginTypes.indexOf(loginType.id),1);
+            }
+        };
+
+        $scope.loginTypeSelected = function( loginType ){
+            return !!$scope.widget.loginTypes && $scope.widget.loginTypes.indexOf(loginType.id) >= 0;
+        };
 
         $scope.remoteBootstrapForms = [
             {
@@ -17,17 +37,18 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.themes = WidgetThemesService.themes;
 
-        $scope.recipeTypes = [{
-            'label':'Application',
-            'id':'application',
-            'installCommand' : 'install-application'
-        },
+        $scope.recipeTypes = [
             {
-                'label':'Service',
-                'id':'service',
-                'installCommand':'install-service'
+                'label': 'Application',
+                'id': 'application',
+                'installCommand': 'install-application'
+            },
+            {
+                'label': 'Service',
+                'id': 'service',
+                'installCommand': 'install-service'
             }
-        ]
+        ];
 
         $scope.widget = {};
         var widgetId = $routeParams.widgetId;
@@ -49,18 +70,18 @@ angular.module('cloudifyWidgetUiApp')
             $location.path('/widgets');
         }
 
-        $scope.delete = function(){
-            WidgetsService.deleteWidget( $scope.widget);
+        $scope.delete = function () {
+            WidgetsService.deleteWidget($scope.widget);
             redirectToWidgets();
         };
 
 
-        $scope.widgetAsJson = function(){
+        $scope.widgetAsJson = function () {
             return JSON.stringify($scope.widget, {}, 4);
         };
 
-        $scope.view = function(){
-            $scope.update().then(function(){
+        $scope.view = function () {
+            $scope.update().then(function () {
                 $location.path('/widgets/' + $scope.widget._id + '/read');
             });
         };
@@ -78,7 +99,7 @@ angular.module('cloudifyWidgetUiApp')
             );
         };
 
-        $scope.done = function(){
+        $scope.done = function () {
             redirectToWidgets();
         };
 
@@ -95,7 +116,6 @@ angular.module('cloudifyWidgetUiApp')
                 function error() {
                     $log.info('error creating widget');
                 }
-
             );
         };
     });

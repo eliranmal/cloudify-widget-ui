@@ -78,7 +78,7 @@ angular.module('cloudifyWidgetUiApp')
                 WidgetsService.playRemoteWidget($scope.widget, options)
                     .then(function (result) {
                         console.log(['play result', result]);
-                        $scope.widgetStatus = result.status;
+                        $scope.widgetExecution = result.data;
                         _pollStatus(1);
                     }, function (err) {
                         console.log(['play error', err]);
@@ -89,8 +89,9 @@ angular.module('cloudifyWidgetUiApp')
                 WidgetsService.playWidget($scope.widget, options)
                     .then(function (result) {
                         console.log(['play result', result]);
-                        $scope.widgetStatus = result.status;
-                        _pollStatus(1);
+                        $scope.widgetExecution = result.data;
+
+                        _pollStatus(1); // TODO should be _pollExecution - this will unify all details (output, status etc.)
                     }, function (err) {
                         console.log(['play error', err]);
                         _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');

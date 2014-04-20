@@ -16,7 +16,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
     async.waterfall([
 
             function getWidget(callback) {
-                logger.trace('-play waterfall- getWidget');
+                logger.trace('-play- getWidget');
                 managers.db.connect('widgets', function (db, collection, done) {
                     collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {
                         if (!!err) {
@@ -41,7 +41,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
             },
 
             function createExecutionModel(result, callback) {
-                logger.trace('-play waterfall- createExecutionModel');
+                logger.trace('-play- createExecutionModel');
 
                 managers.db.connect('widgetExecutions', function (db, collection, done) {
                     // instantiate the execution model with the widget data
@@ -66,7 +66,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
             },
 
             function updateExecutionModel(result, callback) {
-                logger.trace('-play waterfall- updateExecutionModel');
+                logger.trace('-play- updateExecutionModel');
 
                 logger.info('execution ObjectId is [%s]', result);
                 // now that we have an auto generated model id, insert new fields based on it
@@ -101,7 +101,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
             },
 
             function downloadRecipe(result, callback) {
-                logger.trace('-play waterfall- downloadRecipe');
+                logger.trace('-play- downloadRecipe');
 
                 // TODO : add validation if destination download not already exists otherwise simply call callback.
                 logger.info('downloading recipe from ', widget.recipeUrl);
@@ -123,13 +123,13 @@ exports.play = function (widgetId, poolKey, playCallback) {
             },
 
             function occupyMachine(result, callback) {
-                logger.trace('-play waterfall- occupyMachine');
+                logger.trace('-play- occupyMachine');
 
                 managers.poolClient.occupyPoolNode(poolKey, widget.poolId, callback);
             },
 
             function handleOccupyMachine(result, callback) {
-                logger.trace('-play waterfall- handleOccupyMachine');
+                logger.trace('-play- handleOccupyMachine');
 
                 if (!result) {
                     logger.error('result is null for occupy node');
@@ -147,7 +147,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
             },
 
             function runCliCommand(result, callback) {
-                logger.trace('-play waterfall- runCliCommand');
+                logger.trace('-play- runCliCommand');
 
                 var command = {
                     arguments: [
@@ -159,7 +159,13 @@ exports.play = function (widgetId, poolKey, playCallback) {
                     ],
                     logsDir: executionLogsPath
                 };
-                services.cloudifyCli.executeCommand(command);
+                // we want to remove the execution model when the execution is over
+                services.cloudifyCli.executeCommand(command, function (exErr, exResult) {
+                    if (!!exErr) {
+                        logger.error(exErr);
+                    }
+                    // TODO change execution status
+                });
 
                 callback(null, executionObjectId.toHexString());
             }
@@ -168,11 +174,12 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
 
         function (err, result) {
-            logger.trace('-play waterfall- finished!');
+            logger.trace('-play- finished!');
             logger.info('result is ', result);
 
             if (!!err) {
                 logger.error('failed to play widget with id [%s]', widgetId);
+                _removeExecutionModel(executionObjectId, playCallback);
                 playCallback(err);
                 return;
             }
@@ -181,23 +188,84 @@ exports.play = function (widgetId, poolKey, playCallback) {
         }
     );
 
+
 };
 
-exports.getOutput = function (executionId, callback) {
-    logger.info('- - - - -');
-    _getLog(executionId, services.logs.getOutput, callback);
+exports.stop = function (executionId, callback) {
+    _removeExecutionModel(executionId, callback);
 };
 
 exports.getStatus = function (executionId, callback) {
-    logger.info('- - - - -');
-    _getLog(executionId, services.logs.getStatus, callback);
+
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
+
+            logger.info('get status result: ', result);
+            if (!!err) {
+                callback(err);
+                done();
+                return;
+            }
+
+            if (!result) {
+                callback(null, {state: 'STOPPED'});
+                done();
+                return;
+            }
+
+            callback(null, {state: 'RUNNING'});
+            done();
+        });
+    });
+
+};
+
+exports.getOutput = function (executionId, callback) {
+    _readOutputLog(executionId, callback);
+};
+
+function _readOutputLog (executionId, callback) {
+    _readLog(executionId, services.logs.getOutput, callback);
+};
+
+function _readStatusLog (executionId, callback) {
+    _readLog(executionId, services.logs.getStatus, callback);
 };
 
 
-function _getLog (executionId, logFn, callback) {
-    if (!executionId) {
-        callback(new Error('unable to get log, execution id is null'));
+function _removeExecutionModel(executionId, callback) {
+    var executionObjectId;
+    try {
+        // make sure it's an ObjectID and not an ID string
+        executionObjectId = managers.db.toObjectId(executionId);
+    } catch (e) {
+        callback(e);
+        return;
     }
+
+    logger.info('removing execution model with id [%s]', executionObjectId.toHexString());
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.remove({ _id: executionObjectId }, function (err, result) {
+
+            if (!!err) {
+                callback(err);
+                done();
+                return;
+            }
+
+            if (!result) {
+                callback(new Error('unable to remove execution model'));
+                done();
+                return;
+            }
+
+            callback(null, result);
+            done();
+        });
+    });
+}
+
+function _readLog (executionId, logFn, callback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
 
@@ -208,7 +276,7 @@ function _getLog (executionId, logFn, callback) {
             }
 
             if (!result) {
-                callback(new Error('unable to get log. cannot to find execution model with id [' + executionId + ']'));
+                callback(new Error('unable to get log. cannot find execution model with id [' + executionId + ']'));
                 done();
                 return;
             }

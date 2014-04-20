@@ -17,7 +17,7 @@ var _ = require('lodash');
  *          logsDir: conf.logsDir
  *      }
  */
-exports.executeCommand = function (cmd, callback) {
+exports.executeCommand = function (cmd, onExit) {
 
     var command = cmd;
     if (_.isArray(cmd)) {
@@ -56,7 +56,7 @@ exports.executeCommand = function (cmd, callback) {
     }
 
 
-    if (callback && typeof callback !== 'function') {
+    if (onExit && typeof onExit !== 'function') {
         throw new Error('callback must be a function');
     }
 
@@ -82,22 +82,22 @@ exports.executeCommand = function (cmd, callback) {
     myCmd.stderr.on('data', appendToLogFile);
 
     myCmd.on('error', function (err) {
-        writeStatusJsonFile({'error': err})
+        writeStatusJsonFile({"error": err})
     });
 
     myCmd.on('exit', function (code, signal) {
         logger.info('finished running command. exit code is [%s], exit signal is [%s]', code, signal);
-        if (callback) {
+        if (onExit) {
             if (code !== 0) {
-                callback(new Error('command failed with exit code [' + code + '] and exit signal [' + signal + ']'));
+                onExit(new Error('command failed with exit code [' + code + '] and exit signal [' + signal + ']'));
             } else {
-                callback();
+                onExit(null, { code: code, signal: signal });
             }
         }
     });
 
     myCmd.on('close', function (code) {
-        writeStatusJsonFile({'code': code})
+        writeStatusJsonFile({"code": code})
     });
 
     logger.info('running command [%s] [%s]. output log file is [%s]', executable, commandArgs, outputLogFile);

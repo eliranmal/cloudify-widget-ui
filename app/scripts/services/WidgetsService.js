@@ -30,15 +30,15 @@ angular.module('cloudifyWidgetUiApp')
             return $http.post('/backend/user/widgets/' + widget._id + '/play');
         };
 
-        this.stopWidget = function( widget ){
-            return $http.post('/backend/widgets/' + widget._id + '/stop');
+        this.stopWidget = function( widget, executionId ){
+            return $http.post('/backend/user/widgets/' + widget._id + '/executions/' + executionId + '/stop');
         };
 
         this.getStatus = function( instanceId, executionId ){
-            return $http.get('/backend/user/widgets/'  + instanceId + '/status/' + executionId);
+            return $http.get('/backend/user/widgets/'  + instanceId + '/executions/' + executionId + '/status');
         };
 
         this.getOutput = function ( widget, executionId ) {
-            return $http.get('/backend/user/widgets/'  + widget._id + '/output/' + executionId);
+            return $http.get('/backend/user/widgets/'  + widget._id + '/executions/' + executionId + '/output');
         };
     });

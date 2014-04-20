@@ -2,7 +2,7 @@
   "name": "cloudify-widget-ui",
   "version": "1.0.0",
   "dependencies": {
-    "express": "*",
+    "express": "~3.4.8",
     "log4js": "*",
     "lodash": "~2.4.1",
     "async": "~0.2.10",

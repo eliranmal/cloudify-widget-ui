@@ -47,10 +47,8 @@ angular.module('cloudifyWidgetUiApp')
             $localStorage.widgetStatus = status;
             ellipsisIndex = ellipsisIndex +1;
             $scope.widgetStatus = status;
+            _getOutput($scope.widget);
             $timeout(_pollStatus, myTimeout || 3000) ;
-
-            $scope.getOutput($scope.widget);
-
             _scrollLog();
         }
 
@@ -107,7 +105,8 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         var emptyList = [];
-        $scope.getOutput = function (widget) {
+
+        function _getOutput (widget) {
 
             if (!widget) {
                 $scope.output = emptyList;

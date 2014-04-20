@@ -11,8 +11,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
     // TODO : add different download destination per widget
     // TODO : make sure it's absolute using path.resolve()
-    var downloadPath = conf.downloadDir;
-    var widget, nodeModel;
+    var downloadPath, widget, executionObjectId, nodeModel;
 
     async.waterfall([
 
@@ -23,21 +22,76 @@ exports.play = function (widgetId, poolKey, playCallback) {
                     collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {
                         if (!!err) {
                             logger.error('unable to find widget', err);
-                            playCallback(err);
+                            callback(err);
                             done();
                             return;
                         }
 
                         if (!result) {
                             logger.error('result is null for widget find');
-                            playCallback(new Error('could not find widget'));
+                            callback(new Error('could not find widget'));
                             done();
                             return;
                         }
 
                         widget = result;
                         callback(null, result);
+                        done();
                     });
+                });
+            },
+
+            function createExecutionModel(result, callback) {
+                logger.trace('-play waterfall- createExecutionModel');
+
+                managers.db.connect('widgetExecutions', function (db, collection, done) {
+                    // instantiate the execution model with the widget data
+                    collection.insert(widget, function (err, docsInserted) {
+                        if (err) {
+                            logger.error('failed creating widget execution model', err);
+                            callback(err);
+                            done();
+                            return;
+                        }
+                        if (!docsInserted) {
+                            logger.error('no widget execution docs inserted to database');
+                            callback(new Error('no widget execution docs inserted to database'));
+                            done();
+                            return;
+                        }
+                        executionObjectId = docsInserted[0]._id;
+                        callback(null, executionObjectId);
+                        done();
+                    });
+                });
+            },
+
+            function updateExecutionModel(result, callback) {
+                logger.trace('-play waterfall- updateExecutionModel');
+
+                logger.info('execution ObjectId is [%s]', result);
+                // now that we have an auto generated model id, insert new fields based on it
+                managers.db.connect('widgetExecutions', function (db, collection, done) {
+                    downloadPath = conf.downloadDir + path.sep + result.toHexString(); // recipes are downloaded per execution
+                    collection.update(
+                        { _id: result },
+                        { $set: { downloadPath: downloadPath } },
+                        function (err, nUpdated) {
+                            if (err) {
+                                logger.error('failed updating widget execution model', err);
+                                callback(err);
+                                done();
+                                return;
+                            }
+                            if (!nUpdated) {
+                                logger.error('no widget execution docs updated in the database');
+                                callback(new Error('no widget execution docs updated in the database'));
+                                done();
+                                return;
+                            }
+                            callback(null, result);
+                            done();
+                        });
                 });
             },
 
@@ -57,7 +111,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
             },
 
             function TBDValidateRecipeExists(result, callback) {
-                logger.trace('TBD - vlaidating groovy file exists');
+                logger.trace('TBD - validate groovy file exists');
 
                 // TODO - validate that -{service|application}.groovy file exists in expected location.
                 callback(null, result);
@@ -74,7 +128,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
                 if (!result) {
                     logger.error('result is null for occupy node');
-                    playCallback(new Error('could not occupy node, no bootstrapped nodes found'));
+                    callback(new Error('could not occupy node, no bootstrapped nodes found'));
                     return;
                 }
 
@@ -101,8 +155,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
                 };
                 services.cloudifyCli.executeCommand(command);
 
-                callback();
-
+                callback(null, executionObjectId.toHexString());
             }
 
         ],

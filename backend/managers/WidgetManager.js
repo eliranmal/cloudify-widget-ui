@@ -54,7 +54,7 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
             _updateExecutionModel,
             _downloadRecipe,
             _copyCloudFolder,
-            _runBootstrapCommand,
+            _runBootstrapCommand
 
         ],
 
@@ -64,6 +64,7 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
 };
 
 exports.stop = function (executionId, callback) {
+    // TODO un-occupy node (delete+create?)
     _removeExecutionModel(executionId, callback);
 };
 

@@ -38,8 +38,8 @@ angular.module('cloudifyWidgetUiApp')
             return $http.post('/backend/user/widgets/' + widget._id + '/executions/' + executionId + '/stop');
         };
 
-        this.getStatus = function( instanceId, executionId ){
-            return $http.get('/backend/user/widgets/'  + instanceId + '/executions/' + executionId + '/status');
+        this.getStatus = function( widget, executionId ){
+            return $http.get('/backend/user/widgets/'  + widget._id + '/executions/' + executionId + '/status');
         };
 
         this.getOutput = function ( widget, executionId ) {

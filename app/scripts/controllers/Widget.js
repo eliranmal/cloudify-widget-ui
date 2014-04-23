@@ -57,7 +57,7 @@ angular.module('cloudifyWidgetUiApp')
         function _pollStatus(myTimeout) {
 
             if ($scope.widgetStatus.state !== stop) { // keep polling until widget stops ==> mainly for timeleft..
-                WidgetsService.getStatus( $scope.widgetStatus.instanceId, $scope.executionId ).then(function (result) {
+                WidgetsService.getStatus( $scope.widget, $scope.executionId ).then(function (result) {
                     if (!result) {
                         return;
                     }
@@ -76,7 +76,7 @@ angular.module('cloudifyWidgetUiApp')
             _resetWidgetStatus();
             $scope.widgetStatus.state = play;
             var options = {advanced: _hasAdvanced() ? _getAdvanced() : null};
-            if ($scope.widget.remoteBootstrap.active) {
+            if ($scope.widget.remoteBootstrap && $scope.widget.remoteBootstrap.active) {
                 WidgetsService.playRemoteWidget($scope.widget, options)
                     .then(function (result) {
                         console.log(['play result', result]);
@@ -91,7 +91,7 @@ angular.module('cloudifyWidgetUiApp')
                 WidgetsService.playWidget($scope.widget, options)
                     .then(function (result) {
                         console.log(['play result', result]);
-                        $scope.widgetExecution = result.data;
+                        $scope.executionId = result.data;
 
                         _pollStatus(1); // TODO should be _pollExecution - this will unify all details (output, status etc.)
                     }, function (err) {

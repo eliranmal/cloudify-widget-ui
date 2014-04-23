@@ -7,171 +7,176 @@ var managers = require('../managers');
 var conf = require('../Conf');
 
 
-exports.play = function (widgetId, poolKey, playCallback) {
+function _getWidget(curryParams, curryCallback) {
+    logger.trace('-play- getWidget');
+    managers.db.connect('widgets', function (db, collection, done) {
+        collection.findOne({ _id: managers.db.toObjectId(curryParams.widgetId) }, function (err, result) {
+            if (!!err) {
+                logger.error('unable to find widget', err);
+                curryCallback(err);
+                done();
+                return;
+            }
 
-    // TODO : add different download destination per widget
-    // TODO : make sure it's absolute using path.resolve()
-    var executionDownloadsPath, executionLogsPath, widget, executionObjectId, nodeModel;
+            if (!result) {
+                logger.error('result is null for widget find');
+                curryCallback(new Error('could not find widget'));
+                done();
+                return;
+            }
+
+            curryParams.widget = result;
+            curryCallback(null, curryParams);
+            done();
+        });
+    });
+}
+
+function _createExecutionModel(curryParams, curryCallback) {
+    logger.trace('-play- createExecutionModel');
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        // instantiate the execution model with the widget data
+        collection.insert(curryParams.widget, function (err, docsInserted) {
+            if (!!err) {
+                logger.error('failed creating widget execution model', err);
+                curryCallback(err);
+                done();
+                return;
+            }
+            if (!docsInserted) {
+                logger.error('no widget execution docs inserted to database');
+                curryCallback(new Error('no widget execution docs inserted to database'));
+                done();
+                return;
+            }
+            curryParams.executionObjectId = docsInserted[0]._id;
+            curryCallback(null, curryParams);
+            done();
+        });
+    });
+}
+
+function _updateExecutionModel (curryParams, curryCallback) {
+    logger.trace('-play- updateExecutionModel');
+
+    logger.info('execution ObjectId is [%s]', curryParams);
+    // now that we have an auto generated model id, insert new fields based on it
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        curryParams.executionDownloadsPath = path.join(conf.downloadsDir, curryParams.executionObjectId.toHexString());
+        curryParams.executionLogsPath = path.join(conf.logsDir, curryParams.executionObjectId.toHexString());
+        collection.update(
+            { _id: curryParams.executionObjectId },
+            {
+                $set: {
+                    downloadsPath: curryParams.executionDownloadsPath,
+                    logsPath: curryParams.executionLogsPath
+                }
+            },
+            function (err, nUpdated) {
+                if (err) {
+                    logger.error('failed updating widget execution model', err);
+                    curryCallback(err);
+                    done();
+                    return;
+                }
+                if (!nUpdated) {
+                    logger.error('no widget execution docs updated in the database');
+                    curryCallback(new Error('no widget execution docs updated in the database'));
+                    done();
+                    return;
+                }
+                curryCallback(null, curryParams);
+                done();
+            });
+    });
+}
+
+function _downloadRecipe(curryParams, curryCallback) {
+    logger.trace('-play- downloadRecipe');
+
+    // TODO : add validation if destination download not already exists otherwise simply call callback.
+    logger.info('downloading recipe from ', curryParams.widget.recipeUrl);
+    // download recipe zip
+    var options = {
+        destDir: curryParams.executionDownloadsPath,
+        recipeUrl: curryParams.widget.recipeUrl
+    };
+    services.dl.downloadRecipe(options, function () {
+        curryCallback(null, curryParams);
+    });
+}
+
+function _occupyMachine(curryParams, curryCallback) {
+    logger.trace('-play- occupyMachine');
+
+    managers.poolClient.occupyPoolNode(curryParams.poolKey, curryParams.widget.poolId, function (err, result) {
+
+        if (!!err) {
+            logger.error('occupy node failed');
+            curryCallback(new Error('failed to occupy node'));
+            return;
+        }
+
+        if (!result) {
+            logger.error('occupy node result is null');
+            curryCallback(new Error('could not occupy node, no bootstrapped nodes found'));
+            return;
+        }
+
+        try {
+            curryParams.nodeModel = JSON.parse(result);
+        } catch (e) {
+            curryCallback(e);
+        }
+
+        curryCallback(null, curryParams);
+    });
+}
+
+function _runCliCommand(curryParams, curryCallback) {
+    logger.trace('-play- runCliCommand');
+
+    var command = {
+        arguments: [
+            'connect',
+            curryParams.nodeModel.machineSshDetails.publicIp,
+            ';',
+            curryParams.widget.recipeType.installCommand,
+            path.join(curryParams.executionDownloadsPath, curryParams.widget.recipeRootPath)
+        ],
+        logsDir: curryParams.executionLogsPath
+    };
+    // we want to remove the execution model when the execution is over
+    services.cloudifyCli.executeCommand(command, function (exErr, exResult) {
+        if (!!exErr) {
+            logger.error(exErr);
+        }
+        // TODO change execution status
+    });
+
+    curryCallback(null, curryParams);
+}
+
+
+exports.play = function (widgetId, poolKey, playCallback) {
 
     async.waterfall([
 
-            function getWidget(callback) {
-                logger.trace('-play- getWidget');
-                managers.db.connect('widgets', function (db, collection, done) {
-                    collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {
-                        if (!!err) {
-                            logger.error('unable to find widget', err);
-                            callback(err);
-                            done();
-                            return;
-                        }
-
-                        if (!result) {
-                            logger.error('result is null for widget find');
-                            callback(new Error('could not find widget'));
-                            done();
-                            return;
-                        }
-
-                        widget = result;
-                        callback(null, result);
-                        done();
-                    });
-                });
-            },
-
-            function createExecutionModel(result, callback) {
-                logger.trace('-play- createExecutionModel');
-
-                managers.db.connect('widgetExecutions', function (db, collection, done) {
-                    // instantiate the execution model with the widget data
-                    collection.insert(widget, function (err, docsInserted) {
-                        if (!!err) {
-                            logger.error('failed creating widget execution model', err);
-                            callback(err);
-                            done();
-                            return;
-                        }
-                        if (!docsInserted) {
-                            logger.error('no widget execution docs inserted to database');
-                            callback(new Error('no widget execution docs inserted to database'));
-                            done();
-                            return;
-                        }
-                        executionObjectId = docsInserted[0]._id;
-                        callback(null, executionObjectId);
-                        done();
-                    });
-                });
-            },
-
-            function updateExecutionModel(result, callback) {
-                logger.trace('-play- updateExecutionModel');
-
-                logger.info('execution ObjectId is [%s]', result);
-                // now that we have an auto generated model id, insert new fields based on it
-                managers.db.connect('widgetExecutions', function (db, collection, done) {
-                    executionDownloadsPath = path.join(conf.downloadsDir, result.toHexString());
-                    executionLogsPath = path.join(conf.logsDir, result.toHexString());
-                    collection.update(
-                        { _id: result },
-                        {
-                            $set: {
-                                downloadsPath: executionDownloadsPath,
-                                logsPath: executionLogsPath
-                            }
-                        },
-                        function (err, nUpdated) {
-                            if (err) {
-                                logger.error('failed updating widget execution model', err);
-                                callback(err);
-                                done();
-                                return;
-                            }
-                            if (!nUpdated) {
-                                logger.error('no widget execution docs updated in the database');
-                                callback(new Error('no widget execution docs updated in the database'));
-                                done();
-                                return;
-                            }
-                            callback(null, result);
-                            done();
-                        });
-                });
-            },
-
-            function downloadRecipe(result, callback) {
-                logger.trace('-play- downloadRecipe');
-
-                // TODO : add validation if destination download not already exists otherwise simply call callback.
-                logger.info('downloading recipe from ', widget.recipeUrl);
-                // download recipe zip
-                var options = {
-                    destDir: executionDownloadsPath,
-                    recipeUrl: widget.recipeUrl
+            function initCurryParams (callback) {
+                var initialCurryParams = {
+                    widgetId: widgetId,
+                    poolKey: poolKey,
+                    playCallback: playCallback
                 };
-                services.dl.downloadRecipe(options, function () {
-                    callback(null, result);
-                });
+                callback(null, initialCurryParams);
             },
-
-            function TBDValidateRecipeExists(result, callback) {
-                logger.trace('TBD - validate groovy file exists');
-
-                // TODO - validate that -{service|application}.groovy file exists in expected location.
-                callback(null, result);
-            },
-
-            function occupyMachine(result, callback) {
-                logger.trace('-play- occupyMachine');
-
-                managers.poolClient.occupyPoolNode(poolKey, widget.poolId, callback);
-            },
-
-            function handleOccupyMachine(result, callback) {
-                logger.trace('-play- handleOccupyMachine');
-
-                if (!result) {
-                    logger.error('result is null for occupy node');
-                    callback(new Error('could not occupy node, no bootstrapped nodes found'));
-                    return;
-                }
-
-                try {
-                    nodeModel = JSON.parse(result);
-                } catch (e) {
-                    callback(e);
-                }
-
-                callback(null, result);
-            },
-
-            function runCliCommand(result, callback) {
-                logger.trace('-play- runCliCommand');
-
-                var command = {
-                    arguments: [
-                        'connect',
-                        nodeModel.machineSshDetails.publicIp,
-                        ';',
-                        widget.recipeType.installCommand,
-                        path.join(executionDownloadsPath, widget.recipeRootPath)
-                    ],
-                    logsDir: executionLogsPath
-                };
-                // we want to remove the execution model when the execution is over
-                services.cloudifyCli.executeCommand(command, function (exErr, exResult) {
-                    if (!!exErr) {
-                        logger.error(exErr);
-                    }
-                    // TODO change execution status
-                });
-
-                callback(null, executionObjectId.toHexString());
-            }
-
+            _getWidget,
+            _createExecutionModel,
+            _updateExecutionModel,
+            _downloadRecipe,
+            _occupyMachine,
+            _runCliCommand
         ],
-
 
         function (err, result) {
             logger.trace('-play- finished!');
@@ -179,12 +184,12 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
             if (!!err) {
                 logger.error('failed to play widget with id [%s]', widgetId);
-                _removeExecutionModel(executionObjectId, playCallback);
+                _removeExecutionModel(result.executionObjectId, playCallback);
                 playCallback(err);
                 return;
             }
 
-            playCallback(null, result);
+            playCallback(null, result.executionObjectId.toHexString());
         }
     );
 

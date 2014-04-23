@@ -64,7 +64,7 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
 };
 
 exports.stop = function (executionId, callback) {
-    // TODO un-occupy node (delete+create?)
+    // TODO un-occupy node (delete+create?) if pool is manually-managed
     _removeExecutionModel(executionId, callback);
 };
 

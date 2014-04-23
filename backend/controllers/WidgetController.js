@@ -75,19 +75,19 @@ exports.playRemote = function ( req, res ) {
 
     managers.widget.playRemote(req.params.widgetId, req.user.poolKey, req.body.data, function (err, result) {
         if (!!err) {
-            logger.error('playRemote failed', err);
-            res.send(500, {message: 'playRemote request failed. ' + err});
+            logger.error('play remote failed', err);
+            res.send(500, {message: 'play failed', error: err});
             return;
         }
 
         if (!result) {
-            logger.error('playRemote failed', err);
-            res.send(500, {message: 'playRemote request failed since result empty ' + err});
+            logger.error('unable to get execution id');
+            res.send(500, {message: 'unable to get execution id'});
             return;
         }
 
-        logger.info('returning playRemote finished');
-        res.send(200, {message: 'playRemote finished successfully'});
+        logger.info('widget play remote initiated successfully, execution id is [%s]', result)
+        res.send(200, result);
     });
 };
 

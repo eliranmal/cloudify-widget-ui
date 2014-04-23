@@ -1,4 +1,5 @@
 var logger = require('log4js').getLogger('WidgetManager');
+var _ = require('lodash');
 var fs = require('fs');
 var path = require('path');
 var async = require('async');
@@ -7,12 +8,11 @@ var managers = require('../managers');
 var conf = require('../Conf');
 
 
-
 exports.play = function (widgetId, poolKey, playCallback) {
 
     async.waterfall([
 
-            function initCurryParams (callback) {
+            function initCurryParams(callback) {
                 var initialCurryParams = {
                     widgetId: widgetId,
                     poolKey: poolKey,
@@ -41,7 +41,7 @@ exports.playRemote = function (widgetId, poolKey, advancedParams, playCallback) 
 
     async.waterfall([
 
-            function initCurryParams (callback) {
+            function initCurryParams(callback) {
                 var initialCurryParams = {
                     widgetId: widgetId,
                     poolKey: poolKey,
@@ -61,7 +61,6 @@ exports.playRemote = function (widgetId, poolKey, advancedParams, playCallback) 
         ],
 
         _playFinally
-
     );
 };
 
@@ -76,7 +75,7 @@ exports.getStatus = function (executionId, callback) {
         collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
 
             logger.info('get status result: ', result);
-            if (!!err) {
+            if (err) {
                 callback(err);
                 done();
                 return;
@@ -100,13 +99,11 @@ exports.getOutput = function (executionId, callback) {
 };
 
 
-
-
 function _getWidget(curryParams, curryCallback) {
     logger.trace('-play- getWidget');
     managers.db.connect('widgets', function (db, collection, done) {
         collection.findOne({ _id: managers.db.toObjectId(curryParams.widgetId) }, function (err, result) {
-            if (!!err) {
+            if (err) {
                 logger.error('unable to find widget', err);
                 curryCallback(err, curryParams);
                 done();
@@ -130,9 +127,10 @@ function _getWidget(curryParams, curryCallback) {
 function _createExecutionModel(curryParams, curryCallback) {
     logger.trace('-play- createExecutionModel');
     managers.db.connect('widgetExecutions', function (db, collection, done) {
-        // instantiate the execution model with the widget data
-        collection.insert(curryParams.widget, function (err, docsInserted) {
-            if (!!err) {
+        // instantiate the execution model with the widget data, and remove the _id - we want mongodb to generate a unique id
+        var executionModel = _.omit(curryParams.widget, '_id');
+        collection.insert(executionModel, function (err, docsInserted) {
+            if (err) {
                 logger.error('failed creating widget execution model', err);
                 curryCallback(err, curryParams);
                 done();
@@ -151,7 +149,7 @@ function _createExecutionModel(curryParams, curryCallback) {
     });
 }
 
-function _updateExecutionModel (curryParams, curryCallback) {
+function _updateExecutionModel(curryParams, curryCallback) {
     logger.trace('-play- updateExecutionModel');
 
     logger.info('execution ObjectId is [%s]', curryParams);
@@ -206,7 +204,7 @@ function _occupyMachine(curryParams, curryCallback) {
 
     managers.poolClient.occupyPoolNode(curryParams.poolKey, curryParams.widget.poolId, function (err, result) {
 
-        if (!!err) {
+        if (err) {
             logger.error('occupy node failed');
             curryCallback(new Error('failed to occupy node'), curryParams);
             return;
@@ -243,7 +241,7 @@ function _runInstallCommand(curryParams, curryCallback) {
     };
     // we want to remove the execution model when the execution is over
     services.cloudifyCli.executeCommand(command, function (exErr, exResult) {
-        if (!!exErr) {
+        if (exErr) {
             logger.error(exErr);
         }
         // TODO change execution status
@@ -252,77 +250,77 @@ function _runInstallCommand(curryParams, curryCallback) {
     curryCallback(null, curryParams);
 }
 
-function _copyCloudFolder( curryParams, curryCallback ){
-    logger.info('copyCloudFolder, widget:', curryParams.widget );
+function _copyCloudFolder(curryParams, curryCallback) {
+    logger.debug('copyCloudFolder, widget:', curryParams.widget);
     var cloudifyCloudsDir = conf.cloudifyCloudsDir;
-    logger.info('cloudifyCloudsDir:' , cloudifyCloudsDir );
+    logger.debug('cloudifyCloudsDir:', cloudifyCloudsDir);
     var cloudName = curryParams.widget.remoteBootstrap.cloudifyCloud;
-    logger.info('cloudName:' , cloudName );
+    logger.debug('cloudName:', cloudName);
     var cloudSourceFolder = cloudifyCloudsDir + path.sep + cloudName;
     var suffix = getTempSuffix();
-    logger.info('suffix:', suffix );
+    logger.debug('suffix:', suffix);
     curryParams.cloudDistFolderName = curryParams.widget.remoteBootstrap.cloudifyCloud + suffix;
     var cloudDistFolder = cloudifyCloudsDir + path.sep + curryParams.cloudDistFolderName;
     curryParams.cloudDistFolder = cloudDistFolder;
-    logger.info('cloudSourceFolder:', cloudSourceFolder , ', cloudDistFolder', cloudDistFolder, 'cloudDistFolderName', curryParams.cloudDistFolderName );
+    logger.debug('cloudSourceFolder:', cloudSourceFolder, ', cloudDistFolder', cloudDistFolder, 'cloudDistFolderName', curryParams.cloudDistFolderName);
 
     var ncp = require('ncp').ncp;
     ncp.limit = 16;
 
     ncp(cloudSourceFolder, cloudDistFolder, function (err) {
-        if( err ) {
+        if (err) {
             logger.info(err);
             return;
         }
-        logger.info( 'Folder []', cloudSourceFolder, ' was successfully copied into []', cloudDistFolder );
+        logger.info('Folder [%s] was successfully copied into [%s]', cloudSourceFolder, cloudDistFolder);
         curryCallback(null, curryParams);
     });
 }
 
-function _overrideCloudPropertiesFile( curryParams, curryCallback ){
+function _overrideCloudPropertiesFile(curryParams, curryCallback) {
 
     var cloudName = curryParams.widget.remoteBootstrap.cloudifyCloud;
     var cloudPropertiesFile = curryParams.cloudDistFolder + path.sep + cloudName + '-cloud.properties';
     var advancedParams = curryParams.advancedParams;
-    logger.info( 'Cloud Properties File is ', cloudPropertiesFile, 'advancedParams=', curryParams.advancedParams );
+    logger.info('Cloud Properties File is ', cloudPropertiesFile, 'advancedParams=', curryParams.advancedParams);
 
     //overrideParams( curryParams.cloudDistFolderName, cloudPropertiesFile, curryParams.advancedParams, curryCallback );
-    logger.info( '---overrideParams---, -advancedParams:', advancedParams );
+    logger.info('---overrideParams---, -advancedParams:', advancedParams);
 
     var updateLine = "";
-    if( advancedParams.SOFTLAYER ){
+    if (advancedParams.SOFTLAYER) {
         var username = advancedParams.SOFTLAYER.params.username;
         var apiKey = advancedParams.SOFTLAYER.params.apiKey;
         updateLine =
-            'user='+ wrapWithQuotes(username) + '\n' +
-            'apiKey='+ wrapWithQuotes(apiKey);
+            'user="' + username + '"\n' +
+            'apiKey="' + apiKey + '"';
     }
-    else if( advancedParams.HP ){
+    else if (advancedParams.HP) {
         var key = advancedParams.HP.params.key;
         var secretKey = advancedParams.HP.params.secretKey;
         var project = advancedParams.HP.params.project;
         updateLine =
-            'tenant=' + wrapWithQuotes( project ) + '\n' +
-            'user=' + wrapWithQuotes( key ) + '\n' +
-            'apiKey=' + wrapWithQuotes( secretKey );
+            'tenant="' + project + '"\n' +
+            'user="' + key + '"\n' +
+            'apiKey="' + secretKey + '"';
         /*
-         'keyFile=' + wrapWithQuotes(newPemFile.getName() + ".pem");
-         'keyPair=' + wrapWithQuotes(newPemFile.getName());
-         'securityGroup=' + wrapWithQuotes(cloudConf.securityGroup);
+         'keyFile="' + newPemFile.getName() + '.pem"';
+         'keyPair="' + newPemFile.getName() + '"';
+         'securityGroup="' + cloudConf.securityGroup + '"';
          */
     }
 
-    logger.info( '---updateLine', updateLine );
+    logger.info('---updateLine', updateLine);
 
     fs.appendFile(cloudPropertiesFile, updateLine, function (err) {
 
         if (err) {
             logger.info(err);
-            curryCallback( err, curryParams );
+            curryCallback(err, curryParams);
         }
-        logger.info( 'Cloud Properties File was updated:', cloudPropertiesFile );
+        logger.info('Cloud Properties File was updated:', cloudPropertiesFile);
 
-        curryCallback( null, curryParams );
+        curryCallback(null, curryParams);
     });
 
 }
@@ -338,18 +336,18 @@ function _runBootstrapCommand(curryParams, curryCallback) {
         logsDir: curryParams.executionLogsPath
     };
 
-    logger.info( '-command', command );
+    logger.info('-command', command);
 
     services.cloudifyCli.executeCommand(command);
 
     curryCallback(null, curryParams);
 }
 
-function _playFinally (err, curryParams) {
+function _playFinally(err, curryParams) {
     logger.trace('-play- finished!');
     logger.info('result is ', curryParams);
 
-    if (!!err) {
+    if (err) {
         logger.error('failed to play widget with id [%s]', curryParams.widgetId);
         _removeExecutionModel(curryParams.executionObjectId, curryParams.playCallback);
         curryParams.playCallback(err);
@@ -360,13 +358,11 @@ function _playFinally (err, curryParams) {
 }
 
 
-
-
-function _readOutputLog (executionId, callback) {
+function _readOutputLog(executionId, callback) {
     _readLog(executionId, services.logs.getOutput, callback);
 };
 
-function _readStatusLog (executionId, callback) {
+function _readStatusLog(executionId, callback) {
     _readLog(executionId, services.logs.getStatus, callback);
 };
 
@@ -385,7 +381,7 @@ function _removeExecutionModel(executionId, callback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.remove({ _id: executionObjectId }, function (err, result) {
 
-            if (!!err) {
+            if (err) {
                 callback(err);
                 done();
                 return;
@@ -403,11 +399,11 @@ function _removeExecutionModel(executionId, callback) {
     });
 }
 
-function _readLog (executionId, logFn, callback) {
+function _readLog(executionId, logFn, callback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
 
-            if (!!err) {
+            if (err) {
                 callback(err);
                 done();
                 return;
@@ -428,8 +424,4 @@ function _readLog (executionId, logFn, callback) {
 function getTempSuffix() {
     var currTime = '' + new Date().getTime();
     return currTime.substring(currTime.length - 4);
-}
-
-function wrapWithQuotes( s ){
-    return "\"" + s + "\"";
 }

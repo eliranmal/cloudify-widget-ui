@@ -107,12 +107,6 @@ function _play (req, res, playFn) {
         return;
     }
 
-    if (!req.params.executionId) {
-        logger.error('unable to stop widget, no execution id found on request');
-        res.send(500, {message : 'no execution id found on request'});
-        return;
-    }
-
     playFn(req.params.widgetId, req.user.poolKey , function (err, result) {
         if (!!err) {
             logger.error('play failed', err);

@@ -57,7 +57,7 @@ angular.module('cloudifyWidgetUiApp')
         function _pollStatus(myTimeout) {
 
             if ($scope.widgetStatus.state !== stop) { // keep polling until widget stops ==> mainly for timeleft..
-                WidgetsService.getStatus( $scope.widgetStatus.instanceId, $scope.executionId ).then(function (result) {
+                WidgetsService.getStatus( $scope.widget, $scope.executionId ).then(function (result) {
                     if (!result) {
                         return;
                     }
@@ -75,20 +75,18 @@ angular.module('cloudifyWidgetUiApp')
         $scope.play = function () {
             _resetWidgetStatus();
             $scope.widgetStatus.state = play;
-
             console.log('before check advanced');
-
             var options =  _hasAdvanced() ? _getAdvanced() : null;
             console.log('After check advanced, options=', options, '_hasAdvanced()=', _hasAdvanced() );
 
             if ($scope.widget.remoteBootstrap.active) {
                 WidgetsService.playRemoteWidget($scope.widget, options)
                     .then(function (result) {
-                        console.log(['play result', result]);
-                        $scope.widgetExecution = result.data;
+                        console.log(['play remote result', result]);
+                        $scope.executionId = result.data;
                         _pollStatus(1);
                     }, function (err) {
-                        console.log(['play error', err]);
+                        console.log(['play remote error', err]);
                         _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
                     });
             }
@@ -96,7 +94,7 @@ angular.module('cloudifyWidgetUiApp')
                 WidgetsService.playWidget($scope.widget, options)
                     .then(function (result) {
                         console.log(['play result', result]);
-                        $scope.widgetExecution = result.data;
+                        $scope.executionId = result.data;
 
                         _pollStatus(1); // TODO should be _pollExecution - this will unify all details (output, status etc.)
                     }, function (err) {

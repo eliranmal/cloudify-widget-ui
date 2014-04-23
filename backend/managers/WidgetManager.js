@@ -35,7 +35,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
 };
 
 
-exports.playRemote = function (widgetId, poolKey, playCallback) {
+exports.playRemote = function (widgetId, poolKey, advancedParams, playCallback) {
 
     logger.trace('-playRemote !!!!!!');
 
@@ -45,6 +45,7 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
                 var initialCurryParams = {
                     widgetId: widgetId,
                     poolKey: poolKey,
+                    advancedParams: advancedParams,
                     playCallback: playCallback
                 };
                 callback(null, initialCurryParams);
@@ -54,7 +55,8 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
             _updateExecutionModel,
             _downloadRecipe,
             _copyCloudFolder,
-            _runBootstrapCommand
+            _overrideCloudPropertiesFile,
+            _runBootstrapCommand,
 
         ],
 
@@ -254,9 +256,14 @@ function _copyCloudFolder( curryParams, curryCallback ){
     logger.info('copyCloudFolder, widget:', curryParams.widget );
     var cloudifyCloudsDir = conf.cloudifyCloudsDir;
     logger.info('cloudifyCloudsDir:' , cloudifyCloudsDir );
-    var cloudSourceFolder = cloudifyCloudsDir + path.sep + curryParams.widget.remoteBootstrap.cloudifyCloud;
-    curryParams.cloudDistFolderName = curryParams.widget.remoteBootstrap.cloudifyCloud + '_new';//TODO use here UUID generator for cloud name
+    var cloudName = curryParams.widget.remoteBootstrap.cloudifyCloud;
+    logger.info('cloudName:' , cloudName );
+    var cloudSourceFolder = cloudifyCloudsDir + path.sep + cloudName;
+    var suffix = getTempSuffix();
+    logger.info('suffix:', suffix );
+    curryParams.cloudDistFolderName = curryParams.widget.remoteBootstrap.cloudifyCloud + suffix;
     var cloudDistFolder = cloudifyCloudsDir + path.sep + curryParams.cloudDistFolderName;
+    curryParams.cloudDistFolder = cloudDistFolder;
     logger.info('cloudSourceFolder:', cloudSourceFolder , ', cloudDistFolder', cloudDistFolder, 'cloudDistFolderName', curryParams.cloudDistFolderName );
 
     var ncp = require('ncp').ncp;
@@ -272,6 +279,54 @@ function _copyCloudFolder( curryParams, curryCallback ){
     });
 }
 
+function _overrideCloudPropertiesFile( curryParams, curryCallback ){
+
+    var cloudName = curryParams.widget.remoteBootstrap.cloudifyCloud;
+    var cloudPropertiesFile = curryParams.cloudDistFolder + path.sep + cloudName + '-cloud.properties';
+    var advancedParams = curryParams.advancedParams;
+    logger.info( 'Cloud Properties File is ', cloudPropertiesFile, 'advancedParams=', curryParams.advancedParams );
+
+    //overrideParams( curryParams.cloudDistFolderName, cloudPropertiesFile, curryParams.advancedParams, curryCallback );
+    logger.info( '---overrideParams---, -advancedParams:', advancedParams );
+
+    var updateLine = "";
+    if( advancedParams.SOFTLAYER ){
+        var username = advancedParams.SOFTLAYER.params.username;
+        var apiKey = advancedParams.SOFTLAYER.params.apiKey;
+        updateLine =
+            'user='+ wrapWithQuotes(username) + '\n' +
+            'apiKey='+ wrapWithQuotes(apiKey);
+    }
+    else if( advancedParams.HP ){
+        var key = advancedParams.HP.params.key;
+        var secretKey = advancedParams.HP.params.secretKey;
+        var project = advancedParams.HP.params.project;
+        updateLine =
+            'tenant=' + wrapWithQuotes( project ) + '\n' +
+            'user=' + wrapWithQuotes( key ) + '\n' +
+            'apiKey=' + wrapWithQuotes( secretKey );
+        /*
+         'keyFile=' + wrapWithQuotes(newPemFile.getName() + ".pem");
+         'keyPair=' + wrapWithQuotes(newPemFile.getName());
+         'securityGroup=' + wrapWithQuotes(cloudConf.securityGroup);
+         */
+    }
+
+    logger.info( '---updateLine', updateLine );
+
+    fs.appendFile(cloudPropertiesFile, updateLine, function (err) {
+
+        if (err) {
+            logger.info(err);
+            curryCallback( err, curryParams );
+        }
+        logger.info( 'Cloud Properties File was updated:', cloudPropertiesFile );
+
+        curryCallback( null, curryParams );
+    });
+
+}
+
 function _runBootstrapCommand(curryParams, curryCallback) {
     logger.info('-playRemote waterfall- runCliBootstrapCommand');
 
@@ -279,7 +334,8 @@ function _runBootstrapCommand(curryParams, curryCallback) {
         arguments: [
             'bootstrap-cloud',
             curryParams.cloudDistFolderName
-        ]
+        ],
+        logsDir: curryParams.executionLogsPath
     };
 
     logger.info( '-command', command );
@@ -369,4 +425,11 @@ function _readLog (executionId, logFn, callback) {
     });
 };
 
+function getTempSuffix() {
+    var currTime = '' + new Date().getTime();
+    return currTime.substring(currTime.length - 4);
+}
 
+function wrapWithQuotes( s ){
+    return "\"" + s + "\"";
+}

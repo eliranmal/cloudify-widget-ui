@@ -29,11 +29,11 @@ angular.module('cloudifyWidgetUiApp')
         _resetWidgetStatus();
 
         function _hasAdvanced() {
-            return false;
+            return $scope.advancedParams;
         }
 
         function _getAdvanced() {
-            return null;
+            return $scope.advancedParams;
         }
 
         function _scrollLog(){
@@ -75,15 +75,18 @@ angular.module('cloudifyWidgetUiApp')
         $scope.play = function () {
             _resetWidgetStatus();
             $scope.widgetStatus.state = play;
-            var options = {advanced: _hasAdvanced() ? _getAdvanced() : null};
-            if ($scope.widget.remoteBootstrap && $scope.widget.remoteBootstrap.active) {
+            console.log('before check advanced');
+            var options =  _hasAdvanced() ? _getAdvanced() : null;
+            console.log('After check advanced, options=', options, '_hasAdvanced()=', _hasAdvanced() );
+
+            if ($scope.widget.remoteBootstrap.active) {
                 WidgetsService.playRemoteWidget($scope.widget, options)
                     .then(function (result) {
-                        console.log(['play result', result]);
+                        console.log(['play remote result', result]);
                         $scope.executionId = result.data;
                         _pollStatus(1);
                     }, function (err) {
-                        console.log(['play error', err]);
+                        console.log(['play remote error', err]);
                         _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
                     });
             }

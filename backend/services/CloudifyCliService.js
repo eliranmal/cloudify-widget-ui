@@ -24,6 +24,8 @@ exports.executeCommand = function (cmd, onExit) {
         command = {arguments: cmd};
     }
 
+    logger.info('~~~executeCommand [%s] ', cmd );
+
     var defaultOptions = {
         executable: conf.cloudifyExecutable,
         logsDir: conf.logsDir
@@ -36,6 +38,9 @@ exports.executeCommand = function (cmd, onExit) {
     var commandArgs = [].concat(commandOptions.arguments);
 
     var logsDir = commandOptions.logsDir;
+
+    logger.info('~~~logsDir [%s] ', logsDir );
+
     files.mkdirp(logsDir);
 
     if (!executable) {

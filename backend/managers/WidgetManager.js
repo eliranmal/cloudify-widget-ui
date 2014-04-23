@@ -175,7 +175,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
 };
 
 
-exports.playRemote = function (widgetId, poolKey, playCallback) {
+exports.playRemote = function (widgetId, poolKey, advancedParams, playCallback) {
 
     // TODO : add different download destination per widget
     // TODO : make sure it's absolute using path.resolve()
@@ -183,7 +183,7 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
     var widget;
     var cloudDistFolder;
 
-    logger.trace('-playRemote !!!!!!');
+    logger.trace('-playRemote !!!!!! advancedParams=', advancedParams);
 
     async.waterfall([
 
@@ -234,9 +234,13 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
                 logger.info('copyCloudFolder, widget:', widget );
                 var cloudifyCloudsDir = conf.cloudifyCloudsDir;
                 logger.info('cloudifyCloudsDir:' , cloudifyCloudsDir );
-                var cloudSourceFolder = cloudifyCloudsDir + path.sep + widget.remoteBootstrap.cloudifyCloud;
-                cloudDistFolderName = widget.remoteBootstrap.cloudifyCloud + '_new';//TODO use here UUID generator for cloud name
-                var cloudDistFolder = cloudifyCloudsDir + path.sep + cloudDistFolderName;
+                var cloudName = widget.remoteBootstrap.cloudifyCloud;
+                logger.info('cloudName:' , cloudName );
+                var cloudSourceFolder = cloudifyCloudsDir + path.sep + cloudName;
+                var suffix = getTempSuffix();
+                logger.info('suffix:', suffix );
+                var cloudDistFolderName = widget.remoteBootstrap.cloudifyCloud + suffix;
+                cloudDistFolder = cloudifyCloudsDir + path.sep + cloudDistFolderName;
                 logger.info('cloudSourceFolder:', cloudSourceFolder , ', cloudDistFolder', cloudDistFolder, 'cloudDistFolderName', cloudDistFolderName );
 
                 var ncp = require('ncp').ncp;
@@ -248,7 +252,11 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
                         return;
                     }
                     logger.info( 'Folder []', cloudSourceFolder, ' was successfully copied into []', cloudDistFolder );
-                    callback(null, cloudDistFolderName);
+
+                    var cloudPropertiesFile = cloudDistFolder + path.sep + cloudName + '-cloud.properties';
+                    logger.info( 'Cloud Properties File is ', cloudPropertiesFile, 'advancedParams=', advancedParams );
+
+                    overrideParams( cloudDistFolderName, cloudPropertiesFile, advancedParams, callback );
                 });
             },
 
@@ -262,7 +270,7 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
                     ]
                 };
 
-                logger.info( '-command', command );
+                logger.info( '---command:', command );
 
                 services.cloudifyCli.executeCommand(command);
 
@@ -270,7 +278,17 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
             }
         ],
         function (err, result) {
-            logger.trace('-playRemote waterfall- finished!!!');
+
+            logger.trace('-Remove cloud folder', cloudDistFolder );
+
+            fs.rmdir( cloudDistFolder,  function (err, data) {
+                if (!!err) {
+                    logger.trace('-Failed to remove cloud folder', cloudDistFolder );
+                }
+                logger.trace('-Removed cloud folder', cloudDistFolder );
+            });
+
+            logger.trace('-playRemote waterfall- finished!!!' + result );
 
             if (!!err) {
                 logger.error('failed to playRemote widget with id [%s]', widgetId);
@@ -280,7 +298,6 @@ exports.playRemote = function (widgetId, poolKey, playCallback) {
 
             playCallback(null, result);
         }
-
     );
 };
 
@@ -301,3 +318,53 @@ exports.getOutput = function (callback) {
         callback(null, data);
     });
 };
+
+function overrideParams( cloudDistFolderName, cloudPropertiesFile, advancedParams, callback){
+
+    logger.info( '---overrideParams---, -advancedParams:', advancedParams );
+
+    var updateLine = "";
+    if( advancedParams.SOFTLAYER ){
+        var username = advancedParams.SOFTLAYER.params.username;
+        var apiKey = advancedParams.SOFTLAYER.params.apiKey;
+        updateLine =
+            'user='+ wrapWithQuotes(username) + '\n' +
+            'apiKey='+ wrapWithQuotes(apiKey);
+    }
+    else if( advancedParams.HP ){
+        var key = advancedParams.HP.params.key;
+        var secretKey = advancedParams.HP.params.secretKey;
+        var project = advancedParams.HP.params.project;
+        updateLine =
+            'tenant=' + wrapWithQuotes( project ) + '\n' +
+            'user=' + wrapWithQuotes( key ) + '\n' +
+            'apiKey=' + wrapWithQuotes( secretKey );
+        /*
+          'keyFile=' + wrapWithQuotes(newPemFile.getName() + ".pem");
+          'keyPair=' + wrapWithQuotes(newPemFile.getName());
+          'securityGroup=' + wrapWithQuotes(cloudConf.securityGroup);
+        */
+    }
+
+    logger.info( '---updateLine', updateLine );
+
+    fs.appendFile(cloudPropertiesFile, updateLine, function (err) {
+
+        if (err) {
+            logger.info(err);
+            callback( err, cloudDistFolderName );
+        }
+        logger.info( 'Cloud Properties File was updated:', cloudPropertiesFile );
+
+        callback( null, cloudDistFolderName );
+    });
+}
+
+function getTempSuffix() {
+    var currTime = '' + new Date().getTime();
+    return currTime.substring(currTime.length - 4);
+}
+
+function wrapWithQuotes( s ){
+    return "\"" + s + "\"";
+}

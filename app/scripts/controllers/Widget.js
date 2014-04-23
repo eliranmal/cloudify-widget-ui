@@ -29,11 +29,11 @@ angular.module('cloudifyWidgetUiApp')
         _resetWidgetStatus();
 
         function _hasAdvanced() {
-            return false;
+            return $scope.advancedParams;
         }
 
         function _getAdvanced() {
-            return null;
+            return $scope.advancedParams;
         }
 
         function _scrollLog(){
@@ -73,7 +73,12 @@ angular.module('cloudifyWidgetUiApp')
         $scope.play = function () {
             _resetWidgetStatus();
             $scope.widgetStatus.state = play;
-            var options = {advanced: _hasAdvanced() ? _getAdvanced() : null};
+
+            console.log('before check advanced');
+
+            var options =  _hasAdvanced() ? _getAdvanced() : null;
+            console.log('After check advanced, options=', options, '_hasAdvanced()=', _hasAdvanced() );
+
             if ($scope.widget.remoteBootstrap.active) {
                 WidgetsService.playRemoteWidget($scope.widget, options)
                     .then(function (result) {

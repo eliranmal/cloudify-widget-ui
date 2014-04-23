@@ -20,6 +20,8 @@ var _ = require('lodash');
  */
 exports.executeCommand = function (cmd, callback) {
 
+    logger.info('~~~executeCommand [%s] ', cmd );
+
     var defaultOptions = {
         executable: conf.cloudifyExecutable,
         logFile: conf.logFile,

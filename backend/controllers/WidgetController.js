@@ -65,6 +65,7 @@ exports.delete = function ( req, res ){
 
 exports.playRemote = function ( req, res ) {
     logger.info('calling widget playRemote. user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
+    logger.info('req.body data[]', req.body.data);
 
     if (!req.params.widgetId) {
         logger.error('unable to playRemote, no widget id found on request');
@@ -72,10 +73,16 @@ exports.playRemote = function ( req, res ) {
         return;
     }
 
-    managers.widget.playRemote(req.params.widgetId, req.user.poolKey , function (err, result) {
+    managers.widget.playRemote(req.params.widgetId, req.user.poolKey, req.body.data, function (err, result) {
         if (!!err) {
             logger.error('playRemote failed', err);
             res.send(500, {message: 'playRemote request failed. ' + err});
+            return;
+        }
+
+        if (!result) {
+            logger.error('playRemote failed', err);
+            res.send(500, {message: 'playRemote request failed since result empty ' + err});
             return;
         }
 

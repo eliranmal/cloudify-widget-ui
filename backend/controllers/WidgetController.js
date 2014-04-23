@@ -51,7 +51,7 @@ exports.read = function( req, res ){
 exports.delete = function ( req, res ){
     var widgetId = req.params.widgetId;
     managers.db.connect('widgets', function(db, collection,done){
-        collection.remove({'userId' : req.user._id, '_id' : managers.db.asJsonObject(widgetId)}, function(err){
+        collection.remove({'userId' : req.user._id, '_id' : managers.db.toObjectId(widgetId)}, function(err){
             if ( !!err ){
                 res.send(500, {'message' : 'unable to delete widget ' + widgetId + ' :: ' + err.message});
                 done();
@@ -103,7 +103,7 @@ exports.play = function ( req, res ) {
     managers.widget.play(req.params.widgetId, req.user.poolKey , function (err, result) {
         if (!!err) {
             logger.error('play failed', err);
-            res.send(500, {message: 'play failed. ' + err});
+            res.send(500, {message: 'play failed', error: err});
             return;
         }
 
@@ -119,33 +119,30 @@ exports.play = function ( req, res ) {
 };
 
 exports.stop = function (req, res) {
-    res.send(500, 'TBD')
-};
-
-exports.getStatus = function (req, res) {
-    logger.info('calling widget status. user id [%s], params [%s]', req.user._id, req.params);
-    res.send(200, {state: 'RUNNING'});
-};
-
-exports.getOutput = function (req, res) {
-    logger.info('calling widget get output. user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
+    logger.info('calling widget stop. user id [%s], widget id [%s], execution id [%s]', req.user._id, req.params.widgetId, req.params.executionId);
 
     if (!req.params.widgetId) {
-        logger.error('unable to get output, no widget id found on request');
+        logger.error('unable to stop widget, no widget id found on request');
         res.send(500, {message : 'no widget id found on request'});
         return;
     }
 
-    managers.widget.getOutput(function (err, result) {
+    if (!req.params.executionId) {
+        logger.error('unable to stop widget, no execution id found on request');
+        res.send(500, {message : 'no execution id found on request'});
+        return;
+    }
+
+    managers.widget.stop(req.params.executionId, function (err, result) {
         if (!!err) {
-            logger.error('get output failed', err);
-            res.send(500, {message: 'get output request failed. ' + err});
+            logger.error('stop widget failed', err);
+            res.send(500, {message: 'stop widget failed', error: err});
             return;
         }
         res.send(200, result);
     });
-};
 
+};
 
 
 function verifyRequiredFields( fields, widget, errors  ){
@@ -264,5 +261,56 @@ exports.getWidgetForPlayer = function (req, res) {
             done();
             return;
         });
+    });
+};
+
+exports.getStatus = function (req, res) {
+    logger.info('calling widget get status. user id [%s], widget id [%s], execution id [%s]', req.user._id, req.params.widgetId, req.params.executionId);
+
+    if (!req.params.widgetId) {
+        logger.error('unable to get output, no widget id found on request');
+        res.send(500, {message : 'no widget id found on request'});
+        return;
+    }
+
+    if (!req.params.executionId) {
+        logger.error('unable to get output, no execution id found on request');
+        res.send(500, {message : 'no execution id found on request'});
+        return;
+    }
+
+    managers.widget.getStatus(req.params.executionId, function (err, result) {
+        if (!!err) {
+            logger.error('get status failed', err);
+            res.send(500, {message: 'get status failed', error: err});
+            return;
+        }
+        res.send(200, result);
+    });
+
+};
+
+exports.getOutput = function (req, res) {
+    logger.info('calling widget get output. user id [%s], widget id [%s], execution id [%s]', req.user._id, req.params.widgetId, req.params.executionId);
+
+    if (!req.params.widgetId) {
+        logger.error('unable to get output, no widget id found on request');
+        res.send(500, {message : 'no widget id found on request'});
+        return;
+    }
+
+    if (!req.params.executionId) {
+        logger.error('unable to get output, no execution id found on request');
+        res.send(500, {message : 'no execution id found on request'});
+        return;
+    }
+
+    managers.widget.getOutput(req.params.executionId, function (err, result) {
+        if (!!err) {
+            logger.error('get output failed', err);
+            res.send(500, {message: 'get output failed', error: err});
+            return;
+        }
+        res.send(200, result);
     });
 };

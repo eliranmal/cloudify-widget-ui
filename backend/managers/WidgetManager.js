@@ -11,14 +11,13 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
     // TODO : add different download destination per widget
     // TODO : make sure it's absolute using path.resolve()
-    var downloadPath, widget, executionObjectId, nodeModel;
+    var executionDownloadsPath, executionLogsPath, widget, executionObjectId, nodeModel;
 
     async.waterfall([
 
             function getWidget(callback) {
-                logger.trace('-play waterfall- getWidget');
+                logger.trace('-play- getWidget');
                 managers.db.connect('widgets', function (db, collection, done) {
-                    logger.trace('-play waterfall- db.connect');
                     collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {
                         if (!!err) {
                             logger.error('unable to find widget', err);
@@ -42,12 +41,12 @@ exports.play = function (widgetId, poolKey, playCallback) {
             },
 
             function createExecutionModel(result, callback) {
-                logger.trace('-play waterfall- createExecutionModel');
+                logger.trace('-play- createExecutionModel');
 
                 managers.db.connect('widgetExecutions', function (db, collection, done) {
                     // instantiate the execution model with the widget data
                     collection.insert(widget, function (err, docsInserted) {
-                        if (err) {
+                        if (!!err) {
                             logger.error('failed creating widget execution model', err);
                             callback(err);
                             done();
@@ -67,15 +66,21 @@ exports.play = function (widgetId, poolKey, playCallback) {
             },
 
             function updateExecutionModel(result, callback) {
-                logger.trace('-play waterfall- updateExecutionModel');
+                logger.trace('-play- updateExecutionModel');
 
                 logger.info('execution ObjectId is [%s]', result);
                 // now that we have an auto generated model id, insert new fields based on it
                 managers.db.connect('widgetExecutions', function (db, collection, done) {
-                    downloadPath = conf.downloadDir + path.sep + result.toHexString(); // recipes are downloaded per execution
+                    executionDownloadsPath = path.join(conf.downloadsDir, result.toHexString());
+                    executionLogsPath = path.join(conf.logsDir, result.toHexString());
                     collection.update(
                         { _id: result },
-                        { $set: { downloadPath: downloadPath } },
+                        {
+                            $set: {
+                                downloadsPath: executionDownloadsPath,
+                                logsPath: executionLogsPath
+                            }
+                        },
                         function (err, nUpdated) {
                             if (err) {
                                 logger.error('failed updating widget execution model', err);
@@ -96,13 +101,13 @@ exports.play = function (widgetId, poolKey, playCallback) {
             },
 
             function downloadRecipe(result, callback) {
-                logger.trace('-play waterfall- downloadRecipe');
+                logger.trace('-play- downloadRecipe');
 
                 // TODO : add validation if destination download not already exists otherwise simply call callback.
                 logger.info('downloading recipe from ', widget.recipeUrl);
                 // download recipe zip
                 var options = {
-                    destDir: downloadPath,
+                    destDir: executionDownloadsPath,
                     recipeUrl: widget.recipeUrl
                 };
                 services.dl.downloadRecipe(options, function () {
@@ -118,13 +123,13 @@ exports.play = function (widgetId, poolKey, playCallback) {
             },
 
             function occupyMachine(result, callback) {
-                logger.trace('-play waterfall- occupyMachine');
+                logger.trace('-play- occupyMachine');
 
                 managers.poolClient.occupyPoolNode(poolKey, widget.poolId, callback);
             },
 
             function handleOccupyMachine(result, callback) {
-                logger.trace('-play waterfall- handleOccupyMachine');
+                logger.trace('-play- handleOccupyMachine');
 
                 if (!result) {
                     logger.error('result is null for occupy node');
@@ -142,7 +147,7 @@ exports.play = function (widgetId, poolKey, playCallback) {
             },
 
             function runCliCommand(result, callback) {
-                logger.trace('-play waterfall- runCliCommand');
+                logger.trace('-play- runCliCommand');
 
                 var command = {
                     arguments: [
@@ -150,21 +155,31 @@ exports.play = function (widgetId, poolKey, playCallback) {
                         nodeModel.machineSshDetails.publicIp,
                         ';',
                         widget.recipeType.installCommand,
-                        path.join(downloadPath, widget.recipeRootPath)
-                    ]
+                        path.join(executionDownloadsPath, widget.recipeRootPath)
+                    ],
+                    logsDir: executionLogsPath
                 };
-                services.cloudifyCli.executeCommand(command);
+                // we want to remove the execution model when the execution is over
+                services.cloudifyCli.executeCommand(command, function (exErr, exResult) {
+                    if (!!exErr) {
+                        logger.error(exErr);
+                    }
+                    // TODO change execution status
+                });
 
                 callback(null, executionObjectId.toHexString());
             }
 
         ],
 
+
         function (err, result) {
-            logger.trace('-play waterfall- finished!');
+            logger.trace('-play- finished!');
+            logger.info('result is ', result);
 
             if (!!err) {
                 logger.error('failed to play widget with id [%s]', widgetId);
+                _removeExecutionModel(executionObjectId, playCallback);
                 playCallback(err);
                 return;
             }
@@ -172,199 +187,117 @@ exports.play = function (widgetId, poolKey, playCallback) {
             playCallback(null, result);
         }
     );
+
+
 };
 
+exports.stop = function (executionId, callback) {
+    _removeExecutionModel(executionId, callback);
+};
 
-exports.playRemote = function (widgetId, poolKey, advancedParams, playCallback) {
+exports.getStatus = function (executionId, callback) {
 
-    // TODO : add different download destination per widget
-    // TODO : make sure it's absolute using path.resolve()
-    var downloadPath = conf.downloadDir;
-    var widget;
-    var cloudDistFolder;
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
 
-    logger.trace('-playRemote !!!!!! advancedParams=', advancedParams);
-
-    async.waterfall([
-
-            function getWidget(callback) {
-                logger.trace('-playRemote waterfall- getWidget');
-                managers.db.connect('widgets', function (db, collection, done) {
-                    logger.trace('-playRemote waterfall- db.connect');
-                    collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {
-
-                        logger.trace('Within findOne:', err, result );
-
-                        if (!!err) {
-                            logger.error('unable to find widget', err);
-                            playCallback(err);
-                            done();
-                            return;
-                        }
-
-                        if (!result) {
-                            logger.error('result is null for widget find');
-                            playCallback(new Error('could not find widget'));
-                            done();
-                            return;
-                        }
-
-                        widget = result;
-                        callback(null, result);
-                    });
-                });
-            },
-
-            function downloadRecipe(result, callback) {
-                logger.trace('-play waterfall- downloadRecipe');
-
-                // TODO : add validation if destination download not already exists otherwise simply call callback.
-                logger.info('downloading recipe from ', widget.recipeUrl);
-                // download recipe zip
-                var options = {
-                    destDir: downloadPath,
-                    recipeUrl: widget.recipeUrl
-                };
-                services.dl.downloadRecipe(options, function () {
-                    callback(null, result);
-                });
-            },
-
-            function copyCloudFolder( result, callback ){
-                logger.info('copyCloudFolder, widget:', widget );
-                var cloudifyCloudsDir = conf.cloudifyCloudsDir;
-                logger.info('cloudifyCloudsDir:' , cloudifyCloudsDir );
-                var cloudName = widget.remoteBootstrap.cloudifyCloud;
-                logger.info('cloudName:' , cloudName );
-                var cloudSourceFolder = cloudifyCloudsDir + path.sep + cloudName;
-                var suffix = getTempSuffix();
-                logger.info('suffix:', suffix );
-                var cloudDistFolderName = widget.remoteBootstrap.cloudifyCloud + suffix;
-                cloudDistFolder = cloudifyCloudsDir + path.sep + cloudDistFolderName;
-                logger.info('cloudSourceFolder:', cloudSourceFolder , ', cloudDistFolder', cloudDistFolder, 'cloudDistFolderName', cloudDistFolderName );
-
-                var ncp = require('ncp').ncp;
-                ncp.limit = 16;
-
-                ncp(cloudSourceFolder, cloudDistFolder, function (err) {
-                    if( err ) {
-                        logger.info(err);
-                        return;
-                    }
-                    logger.info( 'Folder []', cloudSourceFolder, ' was successfully copied into []', cloudDistFolder );
-
-                    var cloudPropertiesFile = cloudDistFolder + path.sep + cloudName + '-cloud.properties';
-                    logger.info( 'Cloud Properties File is ', cloudPropertiesFile, 'advancedParams=', advancedParams );
-
-                    overrideParams( cloudDistFolderName, cloudPropertiesFile, advancedParams, callback );
-                });
-            },
-
-            function runCliBootstrapCommand(cloudDistFolderName, callback) {
-                logger.info('-playRemote waterfall- runCliBootstrapCommand');
-
-                var command = {
-                    arguments: [
-                        'bootstrap-cloud',
-                        cloudDistFolderName
-                    ]
-                };
-
-                logger.info( '---command:', command );
-
-                services.cloudifyCli.executeCommand(command);
-
-                callback();
-            }
-        ],
-        function (err, result) {
-
-            logger.trace('-Remove cloud folder', cloudDistFolder );
-
-            fs.rmdir( cloudDistFolder,  function (err, data) {
-                if (!!err) {
-                    logger.trace('-Failed to remove cloud folder', cloudDistFolder );
-                }
-                logger.trace('-Removed cloud folder', cloudDistFolder );
-            });
-
-            logger.trace('-playRemote waterfall- finished!!!' + result );
-
+            logger.info('get status result: ', result);
             if (!!err) {
-                logger.error('failed to playRemote widget with id [%s]', widgetId);
-                playCallback(err);
+                callback(err);
+                done();
                 return;
             }
 
-            playCallback(null, result);
-        }
-    );
+            if (!result) {
+                callback(null, {state: 'STOPPED'});
+                done();
+                return;
+            }
+
+            callback(null, {state: 'RUNNING'});
+            done();
+        });
+    });
+
 };
 
-exports.getOutput = function (callback) {
+exports.getOutput = function (executionId, callback) {
+    _readOutputLog(executionId, callback);
+};
 
-    var file = conf.logFile;
+function _readOutputLog (executionId, callback) {
+    _readLog(executionId, services.logs.getOutput, callback);
+};
 
-    if (!file) {
-        callback(new Error('unable to get output, no log file is found in configuration'));
+function _readStatusLog (executionId, callback) {
+    _readLog(executionId, services.logs.getStatus, callback);
+};
+
+
+function _removeExecutionModel(executionId, callback) {
+    var executionObjectId;
+    try {
+        // make sure it's an ObjectID and not an ID string
+        executionObjectId = managers.db.toObjectId(executionId);
+    } catch (e) {
+        callback(e);
         return;
     }
 
-    fs.readFile(file, function (err, data) {
-        if (!!err) {
-            callback(err);
-            return;
-        }
-        callback(null, data);
+    logger.info('removing execution model with id [%s]', executionObjectId.toHexString());
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.remove({ _id: executionObjectId }, function (err, result) {
+
+            if (!!err) {
+                callback(err);
+                done();
+                return;
+            }
+
+            if (!result) {
+                callback(new Error('unable to remove execution model'));
+                done();
+                return;
+            }
+
+            callback(null, result);
+            done();
+        });
+    });
+}
+
+function _readLog (executionId, logFn, callback) {
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
+
+            if (!!err) {
+                callback(err);
+                done();
+                return;
+            }
+
+            if (!result) {
+                callback(new Error('unable to get log. cannot find execution model with id [' + executionId + ']'));
+                done();
+                return;
+            }
+
+            logFn(executionId, callback);
+            done();
+        });
     });
 };
 
-function overrideParams( cloudDistFolderName, cloudPropertiesFile, advancedParams, callback){
 
-    logger.info( '---overrideParams---, -advancedParams:', advancedParams );
 
-    var updateLine = "";
-    if( advancedParams.SOFTLAYER ){
-        var username = advancedParams.SOFTLAYER.params.username;
-        var apiKey = advancedParams.SOFTLAYER.params.apiKey;
-        updateLine =
-            'user='+ wrapWithQuotes(username) + '\n' +
-            'apiKey='+ wrapWithQuotes(apiKey);
-    }
-    else if( advancedParams.HP ){
-        var key = advancedParams.HP.params.key;
-        var secretKey = advancedParams.HP.params.secretKey;
-        var project = advancedParams.HP.params.project;
-        updateLine =
-            'tenant=' + wrapWithQuotes( project ) + '\n' +
-            'user=' + wrapWithQuotes( key ) + '\n' +
-            'apiKey=' + wrapWithQuotes( secretKey );
-        /*
-          'keyFile=' + wrapWithQuotes(newPemFile.getName() + ".pem");
-          'keyPair=' + wrapWithQuotes(newPemFile.getName());
-          'securityGroup=' + wrapWithQuotes(cloudConf.securityGroup);
-        */
-    }
 
-    logger.info( '---updateLine', updateLine );
 
-    fs.appendFile(cloudPropertiesFile, updateLine, function (err) {
 
-        if (err) {
-            logger.info(err);
-            callback( err, cloudDistFolderName );
-        }
-        logger.info( 'Cloud Properties File was updated:', cloudPropertiesFile );
 
-        callback( null, cloudDistFolderName );
-    });
-}
 
-function getTempSuffix() {
-    var currTime = '' + new Date().getTime();
-    return currTime.substring(currTime.length - 4);
-}
 
-function wrapWithQuotes( s ){
-    return "\"" + s + "\"";
-}
+
+
+
+
+
+

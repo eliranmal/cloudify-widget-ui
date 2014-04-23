@@ -35,15 +35,15 @@ angular.module('cloudifyWidgetUiApp')
             return $http.post('/backend/user/widgets/' + widget._id + '/play/remote', {data:advancedParams} );
         };
 
-        this.stopWidget = function( widget ){
-            return $http.post('/backend/widgets/' + widget._id + '/stop');
+        this.stopWidget = function( widget, executionId ){
+            return $http.post('/backend/user/widgets/' + widget._id + '/executions/' + executionId + '/stop');
         };
 
-        this.getOutput = function ( widget ) {
-            return $http.get('/backend/user/widgets/'  + widget._id + '/output');
+        this.getStatus = function( instanceId, executionId ){
+            return $http.get('/backend/user/widgets/'  + instanceId + '/executions/' + executionId + '/status');
         };
 
-        this.getStatus = function( instanceId ){
-            return $http.get('/backend/user/widgets/'  + instanceId + '/status');
+        this.getOutput = function ( widget, executionId ) {
+            return $http.get('/backend/user/widgets/'  + widget._id + '/executions/' + executionId + '/output');
         };
     });

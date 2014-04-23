@@ -62,9 +62,9 @@ app.get('/backend/user/widgets/:widgetId', controllers.widgets.read);
 app.post('/backend/user/widgets/:widgetId/update', controllers.widgets.update);
 app.post('/backend/user/widgets/:widgetId/play', controllers.widgets.play);
 app.post('/backend/user/widgets/:widgetId/play/remote', controllers.widgets.playRemote);
-app.post('/backend/user/widgets/:widgetId/stop', controllers.widgets.stop );
-app.get('/backend/user/widgets/:widgetId/status', controllers.widgets.getStatus );
-app.get('/backend/user/widgets/:widgetId/output', controllers.widgets.getOutput);
+app.post('/backend/user/widgets/:widgetId/executions/:executionId/stop', controllers.widgets.stop );
+app.get('/backend/user/widgets/:widgetId/executions/:executionId/status', controllers.widgets.getStatus );
+app.get('/backend/user/widgets/:widgetId/executions/:executionId/output', controllers.widgets.getOutput);
 // a route to check if user logged in. relies on middleware to do the actual verification.
 app.get('/backend/user/loggedIn', function(req, res){ res.send(managers.users.getPublicUserDetails( req.user ) );} );
 

@@ -38,6 +38,9 @@ exports.executeCommand = function (cmd, onExit) {
     var commandArgs = [].concat(commandOptions.arguments);
 
     var logsDir = commandOptions.logsDir;
+
+    logger.info('~~~logsDir [%s] ', logsDir );
+
     files.mkdirp(logsDir);
 
     if (!executable) {

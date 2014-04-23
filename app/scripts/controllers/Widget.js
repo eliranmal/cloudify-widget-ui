@@ -48,14 +48,16 @@ angular.module('cloudifyWidgetUiApp')
             ellipsisIndex = ellipsisIndex +1;
             $scope.widgetStatus = status;
             _getOutput($scope.widget);
-            $timeout(_pollStatus, myTimeout || 3000) ;
+
+            $timeout(_pollStatus, myTimeout || 3000);
+
             _scrollLog();
         }
 
         function _pollStatus(myTimeout) {
 
             if ($scope.widgetStatus.state !== stop) { // keep polling until widget stops ==> mainly for timeleft..
-                WidgetsService.getStatus( $scope.widgetStatus.instanceId ).then(function (result) {
+                WidgetsService.getStatus( $scope.widgetStatus.instanceId, $scope.executionId ).then(function (result) {
                     if (!result) {
                         return;
                     }
@@ -78,7 +80,7 @@ angular.module('cloudifyWidgetUiApp')
                 WidgetsService.playRemoteWidget($scope.widget, options)
                     .then(function (result) {
                         console.log(['play result', result]);
-                        $scope.widgetExecution = result.data;
+                        $scope.executionId = result.data;
                         _pollStatus(1);
                     }, function (err) {
                         console.log(['play error', err]);
@@ -100,7 +102,7 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.stop = function () {
-            PostParentService.post({'name': 'widget_stop'});
+            WidgetsService.stopWidget($scope.widget, $scope.executionId);
             $scope.widgetStatus.state = stop;
             _resetWidgetStatus();
         };
@@ -108,12 +110,13 @@ angular.module('cloudifyWidgetUiApp')
         var emptyList = [];
 
         function _getOutput (widget) {
+            $log.debug('> > > get output, widget id: ', widget ? widget._id : '', ', execution id: ', $scope.executionId);
 
-            if (!widget) {
+            if (!widget || !$scope.executionId) {
                 $scope.output = emptyList;
             }
 
-            WidgetsService.getOutput(widget)
+            WidgetsService.getOutput(widget, $scope.executionId)
                 .then(function (result) {
                     $scope.output = result.data.split('\n');
                 }, function (err) {

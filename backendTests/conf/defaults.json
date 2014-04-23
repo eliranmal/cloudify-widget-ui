@@ -1,8 +1,8 @@
 {
     "cloudifyExecutable" : "cloudify-folder/bin/cloudify.sh",
     "arguments" : "--version",
-    "logFile": "testOutput/execution.log",
-    "statusFile" :  "testOutput/status",
+    "logsDir": "testOutput/logs",
+    "downloadsDir": "downloads",
     "playWidgetTest" : {
         "poolKey" : "6511770c-1a8a-4813-a23a-7e37d9787375",
         "widgetId" :"534420c77fdcc7884a8992d9"

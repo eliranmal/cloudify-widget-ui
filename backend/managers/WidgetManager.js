@@ -65,12 +65,11 @@ exports.playRemote = function (widgetId, poolKey, advancedParams, playCallback) 
 };
 
 exports.stop = function (executionId, callback) {
+    // TODO un-occupy node (delete+create?) if pool is manually-managed
     _removeExecutionModel(executionId, callback);
 };
 
 exports.getStatus = function (executionId, callback) {
-
-    logger.info('get status: ', executionId);
 
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {

@@ -67,8 +67,8 @@ exports.executeCommand = function (cmd, onExit) {
 
 
     var myCmd = spawn(executable, commandArgs);
+
     var outputLogFile = path.join(logsDir, 'output.log');
-    var statusLogFile = path.join(logsDir, 'status.log');
 
     function appendToLogFile(data) {
         fs.appendFile(outputLogFile, data, function (err) {
@@ -77,6 +77,8 @@ exports.executeCommand = function (cmd, onExit) {
             }
         });
     }
+
+    var statusLogFile = path.join(logsDir, 'status.log');
 
     function writeStatusJsonFile(status) {
         fs.writeFile(statusLogFile, JSON.stringify(status, null, 4));

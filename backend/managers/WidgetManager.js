@@ -56,8 +56,7 @@ exports.playRemote = function (widgetId, poolKey, advancedParams, playCallback) 
             _downloadRecipe,
             _copyCloudFolder,
             _overrideCloudPropertiesFile,
-            _runBootstrapCommand,
-
+            _runBootstrapAndInstallCommands
         ],
 
         _playFinally
@@ -328,18 +327,29 @@ function _overrideCloudPropertiesFile( curryParams, curryCallback ){
 
 }
 
-function _runBootstrapCommand(curryParams, curryCallback) {
-    logger.info('-playRemote waterfall- runCliBootstrapCommand, executionLogsPath:', curryParams.executionLogsPath);
+function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
+    logger.info('-playRemote waterfall- runCliBootstrapCommand, executionLogsPath:', curryParams.executionLogsPath,'installCommand:', curryParams.widget.recipeType.installCommand);
+    logger.info('-playRemote waterfall- runCliBootstrapCommand, executionDownloadsPath:', curryParams.executionDownloadsPath,'recipeRootPath:', curryParams.widget.recipeRootPath);
 
+    var installPath = path.join(curryParams.executionDownloadsPath, curryParams.widget.recipeRootPath);
+
+    logger.info('-playRemote waterfall- runCliBootstrapCommand, JOIN:', installPath );
+    installPath = handlePathSeparators( installPath );
+    logger.info('-installPath after handlingseparators:', installPath );
     var command = {
         arguments: [
             'bootstrap-cloud',
-            curryParams.cloudDistFolderName
+            curryParams.cloudDistFolderName,
+            ';',
+            curryParams.widget.recipeType.installCommand,
+            '-timeout',
+            '60',/*minutes, TODO set value from widget configuration */
+            installPath
         ],
         logsDir: curryParams.executionLogsPath
     };
 
-    logger.info( '-command', command );
+    logger.info( '-command:', command );
 
     services.cloudifyCli.executeCommand(command);
 
@@ -425,6 +435,25 @@ function _readLog (executionId, logFn, callback) {
         });
     });
 };
+
+function handlePathSeparators( installPath ){
+    if( path.sep == "\\" ){
+        logger.info( '-WIN !!!' );
+        var array = installPath.split("\\");
+        if( array ){
+            logger.info('-ARRAY !!!', array );
+            installPath = '';
+            for( var i=0; i < array.length; i++ ) {
+                installPath += array[i];
+                if( i != array.length - 1 ){
+                    installPath += '/';
+                }
+            }
+        }
+    }
+
+    return installPath;
+}
 
 function getTempSuffix() {
     var currTime = '' + new Date().getTime();

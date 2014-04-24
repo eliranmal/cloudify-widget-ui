@@ -4,44 +4,40 @@ var fs = require('fs');
 var path = require('path');
 var spawn = require('child_process').spawn;
 var files = require('./FilesService');
+var logs = require('./LogsService');
 var conf = require('../Conf');
 var _ = require('lodash');
 
 
 
 /**
- * @param cmd example:
+ * @param options is an array of command arguments, or an object like this, with only 'arguments' mandatory:
+ *
  *      {
  *          executable: conf.cloudifyExecutable,
  *          arguments: ['connect', nodeModel.machineSshDetails.publicIp, ';', widget.recipeType.installCommand, path.join(downloadPath, widget.recipeRootPath) ],
- *          logsDir: conf.logsDir
+ *          executionId: '1234231412341234'
  *      }
  */
-exports.executeCommand = function (cmd, onExit) {
+exports.executeCommand = function (options, onExit) {
 
-    var command = cmd;
-    if (_.isArray(cmd)) {
-        command = {arguments: cmd};
+    var _options = options;
+    if (_.isArray(options)) {
+        _options = {arguments: options};
     }
 
-    logger.info('~~~executeCommand [%s] ', cmd );
+    logger.info('~~~executeCommand [%s] ', options );
 
     var defaultOptions = {
-        executable: conf.cloudifyExecutable,
-        logsDir: conf.logsDir
+        executable: conf.cloudifyExecutable
     };
-    var commandOptions = _.extend(defaultOptions, command);
+    var _options = _.extend(defaultOptions, _options);
 
-    var executable = commandOptions.executable;
+    var executable = _options.executable;
+
     // converts commandArgs to list if it is not a list. otherwise keeps it as a list
     // http://stackoverflow.com/questions/4775722/check-if-object-is-array
-    var commandArgs = [].concat(commandOptions.arguments);
-
-    var logsDir = commandOptions.logsDir;
-
-    logger.info('~~~logsDir [%s] ', logsDir );
-
-    files.mkdirp(logsDir);
+    var commandArgs = [].concat(_options.arguments);
 
     if (!executable) {
         throw new Error('exectuable is missing from command');
@@ -55,33 +51,19 @@ exports.executeCommand = function (cmd, onExit) {
         throw new Error('commandArgs are missing from command');
     }
 
-
-    if (!logsDir) {
-        throw new Error('logs dir is missing');
-    }
-
-
     if (onExit && typeof onExit !== 'function') {
-        throw new Error('callback must be a function');
+        throw new Error('onExit callback must be a function');
     }
 
 
     var myCmd = spawn(executable, commandArgs);
 
-    var outputLogFile = path.join(logsDir, 'output.log');
-
     function appendToLogFile(data) {
-        fs.appendFile(outputLogFile, data, function (err) {
-            if (!!err) {
-                logger.error('unable to write to log file', outputLogFile, data.toString(), err);
-            }
-        });
+        logs.appendOutput(data, _options.executionId);
     }
 
-    var statusLogFile = path.join(logsDir, 'status.log');
-
     function writeStatusJsonFile(status) {
-        fs.writeFile(statusLogFile, JSON.stringify(status, null, 4));
+        logs.writeStatus(JSON.stringify(status, null, 4) + '\n', _options.executionId);
     }
 
     myCmd.stdout.on('data', appendToLogFile);
@@ -107,7 +89,7 @@ exports.executeCommand = function (cmd, onExit) {
         writeStatusJsonFile({"code": code})
     });
 
-    logger.info('running command [%s] [%s]. output log file is [%s]', executable, commandArgs, outputLogFile);
+    logger.info('running command [%s] [%s]...', executable, commandArgs);
 
 };
 

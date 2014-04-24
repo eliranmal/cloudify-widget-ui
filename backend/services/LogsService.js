@@ -6,48 +6,97 @@ var conf = require('../Conf');
 var files = require('../services/FilesService');
 
 
-exports.getOutput = function (executionId, callback) {
-    logger.info('getting output with execution id [%s]', executionId);
-    var path = _getExecutionOutputFilePath(executionId);
-    logger.info('output file path is [%s]', path);
-    _getContents(path, callback);
+exports.readOutput = function (relativePath, callback) {
+    logger.info('reading from output log file');
+    _readLog(_getOutputFilePath(relativePath), callback);
 };
 
-
-exports.getStatus = function (executionId, callback) {
-    logger.info('getting status with execution id [%s]', executionId);
-    var path = _getExecutionStatusFilePath(executionId);
-    logger.info('status file path is [%s]', path);
-    _getContents(path, callback);
+exports.readStatus = function (relativePath, callback) {
+    _readLog(_getStatusFilePath(relativePath), callback);
 };
 
-function _getContents(path, callback) {
-    logger.info('getting file contents for path [%s]', path);
+exports.writeOutput = function (data, relativePath, callback) {
+    _writeLog(data, _getLogDirPath(relativePath), _getOutputFilePath(relativePath), callback);
+};
 
-    if (!path) {
-        callback(new Error('unable to get output, cannot build log file path'));
-        return;
-    }
+exports.appendOutput = function (data, relativePath, callback) {
+    _appendLog(data, _getLogDirPath(relativePath), _getOutputFilePath(relativePath), callback);
+};
 
-    if (!fs.existsSync(path)) {
-        callback(new Error('unable to read contents, file does not exist'));
-        return;
-    }
+exports.writeStatus = function (data, relativePath, callback) {
+    _writeLog(data, _getLogDirPath(relativePath), _getStatusFilePath(relativePath), callback);
+};
 
-    fs.readFile(path, function (err, data) {
+function _writeLog (data, logsDir, logFilePath, callback) {
+    files.mkdirp(logsDir); // make sure dir exists
+    fs.writeFile(logFilePath, data, function (err) {
         if (!!err) {
-            callback(err);
+            logger.error('unable to write to log file', logFilePath, data.toString(), err);
+            _call(callback, err);
             return;
         }
-        callback(null, data);
+        _call(callback);
     });
-};
+}
 
-function _getExecutionOutputFilePath(executionId) {
-    return executionId ? path.join(conf.logsDir, executionId, 'output.log') : '';
-};
+function _appendLog (data, logsDir, logFilePath, callback) {
+    files.mkdirp(logsDir); // make sure dir exists
+    fs.appendFile(logFilePath, data, function (err) {
+        if (!!err) {
+            logger.error('unable to append to log file', logFilePath, data.toString(), err);
+            _call(callback, err);
+            return;
+        }
+        _call(callback);
+    });
+}
 
-function _getExecutionStatusFilePath(executionId) {
-    return executionId ? path.join(conf.logsDir, executionId, 'status.log') : '';
-};
+function _readLog (logFilePath, callback) {
 
+    if (!logFilePath) {
+        _call(callback, new Error('unable to get output, cannot build log file path'));
+        return;
+    }
+
+    fs.exists(logFilePath, function (exists) {
+
+        if (!exists) {
+            _call(callback, new Error('file does not exist'));
+            return;
+        }
+
+        fs.readFile(logFilePath, function (err, data) {
+            if (!!err) {
+                _call(callback, err);
+                return;
+            }
+            _call(callback, null, data);
+        });
+    });
+}
+
+function _getOutputFilePath(relativePath) {
+    return _getLogFilePath(relativePath, 'output.log');
+}
+
+function _getStatusFilePath(relativePath) {
+    return _getLogFilePath(relativePath, 'status.log');
+}
+
+function _getLogFilePath(relativePath, fileName) {
+    return path.join(_getLogDirPath(relativePath), fileName);
+}
+
+function _getLogDirPath(relativePath) {
+    return path.join(conf.logsDir, relativePath || '');
+}
+
+/**
+ * safe callback invocation
+ * @private
+ */
+function _call() {
+    // first argument is expected to be the callback, the rest are its arguments, if any
+    var callback = Array.prototype.shift.call(arguments);
+    callback && ('function' === typeof callback) && callback.apply(this, arguments);
+}

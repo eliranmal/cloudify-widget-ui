@@ -56,7 +56,7 @@ exports.playRemote = function (widgetId, poolKey, advancedParams, playCallback) 
             _downloadRecipe,
             _copyCloudFolder,
             _overrideCloudPropertiesFile,
-            _runBootstrapCommand,
+            _runBootstrapCommand
 
         ],
 
@@ -65,7 +65,6 @@ exports.playRemote = function (widgetId, poolKey, advancedParams, playCallback) 
 };
 
 exports.stop = function (executionId, callback) {
-    // TODO un-occupy node (delete+create?) if pool is manually-managed
     _removeExecutionModel(executionId, callback);
 };
 
@@ -75,7 +74,7 @@ exports.getStatus = function (executionId, callback) {
         collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
 
             logger.info('get status result: ', result);
-            if (err) {
+            if (!!err) {
                 callback(err);
                 done();
                 return;
@@ -103,7 +102,7 @@ function _getWidget(curryParams, curryCallback) {
     logger.trace('-play- getWidget');
     managers.db.connect('widgets', function (db, collection, done) {
         collection.findOne({ _id: managers.db.toObjectId(curryParams.widgetId) }, function (err, result) {
-            if (err) {
+            if (!!err) {
                 logger.error('unable to find widget', err);
                 curryCallback(err, curryParams);
                 done();
@@ -130,7 +129,7 @@ function _createExecutionModel(curryParams, curryCallback) {
         // instantiate the execution model with the widget data, and remove the _id - we want mongodb to generate a unique id
         var executionModel = _.omit(curryParams.widget, '_id');
         collection.insert(executionModel, function (err, docsInserted) {
-            if (err) {
+            if (!!err) {
                 logger.error('failed creating widget execution model', err);
                 curryCallback(err, curryParams);
                 done();
@@ -166,7 +165,7 @@ function _updateExecutionModel(curryParams, curryCallback) {
                 }
             },
             function (err, nUpdated) {
-                if (err) {
+                if (!!err) {
                     logger.error('failed updating widget execution model', err);
                     curryCallback(err, curryParams);
                     done();
@@ -204,7 +203,7 @@ function _occupyMachine(curryParams, curryCallback) {
 
     managers.poolClient.occupyPoolNode(curryParams.poolKey, curryParams.widget.poolId, function (err, result) {
 
-        if (err) {
+        if (!!err) {
             logger.error('occupy node failed');
             curryCallback(new Error('failed to occupy node'), curryParams);
             return;
@@ -227,7 +226,7 @@ function _occupyMachine(curryParams, curryCallback) {
 }
 
 function _runInstallCommand(curryParams, curryCallback) {
-    logger.trace('-play- runCliCommand');
+    logger.trace('-play- runInstallCommand');
 
     var command = {
         arguments: [
@@ -237,7 +236,8 @@ function _runInstallCommand(curryParams, curryCallback) {
             curryParams.widget.recipeType.installCommand,
             path.join(curryParams.executionDownloadsPath, curryParams.widget.recipeRootPath)
         ],
-        logsDir: curryParams.executionLogsPath
+        logsDir: curryParams.executionLogsPath,
+        executionId: curryParams.executionObjectId.toHexString()
     };
     // we want to remove the execution model when the execution is over
     services.cloudifyCli.executeCommand(command, function (exErr, exResult) {
@@ -251,6 +251,8 @@ function _runInstallCommand(curryParams, curryCallback) {
 }
 
 function _copyCloudFolder(curryParams, curryCallback) {
+    logger.trace('-play- copyCloudFolder');
+
     logger.debug('copyCloudFolder, widget:', curryParams.widget);
     var cloudifyCloudsDir = conf.cloudifyCloudsDir;
     logger.debug('cloudifyCloudsDir:', cloudifyCloudsDir);
@@ -268,7 +270,7 @@ function _copyCloudFolder(curryParams, curryCallback) {
     ncp.limit = 16;
 
     ncp(cloudSourceFolder, cloudDistFolder, function (err) {
-        if (err) {
+        if (!!err) {
             logger.info(err);
             return;
         }
@@ -278,6 +280,7 @@ function _copyCloudFolder(curryParams, curryCallback) {
 }
 
 function _overrideCloudPropertiesFile(curryParams, curryCallback) {
+    logger.trace('-play- overrideCloudPropertiesFile');
 
     var cloudName = curryParams.widget.remoteBootstrap.cloudifyCloud;
     var cloudPropertiesFile = curryParams.cloudDistFolder + path.sep + cloudName + '-cloud.properties';
@@ -314,7 +317,7 @@ function _overrideCloudPropertiesFile(curryParams, curryCallback) {
 
     fs.appendFile(cloudPropertiesFile, updateLine, function (err) {
 
-        if (err) {
+        if (!!err) {
             logger.info(err);
             curryCallback(err, curryParams);
         }
@@ -326,14 +329,15 @@ function _overrideCloudPropertiesFile(curryParams, curryCallback) {
 }
 
 function _runBootstrapCommand(curryParams, curryCallback) {
-    logger.info('-playRemote waterfall- runCliBootstrapCommand');
+    logger.trace('-play- runCliBootstrapCommand');
 
     var command = {
         arguments: [
             'bootstrap-cloud',
             curryParams.cloudDistFolderName
         ],
-        logsDir: curryParams.executionLogsPath
+        logsDir: curryParams.executionLogsPath,
+        executionId: curryParams.executionObjectId.toHexString()
     };
 
     logger.info('-command', command);
@@ -344,10 +348,10 @@ function _runBootstrapCommand(curryParams, curryCallback) {
 }
 
 function _playFinally(err, curryParams) {
-    logger.trace('-play- finished!');
+    logger.trace('-play- finished !');
     logger.info('result is ', curryParams);
 
-    if (err) {
+    if (!!err) {
         logger.error('failed to play widget with id [%s]', curryParams.widgetId);
         _removeExecutionModel(curryParams.executionObjectId, curryParams.playCallback);
         curryParams.playCallback(err);
@@ -357,14 +361,6 @@ function _playFinally(err, curryParams) {
     curryParams.playCallback(null, curryParams.executionObjectId.toHexString());
 }
 
-
-function _readOutputLog(executionId, callback) {
-    _readLog(executionId, services.logs.getOutput, callback);
-};
-
-function _readStatusLog(executionId, callback) {
-    _readLog(executionId, services.logs.getStatus, callback);
-};
 
 
 function _removeExecutionModel(executionId, callback) {
@@ -381,7 +377,7 @@ function _removeExecutionModel(executionId, callback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.remove({ _id: executionObjectId }, function (err, result) {
 
-            if (err) {
+            if (!!err) {
                 callback(err);
                 done();
                 return;
@@ -399,11 +395,19 @@ function _removeExecutionModel(executionId, callback) {
     });
 }
 
+function _readOutputLog(executionId, callback) {
+    _readLog(executionId, services.logs.readOutput, callback);
+}
+
+function _readStatusLog(executionId, callback) {
+    _readLog(executionId, services.logs.readStatus, callback);
+}
+
 function _readLog(executionId, logFn, callback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
 
-            if (err) {
+            if (!!err) {
                 callback(err);
                 done();
                 return;

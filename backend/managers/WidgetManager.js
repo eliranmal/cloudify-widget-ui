@@ -332,6 +332,8 @@ function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
 
     var installPath = path.join(curryParams.executionDownloadsPath, curryParams.widget.recipeRootPath);
 
+    logger.info('-playRemote waterfall- installTimeout:', curryParams.widget.installTimeout );
+
     logger.info('-playRemote waterfall- runCliBootstrapCommand, JOIN:', installPath );
     installPath = handlePathSeparators( installPath );
     logger.info('-installPath after handlingseparators:', installPath );
@@ -350,7 +352,7 @@ function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
 
     logger.info( '-command:', command );
 
-    services.cloudifyCli.executeCommand(command);
+    //services.cloudifyCli.executeCommand(command);
 
     curryCallback(null, curryParams);
 }

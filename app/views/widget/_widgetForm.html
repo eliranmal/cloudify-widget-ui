@@ -41,23 +41,56 @@
         Pool Id : <input type="text" ng-model="widget.poolId"/>
     </p>
 
-
+    <h1> Social Login </h1>
     <p>
-        Require Login : <input type="checkbox" ng-model="widget.login.require"/><br/>
-    <span>
-        If "proprietary" login is selected, the widget will do nothing on "play" but send a PostMessage event. <br/>
-        It will wait for the embedding page to invoke the play.<br/>
-        It will look for userId and userKey to verify with Verification URL and Web Service Private Key that the<br/>
-        credentials are legitimate<br/>
-    </span>
+        The social login feature is intended for conversion purposes. <br/>
+        The goal is to get contact information of potential future customers.<br/>
+    </p>
+    <p>
         Login Type:
         <button class="loginTypeButton" ng-click="toggleLoginType(loginType)" ng-class="{'selected' : loginTypeSelected(loginType) }"
                 ng-repeat="loginType in loginTypes">{{loginType.label}}
         </button>
         <br/>
     </p>
-    <strong> proprietary login details</strong>
 
+    <h2> Login Details Handlers </h2>
+
+    Please specify what you want us to do with the login details. <br/>
+    Login details are saved in our DB so you can always view them.<br/>
+
+
+    <h3> Mailchimp </h3>
+    <p>
+        Fill in mailchimp details so we will subscribe users to your list. <br/>
+        We subscribe the following fields : NAME, LASTNAME. <br/>
+        All other fields should be optional or otherwise we will fail to publish them.<br/>
+
+    </p>
+    <p>
+
+        <input type="checkbox" ng-model="widget.socialLogin.handlers.mailchimp.enabled"/>Enabled<br/>
+        Api Key : <input type="text" ng-model="widget.socialLogin.handlers.mailchimp.apiKey"/><br/>
+        List Id : <input type="text" ng-model="widget.socialLogin.handlers.mailchimp.listId"/><br/>
+
+    </p>
+
+    <h3> Pass it to parent IFrame using PostMessage </h3>
+    <p>
+        <input type="checkbox" ng-model="widget.socialLogin.handlers.postMessage.enabled"/>Enabled
+    </p>
+
+
+    <h1> proprietary login details</h1>
+    <p>
+        Require Login : <input type="checkbox" ng-model="widget.login.require"/><br/>
+        <span>
+            If "proprietary" login is selected, the widget will do nothing on "play" but send a PostMessage event. <br/>
+            It will wait for the embedding page to invoke the play.<br/>
+            It will look for userId and userKey to verify with Verification URL and Web Service Private Key that the<br/>
+            credentials are legitimate<br/>
+        </span>
+    </p>
     <p>
         Verification URL : <input ng-model="widget.login.propVerificationUrl" type="text"/><br/>
         Web Service Private Key : <input ng-model="widget.login.propServicePrivateKey" type="text"/><br/>

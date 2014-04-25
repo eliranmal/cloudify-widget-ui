@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $routeParams, PostParentService, $localStorage, $timeout) {
+    .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window,  $routeParams, PostParentService, $localStorage, $timeout) {
+
+        $window.$windowScope = $scope;
 
         $scope.collapseAdvanced = false;
         $scope.widgetStatus = {};
@@ -13,7 +15,6 @@ angular.module('cloudifyWidgetUiApp')
         $scope.showPlay = function () {
             return $scope.widgetStatus.state === stop;
         };
-
         $scope.showStop = function () {
             return $scope.widgetStatus.state === play;
         };
@@ -71,20 +72,21 @@ angular.module('cloudifyWidgetUiApp')
 
         // use this with the following from the popup window:
         //
-        $scope.loginDone = function( loginDetails ){
+        $scope.loginDone = function( ){
+            $log.info('login is done');
             if ( popupWindow !== null ){
                 popupWindow.close();
                 popupWindow = null;
             }
 
-            $scope.loginDetails = loginDetails;
+            $scope.loginDetails = {};   // we will verify this in the backend
             $timeout(function(){$scope.play()}, 0);
         };
 
         var popupWindow = null;
         $scope.play = function () {
 
-            if ( !!$scope.widget.loginTypes  && $scope.widget.loginTypes.length > 0 && !$scope.loginDetails ){
+            if ( !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.types  && $scope.widget.socialLogin.types.length > 0 && !$scope.loginDetails ){
 
                 var size = LoginTypesService.getIndexSize();
 
@@ -99,12 +101,12 @@ angular.module('cloudifyWidgetUiApp')
             $scope.widgetStatus.state = play;
             WidgetsService.playWidget($scope.widget, _hasAdvanced() ? _getAdvanced() : null)
                 .then(function (result) {
-                    console.log(['play result', result]);
+                    $log.info(['play result', result]);
                     $scope.widgetExecution = result.data;
 
                     _pollStatus(1); // TODO should be _pollExecution - this will unify all details (output, status etc.)
                 }, function (err) {
-                    console.log(['play error', err]);
+                    $log.error(['play error', err]);
                     _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
                 });
         };
@@ -139,7 +141,7 @@ angular.module('cloudifyWidgetUiApp')
             return '';
         };
 
-        WidgetsService.getWidget($routeParams.widgetId).then(function (result) {
+        WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;
         });
 

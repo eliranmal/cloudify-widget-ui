@@ -14,6 +14,10 @@ angular.module('cloudifyWidgetUiApp')
             return $http.get('/backend/user/widgets');
         };
 
+        this.getPublicWidget = function( widgetId ){
+            return $http.get('/backend/widgets/'  + widgetId);
+        };
+
         this.getWidget = function( widgetId){
             return $http.get('/backend/user/widgets/' + widgetId);
         };

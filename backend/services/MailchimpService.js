@@ -1,8 +1,8 @@
-var logger = require('log4js').getLogger('CloudifyCliService');
+var logger = require('log4js').getLogger('MailchimpService');
 var mailchimp = require('mailchimp');
-var MailChimpAPI = mailchimp.MailChimpAPI;
+var MailchimpAPI = mailchimp.MailChimpAPI;
 
-function createMailChimpAPI( apiKey ){
+function createMailchimpAPI( apiKey ){
 
     if ( !apiKey ){
         throw new Error('Api key is missing');
@@ -10,10 +10,9 @@ function createMailChimpAPI( apiKey ){
 
     var api;
     try {
-        api = new MailChimpAPI(apiKey, { version : '2.0' });
-    } catch (error) {
-        console.log(error.message);
-        throw new Error('Unable to initilize MailChimpAPI');
+        api = new MailchimpAPI(apiKey, { version : '2.0' });
+    } catch (err) {
+        throw new Error('Unable to initilize MailchimpAPI',err);
     }
 
     return api;
@@ -21,27 +20,38 @@ function createMailChimpAPI( apiKey ){
 
 /**
  * This method allows to associate(subscribe) new member
- * @param command, is JSON, example: { "apikey" : "Your_api_key", "id" : "Your_list_id", "email" :
-            {"email": "Your_proper_mail"}, "merge_vars":{ "Email Address":"Your_proper_mail",
-            "First Name":"Your First name", "Last Name":"Your Last name"} }
+ * @param command, is JSON, example:
+ *
+ *
+ *      { "apikey" : "Your_api_key",
+ *        "id" : "Your_list_id",
+ *        "email" :
+            {"email": "Your_proper_mail"},
+         "merge_vars":{
+               "NAME":"Your First name",
+               "LASTNAME":"Your Last name"
+         }
+      }
     Confirma mail will be send and only after confirmation new member will be assiociated/subscribed to provided list
     apiKey - taken from your mailchimp accoun
     id - lits id for new member association
  * @param callback funaction
  */
 exports.subscribe = function( command, callback ){
+    logger.info('subscribing', command);
 
-    var api = createMailChimpAPI( command.apikey, command.id );
+    callback = typeof(callback) === 'function' && callback || function(){};
+
+    var api = createMailchimpAPI( command.apikey, command.id );
 
     api.call('lists', 'subscribe', command, function (error, data) {
-        if (error)
-            console.log(error.message);
-        else {
-            console.log('----subscribe sucessfully completed:');
-            console.log(JSON.stringify(data, null, 2)); // Do something with your data!
+        if (!!error){
+            logger.error('unable to subscribe', error);
+            callback(error);
         }
-        if(callback && typeof callback === 'function' ){
-            callback();
+        else {
+            logger.info('----subscribe successfully completed:');
+            logger.info(JSON.stringify(data, null, 2)); // Do something with your data!
         }
     });
 };
@@ -55,19 +65,22 @@ exports.subscribe = function( command, callback ){
  */
 exports.unsubscribe = function( command, callback ){
 
-    var api = createMailChimpAPI( command.apikey, command.id );
+    var api = createMailchimpAPI( command.apikey, command.id );
+
+    callback = typeof(callback) === 'function' ? callback : function(){};
 
     api.call('lists', 'unsubscribe', command, function (error, data) {
-        if (error)
-            console.log(error.message);
+        if (err) {
+            logger.error('unable to unsubscribe from mailchimp',err);
+            callback(err);
+            return;
+        }
         else {
-            console.log('----unsubscribe sucessfully completed:');
-            console.log(JSON.stringify(data, null, 2)); // Do something with your data!
+            logger.info('unsubscribed from mailchimp successfully');
+            callback();
+//            logger.debug(JSON.stringify(data, null, 2)); // Do something with your data!
         }
 
-        if(callback && typeof callback === 'function' ){
-            callback();
-        }
     });
 };
 

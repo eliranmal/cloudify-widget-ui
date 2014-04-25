@@ -8,19 +8,23 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.toggleLoginType = function( loginType ){
 
-              if ( !$scope.widget.loginTypes ){
-                  $scope.widget.loginTypes = [];
+            if ( !$scope.widget.socialLogin ){
+                $scope.widget.socialLogin = { 'types' : [] };
+            }
+
+              if ( !$scope.widget.socialLogin.types ){
+                  $scope.widget.socialLogin.types = [];
               }
 
             if ( !$scope.loginTypeSelected(loginType)) {
-                $scope.widget.loginTypes.push(loginType.id);
+                $scope.widget.socialLogin.types.push(loginType.id);
             }else{
-                $scope.widget.loginTypes.splice( $scope.widget.loginTypes.indexOf(loginType.id),1);
+                $scope.widget.socialLogin.types.splice( $scope.widget.socialLogin.types.indexOf(loginType.id),1);
             }
         };
 
         $scope.loginTypeSelected = function( loginType ){
-            return !!$scope.widget.loginTypes && $scope.widget.loginTypes.indexOf(loginType.id) >= 0;
+            return !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.types && $scope.widget.socialLogin.types.indexOf(loginType.id) >= 0;
         };
 
         $scope.remoteBootstrapForms = [
@@ -105,9 +109,8 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.create = function () {
 
-            $log.info('creating new widget');
+            $log.info('creating new widget', $scope.widget);
 
-            console.log($scope.widget);
             WidgetsService.createWidget($scope.widget).then(
                 function success() {
                     $log.info('successfully created widget');

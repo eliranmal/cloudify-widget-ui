@@ -5,7 +5,8 @@
 var express = require('express')
     , controllers = require('./backend/controllers')
     , logger = require('log4js').getLogger('server')
-    , managers = require('./backend/managers');
+    , managers = require('./backend/managers')
+    , middleware = require('./backend/middleware');
 
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
@@ -13,11 +14,12 @@ var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
 var errorHandler = require('errorhandler');
 
+
 var app = module.exports = express();
 
 // Configuration
 var conf = require('./backend/Conf');
-console.log(JSON.stringify(conf));
+logger.info(JSON.stringify(conf));
 
 if ( !!conf.adminUser ){
     conf.adminUser.passwordConfirm = conf.adminUser.password;
@@ -35,17 +37,15 @@ if ( !!conf.adminUser ){
 }
 
 
-
-    app.set('views', __dirname + '/views');
-    app.set('view engine', 'jade');
-    app.use(bodyParser());
-    app.use(methodOverride());
-    app.use(cookieParser());
-    logger.info('configuring express');
-    app.use(cookieSession({ 'secret': 'somesecret' }));
-    app.use('/backend/user', managers.middleware.loggedUser);
-    app.use('/backend/admin', managers.middleware.loggedUser);
-    app.use('/backend/admin', managers.middleware.adminUser);
+app.use(middleware.requestInfo.origin);
+app.use(bodyParser());
+app.use(methodOverride());
+app.use(cookieParser());
+logger.info('configuring express');
+app.use(cookieSession({ 'secret': 'somesecret' }));
+app.use('/backend/user', middleware.session.loggedUser);
+app.use('/backend/admin', middleware.session.loggedUser);
+app.use('/backend/admin', middleware.session.adminUser);
 
 
 
@@ -100,11 +100,12 @@ app.get('/backend/user/account/pools/:poolId/status', controllers.pool.accountRe
 app.get('/backend/user/account/pools/status', controllers.pool.accountReadPoolsStatus);
 
 
-app.get('/backend/widgets/login/google', controllers.widgetLogin.googleLogin);
-app.get('/backend/widgets/login/google/callback', controllers.widgetLogin.googleLoginCallback);
+app.get('/backend/widgets/:widgetId', controllers.widgets.getPublicInfo);
+app.get('/backend/widgets/:widgetId/login/google', controllers.widgetLogin.googleLogin);
+app.get('/backend/widgets/:widgetId/login/google/callback', controllers.widgetLogin.googleLoginCallback);
 
 var widgetPort = process.argv[2] || 9001;
 var server = app.listen(widgetPort, function(){
-    console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
+    logger.info("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
 });
 app.use(errorHandler({ dumpExceptions: true, showStack: true }));

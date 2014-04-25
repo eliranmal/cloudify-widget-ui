@@ -3,7 +3,7 @@
 angular.module('cloudifyWidgetUiApp')
   .controller('WidgetLoginCtrl', function ($scope, $routeParams, WidgetsService, LoginTypesService, $log ) {
 
-        WidgetsService.getWidget($routeParams.widgetId).then(function (result) {
+        WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;
         });
 

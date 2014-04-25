@@ -17,31 +17,11 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
             function getWidget(callback) {
                 logger.trace('-play waterfall- getWidget');
-                managers.db.connect('widgets', function (db, collection, done) {
-                    logger.trace('-play waterfall- db.connect');
-                    collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {
-                        if (!!err) {
-                            logger.error('unable to find widget', err);
-                            callback(err);
-                            done();
-                            return;
-                        }
-
-                        if (!result) {
-                            logger.error('result is null for widget find');
-                            callback(new Error('could not find widget'));
-                            done();
-                            return;
-                        }
-
-                        widget = result;
-                        callback(null, result);
-                        done();
-                    });
-                });
+                exports.findById( widgetId, callback );
             },
 
             function createExecutionModel(result, callback) {
+                widget = result;
                 logger.trace('-play waterfall- createExecutionModel');
 
                 managers.db.connect('widgetExecutions', function (db, collection, done) {
@@ -176,6 +156,30 @@ exports.play = function (widgetId, poolKey, playCallback) {
 
 };
 
+
+exports.findById = function( widgetId , callback ){
+    debugger;
+    logger.info(widgetId);
+    managers.db.connect('widgets', function (db, collection, done) {
+        collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {
+            if (!!err) {
+                logger.error('unable to find widget', err);
+                done();
+                callback(err);
+                return;
+            }
+
+            if (!result) {
+                logger.error('result is null for widget find');
+                done();
+                callback(new Error('could not find widget'));
+                return;
+            }
+            done();
+            callback(null, result);
+        });
+    });
+};
 
 exports.getOutput = function (callback) {
 

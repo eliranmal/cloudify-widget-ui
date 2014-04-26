@@ -15,6 +15,7 @@ angular.module('cloudifyWidgetUiApp')
         $scope.showPlay = function () {
             return $scope.widgetStatus.state === stop;
         };
+
         $scope.showStop = function () {
             return $scope.widgetStatus.state === play;
         };
@@ -30,11 +31,11 @@ angular.module('cloudifyWidgetUiApp')
         _resetWidgetStatus();
 
         function _hasAdvanced() {
-            return false;
+            return $scope.advancedParams;
         }
 
         function _getAdvanced() {
-            return null;
+            return $scope.advancedParams;
         }
 
         function _scrollLog(){
@@ -49,14 +50,16 @@ angular.module('cloudifyWidgetUiApp')
             ellipsisIndex = ellipsisIndex +1;
             $scope.widgetStatus = status;
             _getOutput($scope.widget);
-            $timeout(_pollStatus, myTimeout || 3000) ;
+
+            $timeout(_pollStatus, myTimeout || 3000);
+
             _scrollLog();
         }
 
         function _pollStatus(myTimeout) {
 
             if ($scope.widgetStatus.state !== stop) { // keep polling until widget stops ==> mainly for timeleft..
-                WidgetsService.getStatus( $scope.widgetStatus.instanceId ).then(function (result) {
+                WidgetsService.getStatus( $scope.widget, $scope.executionId ).then(function (result) {
                     if (!result) {
                         return;
                     }
@@ -99,20 +102,36 @@ angular.module('cloudifyWidgetUiApp')
 
             _resetWidgetStatus();
             $scope.widgetStatus.state = play;
-            WidgetsService.playWidget($scope.widget, _hasAdvanced() ? _getAdvanced() : null)
-                .then(function (result) {
-                    $log.info(['play result', result]);
-                    $scope.widgetExecution = result.data;
+            console.log('before check advanced');
+            var options =  _hasAdvanced() ? _getAdvanced() : null;
+            console.log('After check advanced, options=', options, '_hasAdvanced()=', _hasAdvanced() );
 
-                    _pollStatus(1); // TODO should be _pollExecution - this will unify all details (output, status etc.)
-                }, function (err) {
-                    $log.error(['play error', err]);
-                    _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
-                });
+            if ($scope.widget.remoteBootstrap && $scope.widget.remoteBootstrap.active) {
+                WidgetsService.playRemoteWidget($scope.widget, options)
+                    .then(function (result) {
+                        console.log(['play remote result', result]);
+                        $scope.executionId = result.data;
+                        _pollStatus(1);
+                    }, function (err) {
+                        console.log(['play remote error', err]);
+                        _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
+                    });
+            }
+            else {
+                WidgetsService.playWidget($scope.widget, options)
+                    .then(function (result) {
+                        console.log(['play result', result]);
+                        $scope.executionId = result.data;
+                        _pollStatus(1);
+                    }, function (err) {
+                        console.log(['play error', err]);
+                        _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
+                    });
+            }
         };
 
         $scope.stop = function () {
-            PostParentService.post({'name': 'widget_stop'});
+            WidgetsService.stopWidget($scope.widget, $scope.executionId);
             $scope.widgetStatus.state = stop;
             _resetWidgetStatus();
         };
@@ -120,12 +139,13 @@ angular.module('cloudifyWidgetUiApp')
         var emptyList = [];
 
         function _getOutput (widget) {
+            $log.debug('> > > get output, widget id: ', widget ? widget._id : '', ', execution id: ', $scope.executionId);
 
-            if (!widget) {
+            if (!widget || !$scope.executionId) {
                 $scope.output = emptyList;
             }
 
-            WidgetsService.getOutput(widget)
+            WidgetsService.getOutput(widget, $scope.executionId)
                 .then(function (result) {
                     $scope.output = result.data.split('\n');
                 }, function (err) {
@@ -141,7 +161,7 @@ angular.module('cloudifyWidgetUiApp')
             return '';
         };
 
-        WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {
+        WidgetsService.getWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;
         });
 

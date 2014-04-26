@@ -19,11 +19,17 @@ exports.connect = function( collectionName, callback ){
         if (!closed) {
             logger.warn('connection was not closed by callback');
             // we just want to warn at the moment, not actually close it.
-            // for some reason, closing the connection here will break login
+            // for some reason, closing the connection here will break functionality
         }
     })
 };
 
-exports.toObjectId = function( hexString ){
-    return ObjectID.createFromHexString(hexString);
-}
+exports.toObjectId = function (id) {
+    if (id instanceof ObjectID) {
+        return id;
+    }
+    if (typeof id === 'string') { // this is a hex string
+        return ObjectID.createFromHexString(id);
+    }
+    throw new Error('unable to parse ObjectID from id [' + id + ']');
+};

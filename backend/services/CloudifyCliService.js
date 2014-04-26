@@ -4,39 +4,40 @@ var fs = require('fs');
 var path = require('path');
 var spawn = require('child_process').spawn;
 var files = require('./FilesService');
+var logs = require('./LogsService');
 var conf = require('../Conf');
 var _ = require('lodash');
 
 
 
 /**
- * @param cmd example:
+ * @param options is an array of command arguments, or an object like this, with only 'arguments' mandatory:
+ *
  *      {
  *          executable: conf.cloudifyExecutable,
  *          arguments: ['connect', nodeModel.machineSshDetails.publicIp, ';', widget.recipeType.installCommand, path.join(downloadPath, widget.recipeRootPath) ],
- *          logFile: conf.logFile,
- *          statusFile: conf.statusFile
+ *          executionId: '1234231412341234'
  *      }
  */
-exports.executeCommand = function (cmd, callback) {
+exports.executeCommand = function (options, onExit) {
+
+    var _options = options;
+    if (_.isArray(options)) {
+        _options = {arguments: options};
+    }
+
+    logger.info('~~~executeCommand [%s] ', options );
 
     var defaultOptions = {
-        executable: conf.cloudifyExecutable,
-        logFile: conf.logFile,
-        statusFile: conf.statusFile
+        executable: conf.cloudifyExecutable
     };
-    var command = _.extend(defaultOptions, cmd);
+    var _options = _.extend(defaultOptions, _options);
 
-    var executable = command.executable;
+    var executable = _options.executable;
+
     // converts commandArgs to list if it is not a list. otherwise keeps it as a list
     // http://stackoverflow.com/questions/4775722/check-if-object-is-array
-    var commandArgs = [].concat(command.arguments);
-
-    var logFile = command.logFile;
-    files.mkdirp(path.dirname(logFile));
-
-    var statusFile = command.statusFile;
-    files.mkdirp(path.dirname(statusFile));
+    var commandArgs = [].concat(_options.arguments);
 
     if (!executable) {
         throw new Error('exectuable is missing from command');
@@ -50,33 +51,19 @@ exports.executeCommand = function (cmd, callback) {
         throw new Error('commandArgs are missing from command');
     }
 
-
-    if (!logFile) {
-        throw new Error('log file is missing');
-    }
-
-    if (!statusFile) {
-        throw new Error('status file is missing');
-    }
-
-
-    if (callback && typeof callback !== 'function') {
-        throw new Error('callback must be a function');
+    if (onExit && typeof onExit !== 'function') {
+        throw new Error('onExit callback must be a function');
     }
 
 
     var myCmd = spawn(executable, commandArgs);
 
     function appendToLogFile(data) {
-        fs.appendFile(logFile, data, function (err) {
-            if (!!err) {
-                logger.error('unable to write to log file', logFile, data.toString(), err);
-            }
-        });
+        logs.appendOutput(data, _options.executionId);
     }
 
     function writeStatusJsonFile(status) {
-        fs.writeFile(statusFile, JSON.stringify(status, null, 4));
+        logs.writeStatus(JSON.stringify(status, null, 4) + '\n', _options.executionId);
     }
 
     myCmd.stdout.on('data', appendToLogFile);
@@ -84,25 +71,25 @@ exports.executeCommand = function (cmd, callback) {
     myCmd.stderr.on('data', appendToLogFile);
 
     myCmd.on('error', function (err) {
-        writeStatusJsonFile({'error': err})
+        writeStatusJsonFile({"error": err})
     });
 
     myCmd.on('exit', function (code, signal) {
         logger.info('finished running command. exit code is [%s], exit signal is [%s]', code, signal);
-        if (callback) {
+        if (onExit) {
             if (code !== 0) {
-                callback(new Error('command failed with exit code [' + code + '] and exit signal [' + signal + ']'));
+                onExit(new Error('command failed with exit code [' + code + '] and exit signal [' + signal + ']'));
             } else {
-                callback();
+                onExit(null, { code: code, signal: signal });
             }
         }
     });
 
     myCmd.on('close', function (code) {
-        writeStatusJsonFile({'code': code})
+        writeStatusJsonFile({"code": code})
     });
 
-    logger.info('running command [%s] [%s]. log file is [%s]', executable, commandArgs, logFile);
+    logger.info('running command [%s] [%s]...', executable, commandArgs);
 
 };
 

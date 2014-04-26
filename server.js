@@ -48,7 +48,10 @@ app.use('/backend/admin', middleware.session.loggedUser);
 app.use('/backend/admin', middleware.session.adminUser);
 
 
-
+//app.use(function( err ){
+//    logger.error('using error handler', err);
+//});
+app.all('*',errorHandler({ dumpExceptions: true, showStack: true }));
 
 // Routes
 
@@ -60,7 +63,7 @@ app.post('/backend/user/widgets', controllers.widgets.create);
 app.post('/backend/user/widgets/:widgetId/delete', controllers.widgets.delete);
 app.get('/backend/user/widgets/:widgetId', controllers.widgets.read);
 app.post('/backend/user/widgets/:widgetId/update', controllers.widgets.update);
-app.post('/backend/user/widgets/:widgetId/play', controllers.widgets.play);
+app.post('/backend/user/widgets/:widgetId/play', function(req, res, next){ next( new Error('guy') ); /*try{controllers.widgets.play(req, res)}catch(e){ logger.info('excepton caught'); next(e); }*/});
 app.post('/backend/user/widgets/:widgetId/play/remote', controllers.widgets.playRemote);
 app.post('/backend/user/widgets/:widgetId/executions/:executionId/stop', controllers.widgets.stop );
 app.get('/backend/user/widgets/:widgetId/executions/:executionId/status', controllers.widgets.getStatus );
@@ -104,9 +107,24 @@ app.get('/backend/user/account/pools/status', controllers.pool.accountReadPoolsS
 app.get('/backend/widgets/:widgetId', controllers.widgets.getPublicInfo);
 app.get('/backend/widgets/:widgetId/login/google', controllers.widgetLogin.googleLogin);
 app.get('/backend/widgets/:widgetId/login/google/callback', controllers.widgetLogin.googleLoginCallback);
+app.get('/backend/widgets/:widgetId/login/linkedin', controllers.widgetLogin.linkedInLogin);
+app.get('/backend/widgets/:widgetId/login/linkedin/callback', controllers.widgetLogin.linkedInLoginCallback);
+app.get('/backend/widgets/:widgetId/login/twitter', controllers.widgetLogin.twitterLogin);
+app.get('/backend/widgets/:widgetId/login/twitter/callback', controllers.widgetLogin.twitterLoginCallback);
+
+
+
+
+
+
 
 var widgetPort = process.argv[2] || 9001;
+
+
 var server = app.listen(widgetPort, function(){
     logger.info("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
 });
-app.use(errorHandler({ dumpExceptions: true, showStack: true }));
+
+//process.on('uncaughtException', function(){
+//    logger.error('an error has occurred', arguments);
+//});

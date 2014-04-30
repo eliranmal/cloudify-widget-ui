@@ -47,7 +47,7 @@ upgrade_main(){
 
     echo "installing me.conf"
     check_exists ME_CONF_URL;
-    check_exists SYSCONF_URL;
+
 
 
     mkdir -p $INSTALL_LOCATION/conf/dev

@@ -9,6 +9,7 @@
                 <th>Decision Type</th>
                 <th>Pool Settings ID</th>
                 <th>Approved</th>
+                <th>Executed</th>
                 <th>Details</th>
             </tr>
         </thead>
@@ -18,6 +19,7 @@
                 <td>{{ decision.decisionType }}</td>
                 <td>{{ decision.poolId }}</td>
                 <td><input type="checkbox" ng-model="decision.approved" ng-change="updatePoolDecisionApproval(model.poolId, decision)" /></td>
+                <td>{{ decision.executed }}</td>
                 <td><pre>{{ asJson(decision.details) | json }}</pre></td>
             </tr>
         </tbody>

@@ -41,6 +41,24 @@
         Pool Id : <input type="text" ng-model="widget.poolId"/>
     </p>
 
+
+    <p>
+        Require Login : <input type="checkbox" ng-model="widget.login.require"/><br/>
+    <span>
+        If "proprietary" login is selected, the widget will do nothing on "play" but send a PostMessage event. <br/>
+        It will wait for the embedding page to invoke the play.<br/>
+        It will look for userId and userKey to verify with Verification URL and Web Service Private Key that the<br/>
+        credentials are legitimate<br/>
+    </span>
+        Login Type: <select ng-model="widget.login.type" ng-options="c.label for c in loginTypes"></select><br/>
+    </p>
+    <strong> proprietary login details</strong>
+    <p>
+        Verification URL : <input ng-model="widget.login.propVerificationUrl" type="text"/><br/>
+        Web Service Private Key : <input ng-model="widget.login.propServicePrivateKey" type="text"/><br/>
+    </p>
+
+
     <h1> Social Login </h1>
     <p>
         The social login feature is intended for conversion purposes. <br/>

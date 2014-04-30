@@ -100,11 +100,59 @@ exports.delete = function ( req, res ){
 };
 
 exports.playRemote = function ( req, res ) {
-    _play(req, res, managers.widget.playRemote);
+    logger.info('calling widget play for user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
+
+    if (!req.params.widgetId) {
+        logger.error('unable to play remote, no widget id found on request');
+        res.send(500, {message : 'no widget id found on request'});
+        return;
+    }
+
+    managers.widget.playRemote(req.params.widgetId, req.user.poolKey, req.body.data, function (err, result) {
+        if (!!err) {
+            logger.error('play remote failed', err);
+            res.send(500, {message: 'play remote failed', error: err});
+            return;
+        }
+
+        if (!result) {
+            logger.error('unable to get execution id');
+            res.send(500, {message: 'unable to get execution id'});
+            return;
+        }
+
+        logger.info('widget play remote initiated successfully, execution id is [%s]', result)
+        res.send(200, result);
+    });
+
 };
 
 exports.play = function ( req, res ) {
-    _play(req, res, managers.widget.play);
+    logger.info('calling widget play for user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
+
+    if (!req.params.widgetId) {
+        logger.error('unable to play, no widget id found on request');
+        res.send(500, {message : 'no widget id found on request'});
+        return;
+    }
+
+    managers.widget.play(req.params.widgetId, req.user.poolKey , function (err, result) {
+        if (!!err) {
+            logger.error('play failed', err);
+            res.send(500, {message: 'play failed', error: err});
+            return;
+        }
+
+        if (!result) {
+            logger.error('unable to get execution id');
+            res.send(500, {message: 'unable to get execution id'});
+            return;
+        }
+
+        logger.info('widget play initiated successfully, execution id is [%s]', result)
+        res.send(200, result);
+    });
+
 };
 
 exports.stop = function (req, res) {
@@ -135,30 +183,6 @@ exports.stop = function (req, res) {
 
 
 function _play (req, res, playFn) {
-    logger.info('calling widget play for user id [%s], widget id [%s]', req.user._id, req.params.widgetId);
-
-    if (!req.params.widgetId) {
-        logger.error('unable to play, no widget id found on request');
-        res.send(500, {message : 'no widget id found on request'});
-        return;
-    }
-
-    playFn(req.params.widgetId, req.user.poolKey , function (err, result) {
-        if (!!err) {
-            logger.error('play failed', err);
-            res.send(500, {message: 'play failed', error: err});
-            return;
-        }
-
-        if (!result) {
-            logger.error('unable to get execution id');
-            res.send(500, {message: 'unable to get execution id'});
-            return;
-        }
-
-        logger.info('widget play initiated successfully, execution id is [%s]', result)
-        res.send(200, result);
-    });
 }
 
 function verifyRequiredFields( fields, widget, errors  ){

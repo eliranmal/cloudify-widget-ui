@@ -2,6 +2,7 @@
 
 angular.module('cloudifyWidgetUiApp')
     .directive('widgetEmbed', function ($log) {
+        $log.info('loading');
         return {
             template: '<div><iframe style="height: {{theme.height}} ; width: {{theme.width}}" scrolling="no" ng-src="{{getIframeSrc()}}"></iframe></div>',
             restrict: 'A',

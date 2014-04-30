@@ -5,7 +5,7 @@ angular.module('cloudifyWidgetUiApp')
 
 
         $scope.availableLoginTypes = function () {
-            return LoginTypesService.getAll()
+            return LoginTypesService.getAll();
         };
 
 
@@ -26,50 +26,47 @@ angular.module('cloudifyWidgetUiApp')
 
         // use this with the following from the popup window:
         //
-        $scope.loginDone = function( ){
+        $scope.loginDone = function () {
             $log.info('login is done');
-            if ( popupWindow !== null ){
+            if (popupWindow !== null) {
                 popupWindow.close();
                 popupWindow = null;
             }
-
-            $scope.loginDetails = {};   // we will verify this in the backend
-            $timeout(function(){$scope.play()}, 0);
         };
 
         var popupWindow = null;
 
-        $scope.tryItNow = function( socialLogin , widget ){
+        $scope.tryItNow = function (socialLogin, widget) {
             $window.$windowScope = $scope;
 
             var size = LoginTypesService.getIndexSize();
 
-            var left = (screen.width/2)-(size.width/2);
-            var top = (screen.height/2)-(size.height/2);
+            var left = (screen.width / 2) - (size.width / 2);
+            var top = (screen.height / 2) - (size.height / 2);
 
             var url = null;
-            if ( socialLogin === null ){
+            if (socialLogin === null) {
                 url = '/#/widgets/' + $scope.widget._id + '/login/index';
-            }else{
-               url = '/backend/widgets/' + widget._id + '/login/' + socialLogin.id;
+            } else {
+                url = '/backend/widgets/' + widget._id + '/login/' + socialLogin.id;
             }
 
-            popupWindow = window.open( url, 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
+            popupWindow = window.open(url, 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + size.width + ', height=' + size.height + ', top=' + top + ', left=' + left);
         };
 
-        $scope.isTypeSupportsMailchimp = function( socialLogin ){
-            if ( !!socialLogin && !!socialLogin.id ){
+        $scope.isTypeSupportsMailchimp = function (socialLogin) {
+            if (!!socialLogin && !!socialLogin.id) {
                 return !!LoginTypesService.getById(socialLogin.id).data.mailchimp;
-            }else{
+            } else {
                 return false;
             }
         };
 
-        $scope.getSocialLoginLabel = function( socialLogin ){
-            if ( !!socialLogin && !!socialLogin.id ) {
+        $scope.getSocialLoginLabel = function (socialLogin) {
+            if (!!socialLogin && !!socialLogin.id) {
                 return LoginTypesService.getById(socialLogin.id).label;
-            }else{
-                return "N/A"
+            } else {
+                return 'N/A';
             }
         };
 

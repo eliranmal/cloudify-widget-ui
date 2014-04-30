@@ -83,7 +83,7 @@ angular.module('cloudifyWidgetUiApp')
             }
 
             $scope.loginDetails = {};   // we will verify this in the backend
-            $timeout(function(){$scope.play()}, 0);
+            $timeout(function(){$scope.play();}, 0);
         };
 
         var popupWindow = null;
@@ -156,7 +156,7 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.getFormPath = function (widget) {
             if (widget.remoteBootstrap && widget.remoteBootstrap.cloudifyForm) {
-                return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html'
+                return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html';
             }
             return '';
         };

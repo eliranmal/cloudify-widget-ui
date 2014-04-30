@@ -130,6 +130,16 @@ function ArgsBuilder() {
         return this;
     };
 
+    this.decisionId = function (_decisionId) {
+        this.path({"decisionId": _decisionId});
+        return this;
+    };
+
+    this.approved = function (_approved) {
+        this.path({"approved": _approved});
+        return this;
+    };
+
     this.widgetId = function (_widgetId) {
         this.path({"widgetId": _widgetId});
         return this;
@@ -223,16 +233,26 @@ exports.occupyPoolNode = function (poolKey, poolId, callback) {
 };
 
 exports.readPoolErrors = function (poolKey, poolId, callback) {
-    logger.info('reading pool errors [%s]', poolId);
+    logger.info('reading pool errors in pool [%s]', poolId);
     call.get('/admin/pools/${poolId}/errors', _args().poolKey(poolKey).poolId(poolId), callback);
 };
 exports.readPoolTasks = function (poolKey, poolId, callback) {
-    logger.info('reading pool tasks [%s]', poolId);
+    logger.info('reading pool tasks in pool [%s]', poolId);
     call.get('/admin/pools/${poolId}/tasks', _args().poolKey(poolKey).poolId(poolId), callback);
 };
 exports.deletePoolTask = function (poolKey, poolId, taskId, callback) {
     logger.info('deleting pool task [%s] from pool [%s]', taskId, poolId);
     call.post('/admin/pools/${poolId}/tasks/${taskId}/delete', _args().poolKey(poolKey).poolId(poolId).taskId(taskId), callback);
+};
+
+exports.readPoolDecisions = function (poolKey, poolId, callback) {
+    logger.info('reading pool decisions in pool [%s]', poolId);
+    call.get('/admin/pools/${poolId}/decisions', _args().poolKey(poolKey).poolId(poolId), callback);
+};
+exports.updatePoolDecisionApproval = function (poolKey, poolId, decisionId, approved, callback) {
+    logger.info('updating pool decision [%s] in pool [%s]', decisionId, poolId);
+    call.post('/admin/pools/${poolId}/decisions/${decisionId}/approved/${approved}',
+        _args().poolKey(poolKey).poolId(poolId).decisionId(decisionId).approved(approved), callback);
 };
 
 exports.readCloudNodes = function (poolKey, poolId, callback) {

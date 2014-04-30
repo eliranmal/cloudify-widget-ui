@@ -1,0 +1,25 @@
+<div layout>
+    <a href="#/admin/pools">back to all pools</a>
+
+    <h3>Active decisions for pool {{ model.poolId }}</h3>
+    <table ng-init="getPoolDecisions(model.poolId)">
+        <thead>
+            <tr>
+                <th>Decision ID</th>
+                <th>Decision Type</th>
+                <th>Pool Settings ID</th>
+                <th>Approved</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="decision in model.poolDecisions">
+                <td>{{ decision.id }}</td>
+                <td>{{ decision.decisionType }}</td>
+                <td>{{ decision.poolId }}</td>
+                <td><input type="checkbox" ng-model="decision.approved" ng-change="updatePoolDecisionApproval(model.poolId, decision)" /></td>
+                <td><pre>{{ asJson(decision.details) | json }}</pre></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

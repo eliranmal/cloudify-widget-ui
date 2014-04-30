@@ -81,6 +81,13 @@ exports.deletePoolTask = function( req, res ){
     managers.poolClient.deletePoolTask(req.user.poolKey, req.params.poolId, req.params.taskId, _callback(res));
 };
 
+exports.readPoolDecisions = function( req, res ){
+    managers.poolClient.readPoolDecisions(req.user.poolKey, req.params.poolId, _callback(res));
+};
+exports.updatePoolDecisionApproval = function ( req, res ) {
+    managers.poolClient.updatePoolDecisionApproval(req.user.poolKey, req.params.poolId, req.params.decisionId, req.params.approved, _callback(res));
+};
+
 exports.readCloudNodes = function( req, res ){
     managers.poolClient.readCloudNodes(req.user.poolKey, req.params.poolId, _callback(res));
 };

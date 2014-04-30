@@ -99,6 +99,11 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 templateUrl: 'views/admin/poolCloudNodes.html',
                 controller: 'AdminPoolCrudCtrl'
             })
+            .when('/admin/pools/:poolId/decisions', {
+                templateUrl: 'views/admin/poolDecisions.html',
+                controller: 'AdminPoolCrudCtrl'
+            })
+
             .when('/admin/accounts/:accountId/pools', {
                 templateUrl: 'views/admin/userPools.html',
                 controller: 'AdminPoolCrudCtrl'

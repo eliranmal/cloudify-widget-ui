@@ -131,12 +131,28 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.getPoolDecisions = function (poolId) {
+            $log.debug('getPoolDecisions, poolId: ', poolId);
+            AdminPoolCrudService.getPoolDecisions(poolId).then(function (result) {
+                $scope.model.poolDecisions = result.data;
+            });
+        };
+
+        $scope.updatePoolDecisionApproval = function (poolId, decision) {
+            $log.info('updatePoolDecision, poolId: ', poolId, ', decisionId: ', decision.id);
+            AdminPoolCrudService.updatePoolDecisionApproval(poolId, decision).then(
+                function (result) {
+                    $log.info('pool decision approval updated, refreshing all decisions');
+                    $scope.getPoolDecisions(poolId);
+                }, function (err) {
+                    $log.error(err);
+                });
+        };
 
 
         $scope.asJson = function (jsonString) {
             return angular.fromJson(jsonString) || '';
         };
-
 
 
         var refreshInterval = $interval(function () {
@@ -150,6 +166,7 @@ angular.module('cloudifyWidgetUiApp')
                 $scope.getPoolNodes($scope.model.poolId);
                 $scope.getPoolTasks($scope.model.poolId);
                 $scope.getPoolErrors($scope.model.poolId);
+                $scope.getPoolDecisions($scope.model.poolId);
             }
             if (angular.isDefined($scope.model.accountId)) {
                 $scope.getAccountPools($scope.model.accountId);

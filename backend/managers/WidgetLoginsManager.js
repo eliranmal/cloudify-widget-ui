@@ -1,9 +1,10 @@
 var dbManager = require('./DbManager');
 var widgetManager = require('./WidgetManager');
 var mailchimpService = require('../services/MailchimpService');
+var widgetLoginTypes = require('../services/WidgetLoginTypes');
 var logger = require('log4js').getLogger('WidgetLoginsManager');
 
-exports.saveLoginToDb = function (loginId, loginData, callback) {
+exports.saveLoginToDb = function ( loginData, callback) {
 
     var correct_loginDetails = {};
 
@@ -18,21 +19,35 @@ exports.saveLoginToDb = function (loginId, loginData, callback) {
     loginData.loginDetails = correct_loginDetails;
 
 
-    dbManager.connect(loginId + 'WidgetLogin', function (db, collection, done) {
+    dbManager.connect('widgetLogin', function (db, collection, done) {
 
-        collection.findOne({ 'uid': loginData.uid, 'widgetId': loginData.widgetId  }, function (err, result) {
+        collection.findOne({ 'type' : loginData.type, 'uid': loginData.uid, 'widgetId': loginData.widgetId  }, function (err, result) {
             if (!!err) {
-                logger.error('unable to determine if ', loginId, ' already exists due to an error', err);
+                logger.error('unable to determine if ', loginData.type, ' already exists due to an error', err);
                 done();
                 return;
             }
             if (!!result) {
-                logger.info(loginId, 'login already exists. ignoring', loginData.uid);
-                callback(null, loginData);
-                done();
-                return;
+                logger.info(loginData.type, 'login already exists. updating', loginData.uid);
+                loginData._id = result._id;
+                collection.update({'_id' : result._id} , loginData , function( err, nUpdated ){
+                    if ( !!err ){
+                        logger.error('error while updating',err);
+                        callback(null, result); // do not bubble error up.
+                        done();
+                        return;
+                    }
+
+                   logger.info('updated ', nUpdated, ' lines');
+                   callback(null, loginData);
+                    done();
+                    return;
+
+                });
+               return;
             }
 
+            logger.info('login data does not exist. recreating');
             collection.insert(loginData, function (err, obj) {
                 if (!!err) {
                     logger.error('unable to save login details due to an error', err);
@@ -40,6 +55,7 @@ exports.saveLoginToDb = function (loginId, loginData, callback) {
                     return;
                 }
                 done();
+
                 callback(null, obj);
 
 
@@ -52,50 +68,24 @@ exports.saveLoginToDb = function (loginId, loginData, callback) {
 /**
  * loginId = 'google' or 'custom' etc..
  */
-exports.getWidgetLogins = function (userId, loginId, callback) {
-    dbManager.connect(loginId + 'WidgetLogin', function (db, collection, done) {
-        collection.find({ 'userId': userId }).toArray(function (err, result) {
-            callback(err, { 'loginId': loginId, 'data': result });
-        })
-    })
+exports.getWidgetLoginsByType = function (userId, type, callback) {
+    dbManager.connect('widgetLogin', function (db, collection, done) {
+        collection.find({ 'userId': userId, 'type' : loginId }).toArray(function (err, result) {
+            done();
+            callback(err, result);
+            return;
+        });
+    });
 };
 
-
-/**
- * [
- *     {   'loginId' : 'google' , 'data' : [ .... ] }.
- *     {   'loginId' : 'twitter', 'data' : [ .... ] }
- *
- * ]
- * @param userId
- * @param callback
- */
-
-exports.getAllWidgetLogins = function (userId, callback) {
-
-    var functions = [];
-    var result = [];
-    var loginsIds = [ 'google', 'twitter' ];
-    loginsIds.forEach(function (loginId) {
-
-        var _func = function () {
-            exports.getWidgetLogins(userId, loginId, function (err, result) {
-                if (!!err) {
-                    logger.error('unable to get logins for ', loginId);
-                    return;
-                }
-                result.push(result);
-            })
-        };
-
-        functions.push(_func);
-
+exports.getWidgetLogins = function (userId, callback) {
+    dbManager.connect('widgetLogin', function (db, collection, done) {
+        collection.find({ 'userId': userId }).toArray(function (err, result) {
+            done();
+            callback(err, result);
+            return;
+        });
     });
-
-    async.parallel(functions, function (err) {
-        callback(err, result)
-    });
-
 };
 
 function _getLoginHandler(widget, handler) {
@@ -132,8 +122,17 @@ function _sendToMailchimp(widget, mailchimpLoginDetails) {
 
 }
 
-exports.handleGoogleLogin = function (widgetId, loginDetails, callback) {
 
+exports.getLoginTypes = function(){
+    return widgetLoginTypes.getLoginTypes();
+};
+
+exports.handleWidgetLogin = function ( loginTypeId , widgetId, loginDetails, callback) {
+
+    var name = loginDetails.name;
+    var lastName = loginDetails.lastName;
+    var uid = loginDetails.uid || loginDetails.email;
+    var email = loginDetails.email;
 
     widgetManager.findById(widgetId, function (err, widget) {
         if (!!err) { // NOTE : do not return error response here. it does not matter to the users. it is our bug and we should overcome it.
@@ -146,7 +145,30 @@ exports.handleGoogleLogin = function (widgetId, loginDetails, callback) {
             return;
         }
 
-        exports.saveLoginToDb('google', {  'timestamp': new Date().getTime(), 'widgetId': widget._id, 'userId': widget.userId, 'uid': loginDetails['openid.ext1.value.email'], 'loginDetails': loginDetails }, callback);
-        _sendToMailchimp(widget, { 'NAME': loginDetails['openid.ext1.value.firstname'], 'LASTNAME': loginDetails['openid.ext1.value.lastname'], 'email': loginDetails['openid.ext1.value.email']});
+        // get login type
+        var loginType = widgetLoginTypes.getById( loginTypeId );
+
+
+        exports.saveLoginToDb( {  'type' : loginType.id, 'timestamp': new Date().getTime(), 'widgetId': widget._id, 'userId': widget.userId, 'uid': email, 'loginDetails': loginDetails }, callback);
+
+        // get login configuration from widget
+
+        var socialLogin = null;
+        if ( !!widget.socialLogin && !!widget.socialLogin.data && widget.socialLogin.data.hasOwnProperty('length') && widget.socialLogin.data.length > 0 ){
+            var loginDataArray = widget.socialLogin.data;
+            for ( var i = 0; i < loginDataArray.length; i ++){
+                if ( loginDataArray[i].id === loginType.id ){
+                    socialLogin = loginDataArray[i];
+                    break;
+                }
+            }
+        }
+
+        if ( !!loginType && !!loginType.data && !!loginType.data.mailchimp && !!socialLogin && !!socialLogin.mailchimp ){
+            _sendToMailchimp(widget, { 'NAME': name, 'LASTNAME': lastName, 'email': email});
+        }else{
+            logger.info('socialLogin ' + loginType.id + ' either does not support mailchimp or is configured to not send data to mailchimp. skipping mailchimp');
+        }
+
     });
 };

@@ -1,48 +1,13 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-  .service('LoginTypesService', function LoginTypesService() {
-    var loginTypes =  [
-        {
-            'id' : 'google',
-            'label' : 'Google',
-            'size' : {
-                'width' : 100,
-                'height' : 100
-            }
-        },
-        {
-            'id' : 'custom',
-            'label' : 'Custom',
-            'size' : {
-                'width' : 100,
-                'height' : 100
-            }
-        },
-        {
-            'id' : 'facebook',
-            'label' : 'Facebook',
-            'size' : {
-                'width' : 100,
-                'height' : 100
-            }
-        },{
-            'id' : 'twitter',
-            'label' : 'Twitter',
-            'size' : {
-                'width' : 100,
-                'height' : 100
-            }
-        },
-        {
-            'id' : 'linkedin',
-            'label' : 'LinkedIn',
-            'size' : {
-                'width' : 100,
-                'height' : 100
-            }
-        }
-    ];
+  .service('LoginTypesService', function LoginTypesService( $http )  {
+    var loginTypes = [];
+    $http.get('/backend/widgets/login/types').then( function ( result ){
+        console.log(result);
+        loginTypes = result.data;
+        console.log(loginTypes);
+    });
 
         this.getAll = function(){
             return loginTypes;

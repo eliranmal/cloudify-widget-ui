@@ -432,7 +432,6 @@ function getTempSuffix() {
 
 
 exports.findById = function( widgetId , callback ){
-    debugger;
     logger.info(widgetId);
     managers.db.connect('widgets', function (db, collection, done) {
         collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {

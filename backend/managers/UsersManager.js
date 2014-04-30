@@ -54,4 +54,4 @@ exports.createUser = function( user, callback ){
         });
 
     });
-}
+};

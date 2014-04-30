@@ -8,11 +8,15 @@ var express = require('express')
     , managers = require('./backend/managers')
     , middleware = require('./backend/middleware');
 
+var passport = require('passport');
+var conf = require('./backend/Conf');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
 var errorHandler = require('errorhandler');
+
+
 
 
 var app = module.exports = express();
@@ -40,6 +44,7 @@ if ( !!conf.adminUser ){
 app.use(middleware.requestInfo.origin);
 app.use(bodyParser());
 app.use(methodOverride());
+app.use(passport.initialize());
 app.use(cookieParser());
 logger.info('configuring express');
 app.use(cookieSession({ 'secret': 'somesecret' }));
@@ -48,13 +53,15 @@ app.use('/backend/admin', middleware.session.loggedUser);
 app.use('/backend/admin', middleware.session.adminUser);
 
 
+
+
+
 //app.use(function( err ){
 //    logger.error('using error handler', err);
 //});
 app.all('*',errorHandler({ dumpExceptions: true, showStack: true }));
 
 // Routes
-
 app.post('/backend/signup', controllers.session.signup);
 app.post('/backend/login', controllers.session.login );
 app.post('/backend/logout', controllers.session.logout);
@@ -63,7 +70,7 @@ app.post('/backend/user/widgets', controllers.widgets.create);
 app.post('/backend/user/widgets/:widgetId/delete', controllers.widgets.delete);
 app.get('/backend/user/widgets/:widgetId', controllers.widgets.read);
 app.post('/backend/user/widgets/:widgetId/update', controllers.widgets.update);
-app.post('/backend/user/widgets/:widgetId/play', function(req, res, next){ next( new Error('guy') ); /*try{controllers.widgets.play(req, res)}catch(e){ logger.info('excepton caught'); next(e); }*/});
+app.post('/backend/user/widgets/:widgetId/play', function(req, res, next){ try{controllers.widgets.play(req, res)}catch(e){ logger.info('excepton caught'); next(e); }});
 app.post('/backend/user/widgets/:widgetId/play/remote', controllers.widgets.playRemote);
 app.post('/backend/user/widgets/:widgetId/executions/:executionId/stop', controllers.widgets.stop );
 app.get('/backend/user/widgets/:widgetId/executions/:executionId/status', controllers.widgets.getStatus );
@@ -105,12 +112,16 @@ app.get('/backend/user/account/pools/status', controllers.pool.accountReadPoolsS
 
 
 app.get('/backend/widgets/:widgetId', controllers.widgets.getPublicInfo);
-app.get('/backend/widgets/:widgetId/login/google', controllers.widgetLogin.googleLogin);
-app.get('/backend/widgets/:widgetId/login/google/callback', controllers.widgetLogin.googleLoginCallback);
-app.get('/backend/widgets/:widgetId/login/linkedin', controllers.widgetLogin.linkedInLogin);
-app.get('/backend/widgets/:widgetId/login/linkedin/callback', controllers.widgetLogin.linkedInLoginCallback);
-app.get('/backend/widgets/:widgetId/login/twitter', controllers.widgetLogin.twitterLogin);
-app.get('/backend/widgets/:widgetId/login/twitter/callback', controllers.widgetLogin.twitterLoginCallback);
+app.get('/backend/widgets/login/types', controllers.widgetLogin.getTypes);
+app.get('/backend/widgets/:widgetId/login/:loginType', controllers.widgetLogin.widgetLogin);
+app.post('/backend/widgets/:widgetId/login/custom',
+    function(req,res,next){ req.params.loginType = 'custom'; next(); },
+    controllers.widgetLogin.widgetLogin,
+    function(req, res ){
+        res.send(200);
+    }
+);
+app.get('/backend/widgets/:widgetId/login/:loginType/callback', controllers.widgetLogin.widgetLoginCallback);
 
 
 

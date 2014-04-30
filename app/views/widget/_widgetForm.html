@@ -47,10 +47,32 @@
         The goal is to get contact information of potential future customers.<br/>
     </p>
     <p>
-        Login Type:
-        <button class="loginTypeButton" ng-click="toggleLoginType(loginType)" ng-class="{'selected' : loginTypeSelected(loginType) }"
-                ng-repeat="loginType in loginTypes">{{loginType.label}}
-        </button>
+        Select which types you want this widget to support
+        <div ng-repeat="loginType in availableLoginTypes()">
+
+
+            <button class="loginTypeButton" ng-click="addLoginType(loginType)" ng-class="{'hidden' : loginTypeSelected(loginType) }">
+                Add {{loginType.label}} Support For Widget
+            </button>
+        </div>
+        <button ng-click="tryItNow(null, widget)">Try Login Now!</button>
+    </p>
+    <p>
+        <div ng-repeat="socialLogin in widget.socialLogin.data">
+           <h2>{{getSocialLoginLabel(socialLogin)}}</h2>
+           <input type="checkbox" ng-model="socialLogin.enabled"> Enabled
+           <div ng-show="!isTypeSupportsMailchimp(socialLogin)">
+               ** This login type does not support mailchimp integration.
+           </div>
+            <div ng-show="!!isTypeSupportsMailchimp(socialLogin)">
+                <input type="checkbox" ng-model="socialLogin.mailchimp"> Send data to mailchimp
+            </div>
+            <button ng-click="removeSocialLogin(socialLogin)">Remove Social Login</button><br/>
+            <button ng-click="tryItNow(socialLogin, widget)">Try {{getSocialLoginLabel(socialLogin)}} Login Now!</button>
+
+
+        </div>
+
         <br/>
     </p>
 

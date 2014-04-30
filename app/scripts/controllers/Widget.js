@@ -89,7 +89,7 @@ angular.module('cloudifyWidgetUiApp')
         var popupWindow = null;
         $scope.play = function () {
 
-            if ( !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.types  && $scope.widget.socialLogin.types.length > 0 && !$scope.loginDetails ){
+            if ( !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.data  && $scope.widget.socialLogin.data.length > 0 && !$scope.loginDetails ){
 
                 var size = LoginTypesService.getIndexSize();
 

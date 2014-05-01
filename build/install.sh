@@ -42,7 +42,7 @@ upgrade_main(){
 
     echo "installing initd script"
     INSTALL_LOCATION=/var/www/cloudify-widget-ui/lib/node_modules/cloudify-widget-ui
-    echo "installing service script under widget-pool"
+    echo "installing service script under widget-ui"
     SERVICE_NAME=widget-ui SERVICE_FILE=$INSTALL_LOCATION/build/service.sh install_initd_script
 
     echo "installing me.conf"
@@ -56,6 +56,10 @@ upgrade_main(){
 
     echo "installing/upgrading cloudify from [ $CLOUDIFY_URL ]"
     install_cloudify
+
+    dos2unix $INSTALL_LOCATION/build/nginx.conf
+    source $INSTALL_LOCATION/build/nginx.conf | dos2unix > /etc/nginx/sites-enabled/widget-ui.conf
+
 
     echo "service widget-ui"
     service widget-ui

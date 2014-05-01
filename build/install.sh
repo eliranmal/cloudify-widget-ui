@@ -59,6 +59,7 @@ upgrade_main(){
 
     dos2unix $INSTALL_LOCATION/build/nginx.conf
     source $INSTALL_LOCATION/build/nginx.conf | dos2unix > /etc/nginx/sites-enabled/widget-ui.conf
+    service nginx restart
 
 
     echo "service widget-ui"

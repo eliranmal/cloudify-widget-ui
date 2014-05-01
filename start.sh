@@ -1,5 +1,5 @@
+cd "$(dirname "$0")"
+echo `pwd`
 source /etc/sysconfig/widget-ui
-
-
-cd /var/www/cloudify-widget-ui/lib/node_modules/cloudify-widget-ui
-node server.js $PORT
+node server.js $PORT &
+echo $! > /var/run/widgetui.pid

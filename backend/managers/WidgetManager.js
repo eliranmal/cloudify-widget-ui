@@ -227,13 +227,22 @@ function _occupyMachine(curryParams, curryCallback) {
 function _runInstallCommand(curryParams, curryCallback) {
     logger.trace('-play- runInstallCommand');
 
+    var installPath;
+    try {
+        installPath = path.join(curryParams.executionDownloadsPath, curryParams.widget.recipeRootPath);
+    } catch (e) {
+        curryCallback(new Error('failed while joining install path, one or more of the parameters is not a string: ['
+            + curryParams.executionDownloadsPath + '] [' + curryParams.widget.recipeRootPath + ']'), curryParams);
+        return;
+    }
+
     var command = {
         arguments: [
             'connect',
             curryParams.nodeModel.machineSshDetails.publicIp,
             ';',
             curryParams.widget.recipeType.installCommand,
-            path.join(curryParams.executionDownloadsPath, curryParams.widget.recipeRootPath)
+            installPath
         ],
         logsDir: curryParams.executionLogsPath,
         executionId: curryParams.executionObjectId.toHexString()

@@ -27,9 +27,9 @@ upgrade_main(){
     SYSCONFIG_FILE=widget-ui read_sysconfig
 
 
-
-     echo "installing ui npm package from [ $PACKAGE_URL ]"
     PACKAGE_URL=http://get.gsdev.info/cloudify-widget-ui/1.0.0/cloudify-widget-ui-1.0.0.tgz
+     echo "installing ui npm package from [ $PACKAGE_URL ]"
+
      mkdir -p /var/www/cloudify-widget-ui
      npm install $PACKAGE_URL -g --prefix /var/www/cloudify-widget-ui
 

@@ -80,7 +80,10 @@
     "passport-linkedin",
     "request",
     "passport-twitter",
-    "passport-facebook"
+    "passport-facebook",
+    "passport-google",
+    "passport-github",
+    "passport-strategy"
   ],
   "engines": {
     "node": ">=0.8.0"

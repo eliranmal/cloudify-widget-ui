@@ -138,6 +138,13 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.abortPoolDecision = function (poolId, decisionId) {
+            $log.info('abortPoolDecision, poolId: ', poolId, ', decisionId: ', decisionId);
+            AdminPoolCrudService.abortPoolDecision(poolId, decisionId).then(function (result) {
+                $log.info('decision abort finished, result: ', result);
+            });
+        };
+
         $scope.updatePoolDecisionApproval = function (poolId, decision) {
             $log.info('updatePoolDecision, poolId: ', poolId, ', decisionId: ', decision.id);
             AdminPoolCrudService.updatePoolDecisionApproval(poolId, decision).then(

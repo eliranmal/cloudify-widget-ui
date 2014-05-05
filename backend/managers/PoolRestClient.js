@@ -249,10 +249,13 @@ exports.readPoolDecisions = function (poolKey, poolId, callback) {
     logger.info('reading pool decisions in pool [%s]', poolId);
     call.get('/admin/pools/${poolId}/decisions', _args().poolKey(poolKey).poolId(poolId), callback);
 };
+exports.abortPoolDecision = function (poolKey, poolId, decisionId, callback) {
+    logger.info('aborting pool decision [%s] in pool [%s]', decisionId, poolId);
+    call.post('/admin/pools/${poolId}/decisions/${decisionId}/abort', _args().poolKey(poolKey).poolId(poolId).decisionId(decisionId), callback);
+};
 exports.updatePoolDecisionApproval = function (poolKey, poolId, decisionId, approved, callback) {
     logger.info('updating pool decision [%s] in pool [%s]', decisionId, poolId);
-    call.post('/admin/pools/${poolId}/decisions/${decisionId}/approved/${approved}',
-        _args().poolKey(poolKey).poolId(poolId).decisionId(decisionId).approved(approved), callback);
+    call.post('/admin/pools/${poolId}/decisions/${decisionId}/approved/${approved}', _args().poolKey(poolKey).poolId(poolId).decisionId(decisionId).approved(approved), callback);
 };
 
 exports.readCloudNodes = function (poolKey, poolId, callback) {

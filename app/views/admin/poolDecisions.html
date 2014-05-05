@@ -11,6 +11,7 @@
                 <th>Approved</th>
                 <th>Executed</th>
                 <th>Details</th>
+                <th colspan="1">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -21,6 +22,9 @@
                 <td><input type="checkbox" ng-model="decision.approved" ng-change="updatePoolDecisionApproval(model.poolId, decision)" /></td>
                 <td>{{ decision.executed }}</td>
                 <td><pre>{{ asJson(decision.details) | json }}</pre></td>
+                <td>
+                    <button ng-click="abortPoolDecision(model.poolId, decision.id)">abort decision</button>
+                </td>
             </tr>
         </tbody>
     </table>

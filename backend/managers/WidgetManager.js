@@ -200,7 +200,7 @@ function _downloadRecipe(curryParams, curryCallback) {
 function _occupyMachine(curryParams, curryCallback) {
     logger.trace('-play- occupyMachine');
 
-    managers.poolClient.occupyPoolNode(curryParams.poolKey, curryParams.widget.poolId, function (err, result) {
+    managers.poolClient.occupyPoolNode(curryParams.poolKey, curryParams.widget.poolId, curryParams.widget.expires, function (err, result) {
 
         if (!!err) {
             logger.error('occupy node failed');

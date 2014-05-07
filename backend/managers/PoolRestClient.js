@@ -227,9 +227,9 @@ exports.bootstrapPoolNode = function (poolKey, poolId, nodeId, callback) {
     logger.info('bootstrapping machine');
     call.post('/admin/pools/${poolId}/nodes/${nodeId}/bootstrap', _args().poolKey(poolKey).poolId(poolId).nodeId(nodeId), callback);
 };
-exports.occupyPoolNode = function (poolKey, poolId, callback) {
+exports.occupyPoolNode = function (poolKey, poolId, expires, callback) {
     logger.info('occupying machine in pool');
-    call.get('/account/pools/${poolId}/occupy', _args().poolKey(poolKey).poolId(poolId), callback);
+    call.get('/account/pools/${poolId}/occupy', _args().poolKey(poolKey).poolId(poolId).data(expires), callback);
 };
 
 exports.readPoolErrors = function (poolKey, poolId, callback) {

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('AdminPoolCrudCtrl', function ($scope, $log, $routeParams, $interval, AdminPoolCrudService) {
+    .controller('AdminPoolCrudCtrl', function ($scope, $log, $routeParams, $interval, AdminPoolCrudService, $rootScope) {
 
         $scope.model = {
             accountId: $routeParams.accountId,
@@ -163,7 +163,13 @@ angular.module('cloudifyWidgetUiApp')
 
 
         var refreshInterval = $interval(function () {
+
             // TODO create child controllers and separate behaviors so we wouldn't have to call every getter
+
+            if (!$rootScope.autoRefresh) {
+                return;
+            }
+
 //            $scope.getUsers();
 //            $scope.getPools();
             $log.debug('- - - refresh interval - - -');

@@ -200,11 +200,15 @@ function _downloadRecipe(curryParams, curryCallback) {
 function _occupyMachine(curryParams, curryCallback) {
     logger.trace('-play- occupyMachine');
 
-    managers.poolClient.occupyPoolNode(curryParams.poolKey, curryParams.widget.poolId, curryParams.widget.expires, function (err, result) {
+    // TODO better defense
+    var expires = Date.now() + (curryParams.widget.installTimeout * 60 * 1000);
+    logger.info('installation will expire within [%s] minutes - at [%s], or [%s] epoch time', curryParams.widget.installTimeout, Date(expires), expires);
+
+    managers.poolClient.occupyPoolNode(curryParams.poolKey, curryParams.widget.poolId, expires, function (err, result) {
 
         if (!!err) {
             logger.error('occupy node failed');
-            curryCallback(new Error('failed to occupy node'), curryParams);
+            curryCallback(err, curryParams);
             return;
         }
 

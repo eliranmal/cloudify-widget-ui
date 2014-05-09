@@ -4,7 +4,7 @@
     Product Version(*) : <input type="text" ng-model="widget.productVersion"/><br/>
     Title (*) : <input type="text" ng-model="widget.title"/><br/>
     Recipe Name (*) : <input type="text" ng-model="widget.recipeName"/><br/>
-    Recipe URL : <input type="text" ng-model="widget.recipeUrl"/><br/>
+    Recipe URL (*): <input type="text" ng-model="widget.recipeUrl"/><br/>
     Provider URL (*) : <input type="text" ng-model="widget.providerUrl"/><br/>
 </p>
 
@@ -12,34 +12,33 @@
     Embed Video Snippet : <input type="text" ng-model="widget.embedVideoSnippet"/><br/>
     Console Link Title : <input type="text" ng-model="widget.consoleLink.title"/><br/>
     Console Link URL : <input type="text" ng-model="widget.consoleLink.url"/><br/>
+
     Console URL Service : <input type="text" ng-model="widget.urlService"/><br/>
-    <span>
-        required for the link on remote bootstrap
-    </span>
+    <sup>required for the link on remote bootstrap</sup><br/>
+
     Uninstall name: <input type="text" ng-model="widget.uninstallName"/><br/>
-    <span>
-        To enable the widget to stop on remote bootstrap
-    </span>
-    <br/>
+    <sup>To enable the widget to stop on remote bootstrap</sup><br/>
 
-    Recipe Root Path : <input type="text" ng-model="widget.recipeRootPath"/><br/>
-    Recipe Type : <select ng-model="widget.recipeType" ng-options="t.label for t in recipeTypes"></select><br/>
+    Recipe Root Path (*): <input type="text" ng-model="widget.recipeRootPath"/><br/>
+    <sup>the path to the recipe folder inside the downloaded zip</sup><br/>
 
+    Recipe Type (*): <select ng-model="widget.recipeType" ng-options="t.label for t in recipeTypes"></select><br/>
 
+    Pool Id (*): <input type="text" ng-model="widget.poolId"/><br/>
+
+    Installation timeout: (minutes): <input type="text" ng-model="widget.installTimeout" /><br/>
 </p>
 
 <p>
-    Show advanced  : <input type="checkbox" ng-model="widget.showAdvanced"/><br/>
+    Show advanced : <input type="checkbox" ng-model="widget.showAdvanced"/><br/>
     Theme : <select ng-model="theme" ng-options="c.label for c in themes"></select><br/>
-    Installation timeout: <input type="text" ng-model="widget.installTimeout"/><br/>
-    HTML Snippet in Advanced Location ( Use only if show advanced is false, this HTML will display once the widget is played in the same location advanced form is displayed ):
+</p>
+
+<p>
+    HTML Snippet in Advanced Location ( Use only if show advanced is false, this HTML will display once the widget is played in the same location advanced form is displayed ):<br/>
     <textarea ng-model="widget.advancedMessage"></textarea>
 </p>
 
-
-<p>
-    Pool Id : <input type="text" ng-model="widget.poolId"/>
-</p>
 
 
 <p>

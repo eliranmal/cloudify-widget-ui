@@ -23,8 +23,9 @@ start() {
     return 1
   fi
   echo 'Starting service...' >&2
-  local CMD="$SCRIPT &> \"$LOGFILE\" & echo \$!"
-  su -c "$CMD" $RUNAS > "$PIDFILE"
+  local CMD="$SCRIPT &> \"$LOGFILE\" "
+  echo "CMD is [$CMD]"
+  su -c "$CMD" $RUNAS
   echo 'Service started' >&2
 }
 
@@ -74,6 +75,6 @@ case "$1" in
     start
     ;;
   *)
-    echo "Usage: $0 {start|stop|restart}"
+    echo "Usage: $0 {start|stop|restart|upgrade|status}"
 esac
 

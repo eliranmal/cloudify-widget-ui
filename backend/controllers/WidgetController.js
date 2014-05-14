@@ -1,4 +1,5 @@
 var managers = require('../managers');
+var _ = require('lodash');
 var logger = require('log4js').getLogger('WidgetController');
 
 exports.list = function (req, res) {
@@ -20,15 +21,50 @@ exports.list = function (req, res) {
     })
 };
 
+function getWidgetPublicParams( widget ){
+    var result = _.pick(widget, 'showAdvanced', 'productName','productVersion','title','providerUrl','_id','login','showAdvanced', 'socialLogin');
+    if ( result.hasOwnProperty('socialLogin')) {
+        result.socialLogin = _.pick(result.socialLogin, 'data');
+    }
+    return result;
+
+}
+
+exports.getPublicInfo = function( req, res ){
+    var widgetId = req.params.widgetId;
+
+
+    managers.db.connect('widgets', function(db, collection, done){
+        collection.findOne( { '_id' : managers.db.toObjectId(widgetId)}, function( err, result ){
+            if ( !!err ){
+                res.send(500, {'message' : 'unable to find widget' + err.message});
+                done();
+                return;
+            }
+            if ( !result || !!result.disabled ){ // by default widgets should be enabled.
+                res.send( 404, { 'message' : 'unable to find widget with id ' + widgetId});
+                done();
+                return;
+            }
+
+            res.send(getWidgetPublicParams(result));
+        })
+    })
+
+
+} ;
+
 exports.read = function( req, res ){
     var widgetId = req.params.widgetId;
-    if ( isNaN(parseInt(widgetId)) ){
-        logger.info('widget id is not a number ::' + widgetId);
-        res.send(500, 'widgetId is not a number :: ' + widgetId);
-        return;
+
+    var widgetFilter = { '_id' : managers.db.toObjectId(widgetId) };
+
+    if ( !req.user.isAdmin ){
+       widgetFilter['userId'] = req.user._id;
     }
+
     managers.db.connect('widgets', function(db, collection, done){
-       collection.findOne({'_id' : managers.db.toObjectId(widgetId), 'userId' : req.user._id }, function (err, result){
+       collection.findOne( widgetFilter , function (err, result){
            if ( !!err ){
                res.send(500, {'message' : 'unable to find widget ' + err.message});
                done();

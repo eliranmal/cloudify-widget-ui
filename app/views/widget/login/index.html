@@ -1,0 +1,7 @@
+<h4>Widget Requires User Details</h4>
+
+<div>
+    <div ng-repeat="login in loginTypes(widget.socialLogin.data)">
+        <a ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">{{login.label}}</a>
+    </div>
+</div>

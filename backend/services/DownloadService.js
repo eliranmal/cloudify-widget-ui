@@ -8,42 +8,46 @@ var AdmZip = require('adm-zip');
 var files = require('./FilesService');
 
 exports.downloadRecipe = function (options, callback) {
+    try {
+        var destDir = options.destDir,
+            cloudifyRecipeUrl = options.recipeUrl;
 
-    var destDir = options.destDir,
-        cloudifyRecipeUrl = options.recipeUrl;
+        if (!destDir) {
+            throw new Error('destination directory parameter is missing');
+        }
 
-    if (!destDir) {
-        throw new Error('destination directory parameter is missing');
-    }
+        if (!cloudifyRecipeUrl) {
+            throw new Error('Cloudify Recipe url parameter is missing');
+        }
 
-    if (!cloudifyRecipeUrl) {
-        throw new Error('Cloudify Recipe url parameter is missing');
-    }
+        logger.debug('making destination dir [' + destDir + ']');
+        files.mkdirp(destDir);
+        var recipeZipFile = destDir + path.sep + 'recipe.zip';
 
-    logger.debug('making destination dir [' + destDir + ']');
-    files.mkdirp(destDir);
-    var recipeZipFile = destDir + path.sep + 'recipe.zip';
+        logger.debug('fetching zip from url [' + cloudifyRecipeUrl + ']');
 
-    logger.debug('fetching zip from url [' + cloudifyRecipeUrl + ']');
+        var file = fs.createWriteStream(recipeZipFile);
 
-    var file = fs.createWriteStream(recipeZipFile);
-
-    var protocol = http;
-    if ( cloudifyRecipeUrl.indexOf('https') === 0 ){
-        protocol = https;
-    }
-    protocol.get(cloudifyRecipeUrl, function (response) {
-        logger.debug('saving zip');
-        response.pipe(file);
-        file.on('finish', function () {
-            file.close();
-            logger.debug('zip saved successfully [' + recipeZipFile + ']');
-            var zip = new AdmZip(recipeZipFile);
-            zip.extractAllTo(destDir, true);
-            logger.debug('zip extracted to [' + destDir + ']');
-            callback && typeof callback === 'function' && callback(null);
+        var protocol = http;
+        if (cloudifyRecipeUrl.indexOf('https') === 0) {
+            protocol = https;
+        }
+        protocol.get(cloudifyRecipeUrl, function (response) {
+            logger.debug('saving zip');
+            response.pipe(file);
+            file.on('finish', function () {
+                file.close();
+                logger.debug('zip saved successfully [' + recipeZipFile + ']');
+                var zip = new AdmZip(recipeZipFile);
+                zip.extractAllTo(destDir, true);
+                logger.debug('zip extracted to [' + destDir + ']');
+                callback && typeof callback === 'function' && callback(null);
+            });
         });
-    });
+    }catch(e){
+        logger.error(e);
+//        callback(e);
+    }
 };
 
 if (require.main === module) {

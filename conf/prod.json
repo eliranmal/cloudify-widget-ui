@@ -6,6 +6,23 @@
     "downloadsDir" : "/var/opt/cloudify-widget/downloads",
     "mongodbUrl": null,
     "adminUser" : null,
+    "linkedIn": {
+        "apiKey" : "linkedin_api_key",
+        "secretKey" : "linkedin_secret_key"
+    },
+    "twitter" : {
+        "apiKey" : "twitter_api_key",
+        "secretKey" : "twitter_secret_key"
+    },
+
+    "facebook" : {
+        "apiKey" : "facebook_api_key",
+        "secretKey" : "facebook_secret_key"
+    },
+    "github" : {
+        "apiKey" : "github_api_key",
+        "secretyKey" : "github_secret_key"
+    },
     "poolRestUrl" :{
         "protocol" : "http",
         "domain" : "localhost",

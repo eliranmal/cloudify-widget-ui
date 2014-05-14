@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCtrl', function ($scope, WidgetsService, $log, $routeParams, PostParentService, $localStorage, $timeout, $window) {
+    .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window,  $routeParams, PostParentService, $localStorage, $timeout) {
+
+        $window.$windowScope = $scope;
 
         $scope.collapseAdvanced = false;
         $scope.widgetStatus = {};
@@ -71,8 +73,33 @@ angular.module('cloudifyWidgetUiApp')
             }
         }
 
+        // use this with the following from the popup window:
+        //
+        $scope.loginDone = function( ){
+            $log.info('login is done');
+            if ( popupWindow !== null ){
+                popupWindow.close();
+                popupWindow = null;
+            }
 
+            $scope.loginDetails = {};   // we will verify this in the backend
+            $timeout(function(){$scope.play();}, 0);
+        };
+
+        var popupWindow = null;
         $scope.play = function () {
+
+            if ( !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.data  && $scope.widget.socialLogin.data.length > 0 && !$scope.loginDetails ){
+
+                var size = LoginTypesService.getIndexSize();
+
+                var left = (screen.width/2)-(size.width/2);
+                var top = (screen.height/2)-(size.height/2);
+
+                popupWindow = window.open( '/#/widgets/' + $scope.widget._id + '/login/index', 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
+                return;
+            }
+
             _resetWidgetStatus();
             $scope.widgetStatus.state = play;
             console.log('before check advanced');
@@ -124,12 +151,12 @@ angular.module('cloudifyWidgetUiApp')
                 }, function (err) {
                     $log.error(err);
                 });
-        };
+        }
 
 
         $scope.getFormPath = function (widget) {
             if (widget.remoteBootstrap && widget.remoteBootstrap.cloudifyForm) {
-                return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html'
+                return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html';
             }
             return '';
         };

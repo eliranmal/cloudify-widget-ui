@@ -473,3 +473,27 @@ function getTempSuffix() {
     var currTime = '' + new Date().getTime();
     return currTime.substring(currTime.length - 4);
 }
+
+
+exports.findById = function( widgetId , callback ){
+    logger.info(widgetId);
+    managers.db.connect('widgets', function (db, collection, done) {
+        collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {
+            if (!!err) {
+                logger.error('unable to find widget', err);
+                done();
+                callback(err);
+                return;
+            }
+
+            if (!result) {
+                logger.error('result is null for widget find');
+                done();
+                callback(new Error('could not find widget'));
+                return;
+            }
+            done();
+            callback(null, result);
+        });
+    });
+};

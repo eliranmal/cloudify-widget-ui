@@ -27,9 +27,9 @@ upgrade_main(){
     SYSCONFIG_FILE=widget-ui read_sysconfig
 
 
-
-     echo "installing ui npm package from [ $PACKAGE_URL ]"
     PACKAGE_URL=http://get.gsdev.info/cloudify-widget-ui/1.0.0/cloudify-widget-ui-1.0.0.tgz
+     echo "installing ui npm package from [ $PACKAGE_URL ]"
+
      mkdir -p /var/www/cloudify-widget-ui
      npm install $PACKAGE_URL -g --prefix /var/www/cloudify-widget-ui
 
@@ -42,12 +42,12 @@ upgrade_main(){
 
     echo "installing initd script"
     INSTALL_LOCATION=/var/www/cloudify-widget-ui/lib/node_modules/cloudify-widget-ui
-    echo "installing service script under widget-pool"
+    echo "installing service script under widget-ui"
     SERVICE_NAME=widget-ui SERVICE_FILE=$INSTALL_LOCATION/build/service.sh install_initd_script
 
     echo "installing me.conf"
     check_exists ME_CONF_URL;
-    check_exists SYSCONF_URL;
+
 
 
     mkdir -p $INSTALL_LOCATION/conf/dev
@@ -56,6 +56,11 @@ upgrade_main(){
 
     echo "installing/upgrading cloudify from [ $CLOUDIFY_URL ]"
     install_cloudify
+
+    dos2unix $INSTALL_LOCATION/build/nginx.conf
+    source $INSTALL_LOCATION/build/nginx.conf | dos2unix > /etc/nginx/sites-enabled/widget-ui.conf
+    service nginx restart
+
 
     echo "service widget-ui"
     service widget-ui

@@ -1,4 +1,4 @@
-var dbManager = require('./DbManager');
+var dbManager = require('../managers').db;
 var logger = require('log4js').getLogger('widgetMiddleware');
 
 

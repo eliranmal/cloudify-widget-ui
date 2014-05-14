@@ -5,13 +5,25 @@
 var express = require('express')
     , controllers = require('./backend/controllers')
     , logger = require('log4js').getLogger('server')
-    , managers = require('./backend/managers');
+    , managers = require('./backend/managers')
+    , middleware = require('./backend/middleware');
+
+var passport = require('passport');
+var conf = require('./backend/Conf');
+var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
+var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
+var errorHandler = require('errorhandler');
+
+
+
 
 var app = module.exports = express();
 
 // Configuration
 var conf = require('./backend/Conf');
-console.log(JSON.stringify(conf));
+logger.info(JSON.stringify(conf));
 
 if ( !!conf.adminUser ){
     conf.adminUser.passwordConfirm = conf.adminUser.password;
@@ -28,30 +40,28 @@ if ( !!conf.adminUser ){
     })
 }
 
-app.configure(function(){
-    app.set('views', __dirname + '/views');
-    app.set('view engine', 'jade');
-    app.use(express.bodyParser());
-    app.use(express.methodOverride());
-    app.use(express.cookieParser());
-    app.use(express.cookieSession({ secret: 'your secret here' }));
-    app.use('/backend/user', managers.middleware.loggedUser);
-    app.use('/backend/admin', managers.middleware.loggedUser);
-    app.use('/backend/admin', managers.middleware.adminUser);
-    app.use(app.router);
 
-});
+app.use(middleware.requestInfo.origin);
+app.use(bodyParser());
+app.use(methodOverride());
+app.use(passport.initialize());
+app.use(cookieParser());
+logger.info('configuring express');
+app.use(cookieSession({ 'secret': 'somesecret' }));
+app.use('/backend/user', middleware.session.loggedUser);
+app.use('/backend/admin', middleware.session.loggedUser);
+app.use('/backend/admin', middleware.session.adminUser);
 
-app.configure('development', function(){
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-});
 
-app.configure('production', function(){
-    app.use(express.errorHandler());
-});
+
+
+
+//app.use(function( err ){
+//    logger.error('using error handler', err);
+//});
+app.all('*',errorHandler({ dumpExceptions: true, showStack: true }));
 
 // Routes
-
 app.post('/backend/signup', controllers.session.signup);
 app.post('/backend/login', controllers.session.login );
 app.post('/backend/logout', controllers.session.logout);
@@ -60,7 +70,7 @@ app.post('/backend/user/widgets', controllers.widgets.create);
 app.post('/backend/user/widgets/:widgetId/delete', controllers.widgets.delete);
 app.get('/backend/user/widgets/:widgetId', controllers.widgets.read);
 app.post('/backend/user/widgets/:widgetId/update', controllers.widgets.update);
-app.post('/backend/user/widgets/:widgetId/play', controllers.widgets.play);
+app.post('/backend/user/widgets/:widgetId/play', function(req, res, next){ try{controllers.widgets.play(req, res)}catch(e){ logger.info('excepton caught'); next(e); }});
 app.post('/backend/user/widgets/:widgetId/play/remote', controllers.widgets.playRemote);
 app.post('/backend/user/widgets/:widgetId/executions/:executionId/stop', controllers.widgets.stop );
 app.get('/backend/user/widgets/:widgetId/executions/:executionId/status', controllers.widgets.getStatus );
@@ -104,7 +114,31 @@ app.get('/backend/user/account/pools/:poolId/status', controllers.pool.accountRe
 app.get('/backend/user/account/pools/status', controllers.pool.accountReadPoolsStatus);
 
 
+app.get('/backend/widgets/:widgetId', controllers.widgets.getPublicInfo);
+app.get('/backend/widgets/login/types', controllers.widgetLogin.getTypes);
+app.get('/backend/widgets/:widgetId/login/:loginType', controllers.widgetLogin.widgetLogin);
+app.post('/backend/widgets/:widgetId/login/custom',
+    function(req,res,next){ req.params.loginType = 'custom'; next(); },
+    controllers.widgetLogin.widgetLogin,
+    function(req, res ){
+        res.send(200);
+    }
+);
+app.get('/backend/widgets/:widgetId/login/:loginType/callback', controllers.widgetLogin.widgetLoginCallback);
+
+
+
+
+
+
+
 var widgetPort = process.argv[2] || 9001;
+
+
 var server = app.listen(widgetPort, function(){
-    console.log("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
+    logger.info("Express server listening on port %d in %s mode", server.address().port, app.settings.env);
 });
+
+//process.on('uncaughtException', function(){
+//    logger.error('an error has occurred', arguments);
+//});

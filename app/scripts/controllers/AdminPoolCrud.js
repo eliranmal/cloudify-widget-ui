@@ -148,7 +148,7 @@ angular.module('cloudifyWidgetUiApp')
         $scope.updatePoolDecisionApproval = function (poolId, decision) {
             $log.info('updatePoolDecision, poolId: ', poolId, ', decisionId: ', decision.id);
             AdminPoolCrudService.updatePoolDecisionApproval(poolId, decision).then(
-                function (result) {
+                function (/*result*/) {
                     $log.info('pool decision approval updated, refreshing all decisions');
                     $scope.getPoolDecisions(poolId);
                 }, function (err) {

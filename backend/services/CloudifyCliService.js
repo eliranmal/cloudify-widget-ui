@@ -117,6 +117,7 @@ exports.readConfigurationFromFile = function (opts) {
     var files = fs.readdirSync(newDir);
 
     if (files.length == 0 || files.indexOf('stop') >= 0) {
+        logger.debug('no files found, aborting');
         return null;
     }
 
@@ -126,9 +127,18 @@ exports.readConfigurationFromFile = function (opts) {
         fs.mkdirSync(workfile);
     }
 
-    fs.renameSync(newDir + workfile, executingDir + workfile);
+    var executingDir = opts.executingDir;
+    logger.debug(' reading execConfiguration from file', opts);
+    if (!fs.existsSync(executingDir)) {
+        logger.debug('[%s] directory does not exist. nothing to do', executingDir);
+        return null;
+    }
 
-    var fileContent = fs.readFileSync(executingDir + workfile);
+    var filePath = path.join(newDir, workfile);
+    var executingFilePath = path.join(executingDir, workfile);
+    fs.renameSync(filePath, executingFilePath);
+
+    var fileContent = fs.readFileSync(executingFilePath);
 
     return JSON.parse(fileContent);
 };

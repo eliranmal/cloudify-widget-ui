@@ -27,5 +27,10 @@
         "protocol" : "http",
         "domain" : "localhost",
         "port" : "8011"
+    },
+    "cloudifyCliService": {
+        "newDir": "/var/opt/cloudify-widget/cli-service/new",
+        "executingDir": "/var/opt/cloudify-widget/cli-service/executing"
     }
+
 }

@@ -117,7 +117,7 @@
 
   #patent_pending {
     font-size: 10px;
-    top: 13px;
+    top: 11px;
     left: 238px;
     list-style-type: none;
     position: absolute;
@@ -209,11 +209,16 @@
     }
   }
 
-  #footer {
-    font-size: 12px;
+  .widget-footer {
     position: absolute;
-    top: 425px;
-    width: 580px;
+    top: 435px;
+    left: 30px;
+    width: 560px;
+    font-size: 12px;
+  }
+
+  .share_link {
+    margin: 0;
   }
 
   .brand_btns {

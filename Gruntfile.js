@@ -68,10 +68,22 @@ module.exports = function (grunt) {
                     host: 'localhost',
                     port: 9001,
                     https: false,
-                    changeOrigin: false,
+                    changeOrigin: true,
                     xforward: false
                 }
             ],
+/*
+            proxiesProd: [
+                {
+                    context: '/backend',
+                    host: 'widgetui.gsdev.info',
+                    port: 80,
+                    https: false,
+                    changeOrigin: true,
+                    xforward: false
+                }
+            ],
+*/
             livereload: {
                 options: {
                     middleware: function (connect) {

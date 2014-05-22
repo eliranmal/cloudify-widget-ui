@@ -47,14 +47,13 @@ angular.module('cloudifyWidgetUiApp')
                 };
 
                 $scope.compileToText = function () {
-                    console.log('compile to text');
                     TextContentCompiler.asText($scope, $element, 'iframe', ['ng-src']);
                 };
 
             },
             link: function postLink(scope, element, attrs) {
 
-                if (attrs.asText) {
+                if (attrs.asCode) {
                     scope.compileToText();
                 }
             }

@@ -3,7 +3,6 @@
 angular.module('cloudifyWidgetUiApp')
     .controller('WidgetViewCtrl', function ($scope, WidgetsService, $routeParams) {
 
-
         WidgetsService.getWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result;
         });

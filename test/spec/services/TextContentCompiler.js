@@ -10,9 +10,11 @@ describe('Service: TextContentCompiler', function () {
   beforeEach(inject(function (_TextContentCompiler_) {
     TextContentCompiler = _TextContentCompiler_;
   }));
+/*
 
   it('should do something', function () {
     expect(!!TextContentCompiler).toBe(true);
   });
+*/
 
 });

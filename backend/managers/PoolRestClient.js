@@ -180,23 +180,28 @@ exports.adminReadAccountPools = function (poolKey, accountId, callback) {
     call.get('/admin/accounts/${accountId}/pools', _args().poolKey(poolKey).accountId(accountId), callback);
 };
 
-exports.createAccountPools = function (poolKey, accountId, poolSettings, callback) {
+exports.createAccountPool = function (poolKey, accountId, poolSettings, callback) {
     logger.info('creating new pool for account ::' + accountId);
     call.post('/admin/accounts/${accountId}/pools', _args().poolKey(poolKey).accountId(accountId).data(poolSettings), callback);
 };
 
-exports.updateAccountPools = function (poolKey, accountId, poolId, poolSettings, callback) {
-    logger.info('updating account [%s] pool [%s] ', accountId, poolId);
+exports.updateAccountPool = function (poolKey, accountId, poolId, poolSettings, callback) {
+    logger.info('updating pool, account [%s] pool [%s] ', accountId, poolId);
     call.post('/admin/accounts/${accountId}/pools/${poolId}', _args().poolKey(poolKey).accountId(accountId).poolId(poolId).data(poolSettings), callback);
 };
 
-exports.deleteAccountPools = function (poolKey, accountId, poolId, callback) {
-    logger.info('deleting account [%s] pool [%s]', accountId, poolId);
+exports.deleteAccountPool = function (poolKey, accountId, poolId, callback) {
+    logger.info('deleting pool, account [%s] pool [%s]', accountId, poolId);
     call.post('/admin/accounts/${accountId}/pools/${poolId}/delete', _args().poolKey(poolKey).accountId(accountId).poolId(poolId), callback);
 };
 
+exports.cleanAccountPool = function (poolKey, accountId, poolId, callback) {
+    logger.info('cleaning pool, account [%s] pool [%s]', accountId, poolId);
+    call.post('/admin/accounts/${accountId}/pools/${poolId}/clean', _args().poolKey(poolKey).accountId(accountId).poolId(poolId), callback);
+};
+
 exports.readAccountPool = function (poolKey, accountId, poolId, callback) {
-    logger.info('reading account [%s] pool [%s]', accountId, poolId);
+    logger.info('reading pool, account [%s] pool [%s]', accountId, poolId);
     call.get('/admin/accounts/${accountId}/pools/${poolId}', _args().poolKey(poolKey).accountId(accountId).poolId(poolId), callback);
 };
 

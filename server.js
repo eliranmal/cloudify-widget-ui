@@ -83,10 +83,11 @@ domain.run(function () {
     app.get('/backend/admin/pools', controllers.pool.adminReadPools);
 
     app.get('/backend/admin/accounts/:accountId/pools', controllers.pool.adminReadAccountPools);
-    app.post('/backend/admin/accounts/:accountId/pools', controllers.pool.createAccountPools);
-    app.post('/backend/admin/accounts/:accountId/pools/:poolId', controllers.pool.updateAccountPools);
-    app.post('/backend/admin/accounts/:accountId/pools/:poolId/delete', controllers.pool.deleteAccountPools);
+    app.post('/backend/admin/accounts/:accountId/pools', controllers.pool.createAccountPool);
     app.get('/backend/admin/accounts/:accountId/pools/:poolId', controllers.pool.adminReadAccountPool);
+    app.post('/backend/admin/accounts/:accountId/pools/:poolId', controllers.pool.updateAccountPool);
+    app.post('/backend/admin/accounts/:accountId/pools/:poolId/delete', controllers.pool.deleteAccountPool);
+    app.post('/backend/admin/accounts/:accountId/pools/:poolId/clean', controllers.pool.cleanAccountPool);
 
     app.get('/backend/admin/pools/status', controllers.pool.readPoolsStatus);
     app.get('/backend/admin/pools/:poolId/status', controllers.pool.readPoolStatus);

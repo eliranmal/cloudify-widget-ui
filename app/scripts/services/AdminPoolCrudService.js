@@ -37,6 +37,10 @@ angular.module('cloudifyWidgetUiApp')
                 return $http.post('/backend/admin/accounts/' + accountId + '/pools/' + poolId + '/delete');
             };
 
+            this.cleanAccountPool = function (accountId, poolId) {
+                return $http.post('/backend/admin/accounts/' + accountId + '/pools/' + poolId + '/clean');
+            };
+
             this.getPoolStatus = function (poolId) {
                 return $http.get('/backend/admin/pools/' + poolId + '/status');
             };

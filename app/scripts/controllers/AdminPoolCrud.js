@@ -68,6 +68,13 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.cleanAccountPool = function (accountId, poolId) {
+            $log.info('cleanAccountPool, accountId: ', accountId, ', poolId: ', poolId);
+            AdminPoolCrudService.cleanAccountPool(accountId, poolId).then(function (/*result*/) {
+                $log.debug('clean pool initiated successfully');
+            });
+        };
+
         $scope.getPoolStatus = function (poolId) {
             AdminPoolCrudService.getPoolStatus(poolId).then(function (result) {
                 $log.debug('got pool detailed status ', result.data);

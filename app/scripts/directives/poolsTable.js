@@ -8,7 +8,8 @@ angular.module('cloudifyWidgetUiApp')
             scope: {
                 pools: '=ngModel',
                 updateAccountPool: '=updateFn',
-                deleteAccountPool: '=deleteFn'
+                deleteAccountPool: '=deleteFn',
+                cleanAccountPool: '=cleanFn'
             },
             controller: function ($scope, $element, $rootScope) {
 

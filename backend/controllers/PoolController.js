@@ -33,16 +33,20 @@ exports.adminReadAccountPools = function( req, res ){
 };
 
 
-exports.createAccountPools = function( req, res ){
-    managers.poolClient.createAccountPools(req.user.poolKey, req.params.accountId, req.body, _callback(res));
+exports.createAccountPool = function( req, res ){
+    managers.poolClient.createAccountPool(req.user.poolKey, req.params.accountId, req.body, _callback(res));
 };
 
-exports.updateAccountPools = function( req, res ){
-    managers.poolClient.updateAccountPools(req.user.poolKey, req.params.accountId, req.params.poolId, req.body, _callback(res));
+exports.updateAccountPool = function( req, res ){
+    managers.poolClient.updateAccountPool(req.user.poolKey, req.params.accountId, req.params.poolId, req.body, _callback(res));
 };
 
-exports.deleteAccountPools = function( req, res ){
-    managers.poolClient.deleteAccountPools(req.user.poolKey, req.params.accountId, req.params.poolId, _callback(res));
+exports.deleteAccountPool = function( req, res ){
+    managers.poolClient.deleteAccountPool(req.user.poolKey, req.params.accountId, req.params.poolId, _callback(res));
+};
+
+exports.cleanAccountPool = function( req, res ){
+    managers.poolClient.cleanAccountPool(req.user.poolKey, req.params.accountId, req.params.poolId, _callback(res));
 };
 
 exports.adminReadAccountPool = function( req, res ){

@@ -98,7 +98,7 @@ domain.run(function () {
     app.post('/backend/admin/pools/:poolId/nodes/:nodeId/bootstrap', controllers.pool.bootstrapPoolNode);
 
     app.get('/backend/admin/pools/:poolId/errors', controllers.pool.readPoolErrors);
-    app.get('/backend/admin/pools/:poolId/errors/delete', controllers.pool.deletePoolErrors);
+    app.post('/backend/admin/pools/:poolId/errors/delete', controllers.pool.deletePoolErrors);
     app.get('/backend/admin/pools/:poolId/tasks', controllers.pool.readPoolTasks);
     app.get('/backend/admin/pools/:poolId/tasks/:taskId/delete', controllers.pool.deletePoolTask);
     app.get('/backend/admin/pools/:poolId/decisions', controllers.pool.readPoolDecisions);

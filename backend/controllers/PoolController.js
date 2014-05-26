@@ -78,6 +78,9 @@ exports.bootstrapPoolNode = function( req, res ){
 exports.readPoolErrors = function( req, res ){
     managers.poolClient.readPoolErrors(req.user.poolKey, req.params.poolId, _callback(res));
 };
+exports.deletePoolErrors = function( req, res ){
+    managers.poolClient.deletePoolErrors(req.user.poolKey, req.params.poolId, _callback(res));
+};
 exports.readPoolTasks = function( req, res ){
     managers.poolClient.readPoolTasks(req.user.poolKey, req.params.poolId, _callback(res));
 };

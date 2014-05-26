@@ -241,6 +241,10 @@ exports.readPoolErrors = function (poolKey, poolId, callback) {
     logger.info('reading pool errors in pool [%s]', poolId);
     call.get('/admin/pools/${poolId}/errors', _args().poolKey(poolKey).poolId(poolId), callback);
 };
+exports.deletePoolErrors = function (poolKey, poolId, callback) {
+    logger.info('deleting pool errors in pool [%s]', poolId);
+    call.post('/admin/pools/${poolId}/errors/delete', _args().poolKey(poolKey).poolId(poolId), callback);
+};
 exports.readPoolTasks = function (poolKey, poolId, callback) {
     logger.info('reading pool tasks in pool [%s]', poolId);
     call.get('/admin/pools/${poolId}/tasks', _args().poolKey(poolKey).poolId(poolId), callback);

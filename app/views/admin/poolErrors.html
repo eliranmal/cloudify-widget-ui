@@ -6,7 +6,8 @@
         <thead>
             <tr>
                 <th>Error ID</th>
-                <th>Task Name</th>
+                <th>Timestamp</th>
+                <th>Source</th>
                 <th>Pool Settings ID</th>
                 <th>Message</th>
                 <th>Info</th>
@@ -15,7 +16,8 @@
         <tbody>
             <tr ng-repeat="error in model.poolErrors">
                 <td>{{ error.id }}</td>
-                <td>{{ error.taskName }}</td>
+                <td>{{ error.timestamp | date:'medium' }}</td>
+                <td>{{ error.source }}</td>
                 <td>{{ error.poolId }}</td>
                 <td><pre>{{ error.message }}</pre></td>
                 <td><pre>{{ asJson(error.info) | json }}</pre></td>

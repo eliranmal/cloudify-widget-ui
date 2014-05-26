@@ -123,6 +123,13 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.deletePoolErrors = function (poolId) {
+            $log.debug('deletePoolErrors, poolId: ', poolId);
+            AdminPoolCrudService.deletePoolErrors(poolId).then(function (/*result*/) {
+                $scope.getPoolErrors(poolId);
+            });
+        };
+
         $scope.getPoolTasks = function (poolId) {
             $log.debug('getPoolTasks, poolId: ', poolId);
             AdminPoolCrudService.getPoolTasks(poolId).then(function (result) {

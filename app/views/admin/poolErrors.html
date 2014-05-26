@@ -2,6 +2,7 @@
     <a href="#/admin/pools">back to all pools</a>
 
     <h3>Errors for pool {{ model.poolId }}</h3>
+    <button ng-click="deletePoolErrors(model.poolId)">clear errors</button>
     <table ng-init="getPoolErrors(model.poolId)">
         <thead>
             <tr>

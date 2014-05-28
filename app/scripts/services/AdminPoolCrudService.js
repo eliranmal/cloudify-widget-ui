@@ -66,7 +66,7 @@ angular.module('cloudifyWidgetUiApp')
             };
 
             this.deletePoolErrors = function (poolId) {
-                return $http.post('/backend/admin/pools/' + poolId + '/errors/delete')
+                return $http.post('/backend/admin/pools/' + poolId + '/errors/delete');
             };
 
             this.getPoolErrors = function (poolId) {

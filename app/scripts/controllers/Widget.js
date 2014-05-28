@@ -103,38 +103,39 @@ angular.module('cloudifyWidgetUiApp')
             _resetWidgetStatus();
             $scope.widgetStatus.state = play;
             console.log('before check advanced');
-            var options =  _hasAdvanced() ? _getAdvanced() : null;
-            console.log('After check advanced, options=', options, '_hasAdvanced()=', _hasAdvanced() );
+            var advancedParams =  _hasAdvanced() ? _getAdvanced() : null;
+            console.log('After check advanced, options=', advancedParams, '_hasAdvanced()=', _hasAdvanced() );
 
-            if ($scope.widget.remoteBootstrap && $scope.widget.remoteBootstrap.active) {
-                WidgetsService.playRemoteWidget($scope.widget, options)
-                    .then(function (result) {
-                        console.log(['play remote result', result]);
-                        $scope.executionId = result.data;
-                        _pollStatus(1);
-                    }, function (err) {
-                        console.log(['play remote error', err]);
-                        _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
-                    });
-            }
-            else {
-                WidgetsService.playWidget($scope.widget, options)
-                    .then(function (result) {
-                        console.log(['play result', result]);
-                        $scope.executionId = result.data;
-                        _pollStatus(1);
-                    }, function (err) {
-                        console.log(['play error', err]);
-                        _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
-                    });
-            }
+            WidgetsService.playWidget($scope.widget, advancedParams, _isRemoteBootstrap())
+                .then(function (result) {
+                    console.log(['play result', result]);
+                    $scope.executionId = result.data;
+                    _pollStatus(1);
+                }, function (err) {
+                    console.log(['play error', err]);
+                    _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
+                });
         };
 
         $scope.stop = function () {
-            WidgetsService.stopWidget($scope.widget, $scope.executionId);
-            $scope.widgetStatus.state = stop;
-            _resetWidgetStatus();
+            WidgetsService.stopWidget($scope.widget, $scope.executionId, _isRemoteBootstrap()).then(function () {
+                $scope.widgetStatus.state = stop;
+                _resetWidgetStatus();
+            });
         };
+
+        $scope.getFormPath = function (widget) {
+            if (widget.remoteBootstrap && widget.remoteBootstrap.cloudifyForm) {
+                return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html';
+            }
+            return '';
+        };
+
+
+        WidgetsService.getWidget($routeParams.widgetId).then(function (result) {
+            $scope.widget = result.data;
+        });
+
 
         var emptyList = [];
 
@@ -153,16 +154,8 @@ angular.module('cloudifyWidgetUiApp')
                 });
         }
 
-
-        $scope.getFormPath = function (widget) {
-            if (widget.remoteBootstrap && widget.remoteBootstrap.cloudifyForm) {
-                return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html';
-            }
-            return '';
-        };
-
-        WidgetsService.getWidget($routeParams.widgetId).then(function (result) {
-            $scope.widget = result.data;
-        });
+        function _isRemoteBootstrap() {
+            return $scope.widget.remoteBootstrap && $scope.widget.remoteBootstrap.active;
+        }
 
     });

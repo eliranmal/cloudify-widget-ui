@@ -69,8 +69,7 @@ domain.run(function () {
     app.post('/backend/user/widgets/:widgetId/delete', controllers.widgets.delete);
     app.get('/backend/user/widgets/:widgetId', controllers.widgets.read);
     app.post('/backend/user/widgets/:widgetId/update', controllers.widgets.update);
-    app.post('/backend/user/widgets/:widgetId/play', function(req, res, next){ try{controllers.widgets.play(req, res)}catch(e){ logger.info('excepton caught'); next(e); }});
-    app.post('/backend/user/widgets/:widgetId/play/remote', controllers.widgets.playRemote);
+    app.post('/backend/user/widgets/:widgetId/play', controllers.widgets.play);
     app.post('/backend/user/widgets/:widgetId/executions/:executionId/stop', controllers.widgets.stop );
     app.get('/backend/user/widgets/:widgetId/executions/:executionId/status', controllers.widgets.getStatus );
     app.get('/backend/user/widgets/:widgetId/executions/:executionId/output', controllers.widgets.getOutput);

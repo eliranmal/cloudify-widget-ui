@@ -110,7 +110,7 @@ exports.play = function ( req, res ) {
 
     var playCallback = function (err, result) {
         if (!!err) {
-            logger.error('play remote failed', err);
+            logger.error('play failed', err);
             res.send(500, {message: 'play remote failed', error: err});
             return;
         }
@@ -121,7 +121,7 @@ exports.play = function ( req, res ) {
             return;
         }
 
-        logger.info('widget play remote initiated successfully, execution id is [%s]', result)
+        logger.info('widget play initiated successfully, execution id is [%s]', result)
         res.send(200, result);
     }
 

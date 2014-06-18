@@ -251,11 +251,16 @@ function _occupyMachine(curryParams, curryCallback) {
             return;
         }
 
-        try {
-            curryParams.nodeModel = JSON.parse(result);
-        } catch (e) {
-            curryCallback(e, curryParams);
+        var resultObj = result;
+        if (typeof result === 'string') {
+            try {
+                resultObj = JSON.parse(result);
+            } catch (e) {
+                curryCallback(e, curryParams);
+            }
         }
+
+        curryParams.nodeModel = resultObj;
 
         curryCallback(null, curryParams);
     });

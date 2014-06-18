@@ -186,7 +186,6 @@ angular.module('cloudifyWidgetUiApp')
 
 //            $scope.getUsers();
 //            $scope.getPools();
-            $log.debug('- - - refresh interval - - -');
             $scope.getPoolsStatus();
             if (angular.isDefined($scope.model.poolId)) {
                 $scope.getPoolStatus($scope.model.poolId);
@@ -201,7 +200,7 @@ angular.module('cloudifyWidgetUiApp')
             if (angular.isDefined($scope.model.accountId) && angular.isDefined($scope.model.poolId)) {
                 $scope.getAccountPool($scope.model.accountId, $scope.model.poolId);
             }
-        }, 1000 * 5);
+        }, 1000);
 
         $scope.$on('$destroy', function () {
             $interval.cancel(refreshInterval);

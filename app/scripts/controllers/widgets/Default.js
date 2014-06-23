@@ -46,6 +46,11 @@ angular.module('cloudifyWidgetUiApp')
                         delete $localStorage.widgetStatus;
                     }
                     break;
+                case 'played':
+                    $scope.executionId = data.executionId;
+                case 'stopped':
+                    $scope.widgetStatus.state = stop;
+                    _resetWidgetStatus();
                 default:
                     break;
             }
@@ -180,7 +185,6 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.stop = function () {
             _postStop($scope.widget, $scope.executionId, _isRemoteBootstrap);
-            _resetWidgetStatus();
 /*
             WidgetsService.stopWidget($scope.widget, $scope.executionId, _isRemoteBootstrap()).then(function () {
                 $scope.widgetStatus.state = stop;

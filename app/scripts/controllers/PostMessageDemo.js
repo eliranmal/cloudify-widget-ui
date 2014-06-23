@@ -3,6 +3,7 @@
 angular.module('cloudifyWidgetUiApp')
     .controller('PostMessageDemoCtrl', function ($scope, WidgetsService, $routeParams, $window, $location, $log, $timeout) {
 
+/*
         // using timeout only to test if deferred assignment of the url works with the iframe
         $timeout(function () {
             $scope.blankIframeSrc = 'http://localhost.com:9000/#/postmessagedemo/widgets/1/blank';
@@ -25,5 +26,6 @@ angular.module('cloudifyWidgetUiApp')
         $window.addEventListener('message', function (e) {
             $log.info('got message from widget api frame: ', e.data)
         });
+*/
 
     });

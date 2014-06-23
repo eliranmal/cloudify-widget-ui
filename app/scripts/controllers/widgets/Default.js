@@ -109,7 +109,7 @@ angular.module('cloudifyWidgetUiApp')
                 var left = (screen.width / 2) - (size.width / 2);
                 var top = (screen.height / 2) - (size.height / 2);
 
-                popupWindow = window.open('/#/widgets/' + $scope.widget._id + '/login/index', 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + size.width + ', height=' + size.height + ', top=' + top + ', left=' + left);
+                popupWindow = $window.open('/#/widgets/' + $scope.widget._id + '/login/index', 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + size.width + ', height=' + size.height + ', top=' + top + ', left=' + left);
                 return;
             }
 
@@ -203,7 +203,7 @@ angular.module('cloudifyWidgetUiApp')
             $log.info('posting message to widget api frame, message data: ', data);
             // TODO frame ref should not be hard-coded
             var widgetFrameWindow = $window.frames[0];
-            widgetFrameWindow.postMessage(data, $window.location.origin);
+            widgetFrameWindow.postMessage(data, /*$window.location.origin*/ '*');
         }
 
         // listen to incoming messages

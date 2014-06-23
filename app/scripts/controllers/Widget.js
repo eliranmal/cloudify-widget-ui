@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window,  $routeParams, PostParentService, $localStorage, $timeout) {
+    .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window, $routeParams, PostParentService, $localStorage, $timeout) {
 
 
 /*
@@ -100,14 +100,12 @@ angular.module('cloudifyWidgetUiApp')
         }
 
         function _postMessage(data) {
-            $window.parent.postMessage(data, $window.location.origin);
+            $window.parent.postMessage(data, /*$window.location.origin*/ '*');
         }
 
 //        $log.debug('listening to messages on ', $window);
         // listen to incoming messages
         $window.addEventListener('message', function (e) {
-            // FIXME why are duplicate events sent on stop?
-//            debugger;
             $log.info('- - - message received, user posted: ', e.data);
             if (!e.data) {
                 $log.error('unable to handle posted message, no data was found');

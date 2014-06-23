@@ -27,7 +27,7 @@ angular.module('cloudifyWidgetUiApp')
                 .then(function (result) {
                     console.log(['play result', result]);
                     var executionId = result.data;
-                    _postMessage('played', {executionId: executionId});
+                    _postPlayed(executionId);
                     _pollStatus(1, widget, executionId);
                 }, function (err) {
                     console.log(['play error', err]);
@@ -36,7 +36,7 @@ angular.module('cloudifyWidgetUiApp')
 
         function stop (widget, executionId, isRemoteBootstrap) {
             WidgetsService.stopWidget(widget, executionId, isRemoteBootstrap).then(function () {
-                _postMessage('stopped', {executionId: executionId});
+                _postStopped(executionId);
                 _resetWidgetStatus();
             });
         }
@@ -50,9 +50,9 @@ angular.module('cloudifyWidgetUiApp')
 
         function _handleStatus(status, myTimeout, widget, executionId) {
             $scope.widgetStatus = status;
-            _postMessage('status', result);
-            _getOutput($scope.widget);
-            $timeout(_pollStatus.bind(this, widget, executionId), myTimeout || 3000);
+            _postStatus(status);
+            _getOutput(widget, executionId);
+            $timeout(_pollStatus.bind(this, false, widget, executionId), myTimeout || 3000);
         }
 
         function _pollStatus(myTimeout, widget, executionId) {
@@ -74,7 +74,7 @@ angular.module('cloudifyWidgetUiApp')
             WidgetsService.getOutput(widget, executionId)
                 .then(function (result) {
                     var output = result.data.split('\n');
-                    _postMessage('output', output);
+                    _postOutput(output);
                 }, function (err) {
                     $log.error(err);
                 });
@@ -82,13 +82,32 @@ angular.module('cloudifyWidgetUiApp')
 
 
         // post outgoing messages
-        function _postMessage(name, data) {
-            $window.parent.postMessage({name: name, data: data}, $window.location.origin);
+
+        function _postStatus (status) {
+            _postMessage({name: 'status', data: status});
+        }
+
+        function _postOutput (output) {
+            _postMessage({name: 'output', data: output});
+        }
+
+        function _postPlayed (executionId) {
+            _postMessage({name: 'played', executionId: executionId});
+        }
+
+        function _postStopped (executionId) {
+            _postMessage({name: 'stopped', executionId: executionId});
+        }
+
+        function _postMessage(data) {
+            $window.parent.postMessage(data, $window.location.origin);
         }
 
 //        $log.debug('listening to messages on ', $window);
         // listen to incoming messages
         $window.addEventListener('message', function (e) {
+            // FIXME why are duplicate events sent on stop?
+//            debugger;
             $log.info('- - - message received, user posted: ', e.data);
             if (!e.data) {
                 $log.error('unable to handle posted message, no data was found');

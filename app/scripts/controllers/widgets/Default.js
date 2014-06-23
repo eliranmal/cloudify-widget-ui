@@ -8,55 +8,6 @@ angular.module('cloudifyWidgetUiApp')
         // it will also hold the state for the view (which is now coupled inside Widget.js controller, and should be extracted from there)
 
 
-        // TODO frame ref should not be hard-coded
-        var widgetFrame = $window.frames[1];
-
-
-        // post outgoing messages
-        function _postPlay (widget, advancedParams, isRemoteBootstrap) {
-            _postMessage({name: 'play', widget: widget, advancedParams: advancedParams, isRemoteBootstrap: isRemoteBootstrap});
-        }
-
-        function _postStop (widget, executionId, isRemoteBootstrap) {
-            _postMessage({name: 'stop', widget: widget, executionId: executionId, isRemoteBootstrap: isRemoteBootstrap});
-        }
-
-        function _postMessage (data) {
-            $log.info('posting message [' + data + '] to widget api frame');
-            widgetFrame.postMessage(data, $window.location.origin);
-        }
-
-        // listen to incoming messages
-        $window.addEventListener('message', function (e) {
-            $log.info('got message from widget api frame: ', e.data)
-            if (!e.data) {
-                $log.error('unable to handle received message, no data was found');
-                return;
-            }
-            var data = e.data;
-            switch (data.name) {
-                case 'output':
-                    _handleOutput($scope.widget, data.data)
-                    break;
-                case 'status':
-                    if ($scope.widgetStatus.state !== stop) {
-                        _handleStatus(data.data);
-                    } else {
-                        $log.info('removing widget status from local storage');
-                        delete $localStorage.widgetStatus;
-                    }
-                    break;
-                case 'played':
-                    $scope.executionId = data.executionId;
-                case 'stopped':
-                    $scope.widgetStatus.state = stop;
-                    _resetWidgetStatus();
-                default:
-                    break;
-            }
-        });
-
-
         // todo this should be inside the widget controller
         $scope.$watch('widget', function (n, o, s) {
             n && ($scope.blankIframeSrc = $sce.trustAsResourceUrl('/#/widgets/' + $scope.widget._id + '/blank'));
@@ -67,23 +18,23 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.collapseAdvanced = false;
         $scope.widgetStatus = {};
-        var play = 'RUNNING';
-        var stop = 'STOPPED';
+        var RUNNING_STATE = 'RUNNING';
+        var STOPPED_STATE = 'STOPPED';
         var ellipsisIndex = 0;
 
 
         $scope.showPlay = function () {
-            return $scope.widgetStatus.state === stop;
+            return $scope.widgetStatus.state === STOPPED_STATE;
         };
 
         $scope.showStop = function () {
-            return $scope.widgetStatus.state === play;
+            return $scope.widgetStatus.state === RUNNING_STATE;
         };
 
 
         function _resetWidgetStatus() {
             $scope.widgetStatus = {
-                'state': stop,
+                'state': STOPPED_STATE,
                 'reset': true
             };
         }
@@ -163,7 +114,7 @@ angular.module('cloudifyWidgetUiApp')
             }
 
             _resetWidgetStatus();
-            $scope.widgetStatus.state = play;
+            $scope.widgetStatus.state = RUNNING_STATE;
             var advancedParams = _hasAdvanced() ? _getAdvanced() : null;
             console.log('advanced params: ', advancedParams, '_hasAdvanced()=', _hasAdvanced());
 
@@ -184,7 +135,7 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.stop = function () {
-            _postStop($scope.widget, $scope.executionId, _isRemoteBootstrap);
+            _postStop($scope.widget, $scope.executionId, _isRemoteBootstrap());
 /*
             WidgetsService.stopWidget($scope.widget, $scope.executionId, _isRemoteBootstrap()).then(function () {
                 $scope.widgetStatus.state = stop;
@@ -236,5 +187,54 @@ angular.module('cloudifyWidgetUiApp')
         function _isRemoteBootstrap() {
             return $scope.widget.remoteBootstrap && $scope.widget.remoteBootstrap.active;
         }
+
+
+
+        // post outgoing messages
+        function _postPlay (widget, advancedParams, isRemoteBootstrap) {
+            _postMessage({name: 'play', widget: widget, advancedParams: advancedParams, isRemoteBootstrap: isRemoteBootstrap});
+        }
+
+        function _postStop (widget, executionId, isRemoteBootstrap) {
+            _postMessage({name: 'stop', widget: widget, executionId: executionId, isRemoteBootstrap: isRemoteBootstrap});
+        }
+
+        function _postMessage (data) {
+            $log.info('posting message to widget api frame, message data: ', data);
+            // TODO frame ref should not be hard-coded
+            var widgetFrameWindow = $window.frames[0];
+            widgetFrameWindow.postMessage(data, $window.location.origin);
+        }
+
+        // listen to incoming messages
+        $window.addEventListener('message', function (e) {
+            $log.info('- got message from widget api frame: ', e.data)
+            if (!e.data) {
+                $log.error('unable to handle received message, no data was found');
+                return;
+            }
+            var data = e.data;
+            switch (data.name) {
+                case 'output':
+                    _handleOutput($scope.widget, data.data)
+                    break;
+                case 'status':
+                    if ($scope.widgetStatus.state !== STOPPED_STATE) {
+                        _handleStatus(data.data);
+                    } else {
+                        $log.info('removing widget status from local storage');
+                        delete $localStorage.widgetStatus;
+                    }
+                    break;
+                case 'played':
+                    $scope.executionId = data.executionId;
+                case 'stopped':
+                    $scope.widgetStatus.state = STOPPED_STATE;
+                    _resetWidgetStatus();
+                default:
+                    break;
+            }
+        });
+
 
     });

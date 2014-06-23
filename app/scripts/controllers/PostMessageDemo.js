@@ -16,10 +16,6 @@ angular.module('cloudifyWidgetUiApp')
             _postMessage({name: 'stop', widget: {_id: 'abc'}, executionId: 'abc', isRemoteBootstrap: false});
         };
 
-        $scope.getOutput = function () {
-            _postMessage({name: 'getOutput', widget: {_id: 'abc'}, executionId: 'abc'});
-        };
-
         function _postMessage (data) {
             $log.info('posting message to widget api frame');
 //            $log.info('origin: ', $window.location.origin);

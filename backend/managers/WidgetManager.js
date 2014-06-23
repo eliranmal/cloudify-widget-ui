@@ -93,7 +93,7 @@ exports.getStatus = function (executionId, callback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
 
-            logger.info('get status result: ', result);
+//            logger.debug('get status result: ', result);
             if (!!err) {
                 callback(err);
                 done();

@@ -12,14 +12,6 @@ angular.module('cloudifyWidgetUiApp')
             },
             controller: function ($scope, $element) {
 
-                // TODO test this in this level (widget-embed)
-                $timeout(function () {
-                    $scope.blankIframeSrc = 'http://localhost.com:9000/#/widgets/1/blank';
-                }, 1000);
-
-//                $log.info('$scope.theme: ', $scope.theme);
-//                $log.info('$scope.widget: ', $scope.widget);
-
                 $scope.timestamp = new Date().getTime();
 
                 $scope.getIframeWidth = function () {

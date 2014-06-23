@@ -1,27 +1,18 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window,  $routeParams, PostParentService, $localStorage, $timeout) {
-
-
-/*
- $scope.$watch('widget', function (n, o, s) {
- n && ($scope.blankIframeSrc = $sce.trustAsResourceUrl('/#/widgets/' + $scope.widget._id + '/blank'));
- });
-*/
-
-
+    .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window, $routeParams, PostParentService, $localStorage, $timeout) {
 
         // we need to hold the running state to determine when to stop sending status/output messages back
         $scope.widgetStatus = {};
-        var STATUS_RUNNING = 'RUNNING';
-        var STATUS_STOPPED = 'STOPPED';
+        var STATE_RUNNING = 'RUNNING';
+        var STATE_STOPPED = 'STOPPED';
 
 
         function play (widget, advancedParams, isRemoteBootstrap) {
 
             _resetWidgetStatus();
-            $scope.widgetStatus.state = STATUS_RUNNING;
+            $scope.widgetStatus.state = STATE_RUNNING;
 
             WidgetsService.playWidget(widget, advancedParams, isRemoteBootstrap)
                 .then(function (result) {
@@ -43,7 +34,7 @@ angular.module('cloudifyWidgetUiApp')
 
         function _resetWidgetStatus() {
             $scope.widgetStatus = {
-                'state': STATUS_STOPPED,
+                'state': STATE_STOPPED,
                 'reset': true
             };
         }
@@ -57,7 +48,7 @@ angular.module('cloudifyWidgetUiApp')
 
         function _pollStatus(myTimeout, widget, executionId) {
 
-            if ($scope.widgetStatus.state !== STATUS_STOPPED) { // keep polling until widget stops ==> mainly for timeleft..
+            if ($scope.widgetStatus.state !== STATE_STOPPED) { // keep polling until widget stops ==> mainly for timeleft..
                 WidgetsService.getStatus(widget, executionId).then(function (result) {
                     if (!result) {
                         return;
@@ -100,14 +91,12 @@ angular.module('cloudifyWidgetUiApp')
         }
 
         function _postMessage(data) {
-            $window.parent.postMessage(data, $window.location.origin);
+            $window.parent.postMessage(data, /*$window.location.origin*/ '*');
         }
 
 //        $log.debug('listening to messages on ', $window);
         // listen to incoming messages
         $window.addEventListener('message', function (e) {
-            // FIXME why are duplicate events sent on stop?
-//            debugger;
             $log.info('- - - message received, user posted: ', e.data);
             if (!e.data) {
                 $log.error('unable to handle posted message, no data was found');

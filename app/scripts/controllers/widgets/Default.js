@@ -8,7 +8,6 @@ angular.module('cloudifyWidgetUiApp')
         // it will also hold the state for the view (which is now coupled inside Widget.js controller, and should be extracted from there)
 
 
-        // todo this should be inside the widget controller
         $scope.$watch('widget', function (n, o, s) {
             n && ($scope.blankIframeSrc = $sce.trustAsResourceUrl('/#/widgets/' + $scope.widget._id + '/blank'));
         });
@@ -18,23 +17,23 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.collapseAdvanced = false;
         $scope.widgetStatus = {};
-        var RUNNING_STATE = 'RUNNING';
-        var STOPPED_STATE = 'STOPPED';
+        var STATE_RUNNING = 'RUNNING';
+        var STATE_STOPPED = 'STOPPED';
         var ellipsisIndex = 0;
 
 
         $scope.showPlay = function () {
-            return $scope.widgetStatus.state === STOPPED_STATE;
+            return $scope.widgetStatus.state === STATE_STOPPED;
         };
 
         $scope.showStop = function () {
-            return $scope.widgetStatus.state === RUNNING_STATE;
+            return $scope.widgetStatus.state === STATE_RUNNING;
         };
 
 
         function _resetWidgetStatus() {
             $scope.widgetStatus = {
-                'state': STOPPED_STATE,
+                'state': STATE_STOPPED,
                 'reset': true
             };
         }
@@ -54,35 +53,14 @@ angular.module('cloudifyWidgetUiApp')
             log.scrollTop = log.scrollHeight;
         }
 
-        function _handleStatus(status/*, myTimeout*/) {
+        function _handleStatus(status) {
 
-            $log.info(['got status', status]);
+            $log.debug(['got status', status]);
             $localStorage.widgetStatus = status;
             ellipsisIndex = ellipsisIndex + 1;
             $scope.widgetStatus = status;
-//            _getOutput($scope.widget);
-//            $timeout(_pollStatus, myTimeout || 3000);
             _scrollLog();
         }
-
-/*
-        function _pollStatus(myTimeout) {
-
-            if ($scope.widgetStatus.state !== stop) { // keep polling until widget stops ==> mainly for timeleft..
-                WidgetsService.getStatus($scope.widget, $scope.executionId).then(function (result) {
-                    if (!result) {
-                        return;
-                    }
-                    _handleStatus(result.data, myTimeout);
-                }, function (result) {
-                    $log.error(['status error', result]);
-                });
-            } else {
-                $log.info('removing widget status');
-                delete $localStorage.widgetStatus;
-            }
-        }
-*/
 
         // use this with the following from the popup window:
         //
@@ -109,39 +87,21 @@ angular.module('cloudifyWidgetUiApp')
                 var left = (screen.width / 2) - (size.width / 2);
                 var top = (screen.height / 2) - (size.height / 2);
 
-                popupWindow = window.open('/#/widgets/' + $scope.widget._id + '/login/index', 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + size.width + ', height=' + size.height + ', top=' + top + ', left=' + left);
+                popupWindow = $window.open('/#/widgets/' + $scope.widget._id + '/login/index', 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + size.width + ', height=' + size.height + ', top=' + top + ', left=' + left);
                 return;
             }
 
             _resetWidgetStatus();
-            $scope.widgetStatus.state = RUNNING_STATE;
+            $scope.widgetStatus.state = STATE_RUNNING;
             var advancedParams = _hasAdvanced() ? _getAdvanced() : null;
             console.log('advanced params: ', advancedParams, '_hasAdvanced()=', _hasAdvanced());
 
             _postPlay($scope.widget, advancedParams, _isRemoteBootstrap());
 
-            // TODO implement calls to pollStatus on status message received
-            /*
-             WidgetsService.playWidget($scope.widget, advancedParams, _isRemoteBootstrap())
-             .then(function (result) {
-             console.log(['play result', result]);
-             $scope.executionId = result.data;
-             _pollStatus(1);
-             }, function (err) {
-             console.log(['play error', err]);
-             _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
-             });
-             */
         };
 
         $scope.stop = function () {
             _postStop($scope.widget, $scope.executionId, _isRemoteBootstrap());
-/*
-            WidgetsService.stopWidget($scope.widget, $scope.executionId, _isRemoteBootstrap()).then(function () {
-                $scope.widgetStatus.state = stop;
-                _resetWidgetStatus();
-            });
-*/
         };
 
         $scope.getFormPath = function (widget) {
@@ -158,23 +118,6 @@ angular.module('cloudifyWidgetUiApp')
 
 
         var emptyList = [];
-
-/*
-        function _getOutput(widget) {
-//            $log.debug('> > > get output, widget id: ', widget ? widget._id : '', ', execution id: ', $scope.executionId);
-
-            if (!widget || !$scope.executionId) {
-                $scope.output = emptyList;
-            }
-
-            WidgetsService.getOutput(widget, $scope.executionId)
-                .then(function (result) {
-                    $scope.output = result.data.split('\n');
-                }, function (err) {
-                    $log.error(err);
-                });
-        }
-*/
 
         function _handleOutput(widget, output) {
 
@@ -203,7 +146,7 @@ angular.module('cloudifyWidgetUiApp')
             $log.info('posting message to widget api frame, message data: ', data);
             // TODO frame ref should not be hard-coded
             var widgetFrameWindow = $window.frames[0];
-            widgetFrameWindow.postMessage(data, $window.location.origin);
+            widgetFrameWindow.postMessage(data, /*$window.location.origin*/ '*');
         }
 
         // listen to incoming messages
@@ -219,17 +162,17 @@ angular.module('cloudifyWidgetUiApp')
                     _handleOutput($scope.widget, data.data)
                     break;
                 case 'status':
-                    if ($scope.widgetStatus.state !== STOPPED_STATE) {
+                    if ($scope.widgetStatus.state !== STATE_STOPPED) {
                         _handleStatus(data.data);
                     } else {
-                        $log.info('removing widget status from local storage');
+                        $log.debug('removing widget status from local storage');
                         delete $localStorage.widgetStatus;
                     }
                     break;
                 case 'played':
                     $scope.executionId = data.executionId;
                 case 'stopped':
-                    $scope.widgetStatus.state = STOPPED_STATE;
+                    $scope.widgetStatus.state = STATE_STOPPED;
                     _resetWidgetStatus();
                 default:
                     break;

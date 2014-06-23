@@ -146,15 +146,6 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 controller: 'WidgetCtrl'
             })
 
-            .when('/postmessagedemo',{
-                templateUrl: 'views/postmessagedemo/demodefault.html',
-                controller: 'PostMessageDemoCtrl'
-            })
-            .when('/postmessagedemo/widgets/:widgetId/blank',{
-                templateUrl: 'views/widget/themes/blank.html',
-                controller: 'WidgetCtrl'
-            })
-
             .when('/admin/pools/:poolId/combinedView', {
                 templateUrl: 'views/pools/combinedStatusView.html'
             })

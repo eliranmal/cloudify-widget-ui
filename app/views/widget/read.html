@@ -3,4 +3,13 @@
     <a href="#/dashboard">Dashboard</a>
     <pre>{{widgetAsJson()}}</pre>
     <div widget-embed widget="widget"></div>
+
+    <!--post message inner frame test-->
+    <div ng-controller="WidgetsDefaultCtrl">
+        <button ng-click="postPlay()">post play</button>
+        <button ng-click="postStop()">post stop</button>
+        <button ng-click="postGetOutput()">post getOutput</button>
+        <iframe id="api-frame" name="api-frame" width="100%" height="100"
+                ng-src="{{blankIframeSrc}}"></iframe>
+    </div>
 </div>

@@ -24,7 +24,7 @@ angular.module('cloudifyWidgetUiApp')
             $log.info('posting message to widget api frame');
 //            $log.info('origin: ', $window.location.origin);
             $window.frames[0].postMessage(data, $window.location.origin);
-        };
+        }
 
         $window.addEventListener('message', function (e) {
             $log.info('got message from widget api frame: ', e.data)

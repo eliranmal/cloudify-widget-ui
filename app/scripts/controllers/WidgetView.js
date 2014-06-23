@@ -13,8 +13,7 @@ angular.module('cloudifyWidgetUiApp')
                 return '';
             } else {
                 var widgetTheme = $scope.widget.theme || 'default';
-                var includeResult = 'views/widget/themes/' + widgetTheme + '.html';
-                return includeResult;
+                return 'views/widget/themes/' + widgetTheme + '.html';
             }
         };
     });

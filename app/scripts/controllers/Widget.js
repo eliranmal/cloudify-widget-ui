@@ -3,6 +3,23 @@
 angular.module('cloudifyWidgetUiApp')
     .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window,  $routeParams, PostParentService, $localStorage, $timeout) {
 
+
+/*
+        $scope.$watch('widget', function (n, o, s) {
+            if (n) {
+                $log.info('changing blank iframe src...');
+//                $scope.blankIframeSrc = $sce.trustAsResourceUrl('/#/widgets/' + $scope.widget._id + '/blank');
+
+                $log.info(widgetFrame.frameElement);
+            }
+        });
+*/
+
+
+
+
+        // TODO extract all state related behavior to widget-theme-controllers (e.g. DefaultCtrl)
+
         $window.$windowScope = $scope;
 
         $scope.collapseAdvanced = false;
@@ -157,5 +174,26 @@ angular.module('cloudifyWidgetUiApp')
         function _isRemoteBootstrap() {
             return $scope.widget.remoteBootstrap && $scope.widget.remoteBootstrap.active;
         }
+
+
+        $log.debug('listening to messages on ', $window);
+        // listen to incoming messages
+        $window.addEventListener('message', function (result) {
+            $log.info('- - - message received, user posted: ', result.data);
+            switch (result.data) {
+                case 'play':
+
+                    // TODO call play
+
+                    // emulate outgoing output response
+                    $timeout(function () {
+                        $window.parent.postMessage('loaded', $window.location.origin);
+                    }, 1000);
+
+                    break;
+                case 'data':
+                    break;
+            }
+        });
 
     });

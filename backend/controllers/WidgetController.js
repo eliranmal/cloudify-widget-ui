@@ -111,7 +111,7 @@ exports.play = function ( req, res ) {
     var playCallback = function (err, result) {
         if (!!err) {
             logger.error('play failed', err);
-            res.send(500, {message: 'play remote failed', error: err});
+            res.send(500, {message: 'play failed', error: err});
             return;
         }
 

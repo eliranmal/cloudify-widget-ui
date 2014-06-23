@@ -11,7 +11,17 @@ angular.module('cloudifyWidgetUiApp')
 */
 
 
+
+        // we need to hold the running state to determine when to stop sending status/output messages back
+        $scope.widgetStatus = {};
+        var STATUS_RUNNING = 'RUNNING';
+        var STATUS_STOPPED = 'STOPPED';
+
+
         function play (widget, advancedParams, isRemoteBootstrap) {
+
+            _resetWidgetStatus();
+            $scope.widgetStatus.state = STATUS_RUNNING;
 
             WidgetsService.playWidget(widget, advancedParams, isRemoteBootstrap)
                 .then(function (result) {
@@ -27,13 +37,16 @@ angular.module('cloudifyWidgetUiApp')
         function stop (widget, executionId, isRemoteBootstrap) {
             WidgetsService.stopWidget(widget, executionId, isRemoteBootstrap).then(function () {
                 _postMessage('stopped', {executionId: executionId});
+                _resetWidgetStatus();
             });
         }
 
-        // we need to hold the running state to determine when to stop sending status/output messages back
-        $scope.widgetStatus = {};
-        var play = 'RUNNING';
-        var stop = 'STOPPED';
+        function _resetWidgetStatus() {
+            $scope.widgetStatus = {
+                'state': STATUS_STOPPED,
+                'reset': true
+            };
+        }
 
         function _handleStatus(status, myTimeout, widget, executionId) {
             $scope.widgetStatus = status;
@@ -44,7 +57,7 @@ angular.module('cloudifyWidgetUiApp')
 
         function _pollStatus(myTimeout, widget, executionId) {
 
-            if ($scope.widgetStatus.state !== stop) { // keep polling until widget stops ==> mainly for timeleft..
+            if ($scope.widgetStatus.state !== STATUS_STOPPED) { // keep polling until widget stops ==> mainly for timeleft..
                 WidgetsService.getStatus(widget, executionId).then(function (result) {
                     if (!result) {
                         return;

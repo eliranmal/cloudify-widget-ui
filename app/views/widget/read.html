@@ -6,9 +6,8 @@
 
     <!--post message inner frame test-->
     <div ng-controller="WidgetsDefaultCtrl">
-        <button ng-click="postPlay()">post play</button>
-        <button ng-click="postStop()">post stop</button>
-        <button ng-click="postGetOutput()">post getOutput</button>
+        <button ng-click="play()">post play</button>
+        <button ng-click="stop()">post stop</button>
         <iframe id="api-frame" name="api-frame" width="100%" height="100"
                 ng-src="{{blankIframeSrc}}"></iframe>
     </div>

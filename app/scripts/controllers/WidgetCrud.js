@@ -1,14 +1,7 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, LoginTypesService, WidgetsService, $location, WidgetThemesService, $window, $timeout) {
-
-
-/*
-        $timeout(function () {
-            $scope.blankIframeSrc = 'http://localhost.com:9000/#/widgets/1/blank';
-        }, 1000);
-*/
+    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, LoginTypesService, WidgetsService, $location, WidgetThemesService, $window) {
 
 
         $scope.availableLoginTypes = function () {

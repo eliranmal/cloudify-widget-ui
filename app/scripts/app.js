@@ -49,7 +49,7 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
             }
         };
     })
-    .config(function ($routeProvider, $httpProvider, $logProvider) {
+    .config(function ($routeProvider, $httpProvider, $logProvider, $locationProvider) {
         $routeProvider
             .when('/demo', {
                 templateUrl: 'views/demo.html',
@@ -167,5 +167,10 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
 
         $httpProvider.interceptors.push('myHttpInterceptor');
 
+        // we use html5-mode in order for iframe url resolving to work properly
+        // this is necessary when nesting iframes in the widget
+        $locationProvider.html5Mode(true);
+
         $logProvider.debugEnabled(false);
+
     });

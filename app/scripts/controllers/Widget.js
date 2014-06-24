@@ -3,6 +3,8 @@
 angular.module('cloudifyWidgetUiApp')
     .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window, $routeParams, PostParentService, $localStorage, $timeout) {
 
+        $log.info('loading WidgetCtrl');
+
         // we need to hold the running state to determine when to stop sending status/output messages back
         $scope.widgetStatus = {};
         var STATE_RUNNING = 'RUNNING';

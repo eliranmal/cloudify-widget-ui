@@ -14,7 +14,9 @@
         <!-- build:css({.tmp,app}) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
-</head>
+
+      <base href="/">
+  </head>
   <body ng-app="cloudifyWidgetUiApp">
     <!--[if lt IE 7]>
       <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
@@ -93,6 +95,7 @@
       <script src="scripts/services/CustomLogin.js"></script>
       <script src="scripts/services/TextContentCompiler.js"></script>
       <script src="scripts/controllers/widgets/Default.js"></script>
+      <script src="scripts/directives/apiFrame.js"></script>
       <!-- endbuild -->
 </body>
 </html>

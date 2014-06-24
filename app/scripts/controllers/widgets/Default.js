@@ -8,11 +8,6 @@ angular.module('cloudifyWidgetUiApp')
         // it will also hold the state for the view (which is now coupled inside Widget.js controller, and should be extracted from there)
 
 
-        $scope.$watch('widget', function (n, o, s) {
-            n && ($scope.blankIframeSrc = $sce.trustAsResourceUrl('/#/widgets/' + $scope.widget._id + '/blank'));
-        });
-
-
         $window.$windowScope = $scope;
 
         $scope.collapseAdvanced = false;

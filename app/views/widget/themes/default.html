@@ -1,7 +1,9 @@
 <div class="default-theme" ng-controller="WidgetsDefaultCtrl">
 
-    <!-- TODO FIXME figure out how to put inner frame without it being empty -->
-    <!--<iframe id="api-frame" ng-src="{{blankIframeSrc}}"></iframe>-->
+
+    <!-- embed the api frame to catch and send post messages -->
+    <div api-frame widget-id="widget._id"></div>
+
 
     <img src="/images/beta.png" class="beta-ribbon" />
     <span id="title">{{widget.title}}</span>

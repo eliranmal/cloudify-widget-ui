@@ -56,58 +56,6 @@ angular.module('cloudifyWidgetUiApp')
                 if (attrs.asCode) {
                     scope.compileToText();
                 }
-
-/*
-
- var iframeEl = element.find('iframe');
- var iframeDomWindow = iframeEl[0].contentWindow;
-
-                // listen to incoming messages
-                iframeDomWindow.addEventListener('message', function (result) {
-                    $log.info('- - - message received, user posted: ', result.data);
-                    switch (result.data) {
-                        case 'play':
-
-                            // send event to call play
-                            $timeout(function () {
-                                scope.$broadcast('$incomingPostMessage', 'play');
-                            }, 1000);
-
-                            // emulate outgoing output response
-*/
-/*
-                            $timeout(function () {
-                                var w = findWindowByOrigin(result.origin, iframeDomWindow);
-                                w.postMessage('loaded', $window.location.origin);
-                            }, 1000);
-*//*
-
-
-                            break;
-                        case 'data':
-                            break;
-                    }
-                });
-                $rootScope.apiIframeWindow = iframeDomWindow;
-
-
-                */
-/**
-                 * traverses up the window hierarchy to find a window matching the origin address.
-                 *
-                 * @param origin the origin address ([protocol]://[host]:[port])
-                 * @param w a window object to start the search from
-                 * @returns {*}
-                 *//*
-
-                function findWindowByOrigin (origin, w) {
-                    if (w.location.origin === origin) {
-                        return w;
-                    }
-                    return findWindowByOrigin(origin, w.parent);
-                }
-*/
-
             }
         };
     });
